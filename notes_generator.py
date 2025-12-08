@@ -8,13 +8,63 @@ import requests
 # 1. DSA Topic Roadmap
 # ---------------------------
 dsa_topics = [
-    "Arrays Basics", "Arrays Problems", "Time and Space Complexity",
-    "Pointers in C++", "Recursion Basics", "Recursion Problems",
-    "Linked List Basics", "Doubly Linked List", "Stacks Implementation",
-    "Queues Implementation", "Binary Trees Basics", "Tree Traversals",
-    "Binary Search Tree", "Graphs Basics", "Graph Traversals (BFS/DFS)",
-    "Dynamic Programming Intro", "Knapsack Problems", "Greedy Algorithms",
-    "Sliding Window Techniques"
+    # --- PHASE 1: BASICS & FOUNDATION (Existing) ---
+    "Arrays Basics", 
+    "Arrays Problems", 
+    "Time and Space Complexity",
+    "Pointers in C++", 
+    "Recursion Basics", 
+    "Recursion Problems",
+    "Linked List Basics", 
+    "Doubly Linked List", 
+    "Stacks Implementation",
+    "Queues Implementation", 
+    "Binary Trees Basics", 
+    "Tree Traversals",
+    "Binary Search Tree", 
+    "Graphs Basics", 
+    "Graph Traversals (BFS/DFS)",
+    "Dynamic Programming Intro", 
+    "Knapsack Problems", 
+    "Greedy Algorithms",
+    "Sliding Window Techniques",
+
+    # --- PHASE 2: INTERMEDIATE ALGORITHMS ---
+    "Two Pointer Technique",
+    "Binary Search Basics",
+    "Binary Search on Answer",
+    "Sorting Algorithms (Merge Sort, Quick Sort)",
+    "Hashing and HashMaps",
+    "String Manipulation Basics",
+    "String Matching (KMP, Rabin-Karp)",
+    "Backtracking Basics",
+    "N-Queens & Sudoku Solver",
+    
+    # --- PHASE 3: ADVANCED DATA STRUCTURES ---
+    "Heaps and Priority Queues",
+    "Trie Data Structure",
+    "Disjoint Set Union (DSU)",
+    "Segment Trees",
+    "Fenwick Trees (Binary Indexed Tree)",
+    
+    # --- PHASE 4: ADVANCED GRAPHS ---
+    "Shortest Path (Dijkstra's Algorithm)",
+    "Bellman-Ford Algorithm",
+    "Floyd-Warshall Algorithm",
+    "Minimum Spanning Tree (Prim's & Kruskal's)",
+    "Topological Sort (Kahn's Algorithm)",
+    "Strongly Connected Components (Kosaraju/Tarjan)",
+    "Bridges and Articulation Points",
+    
+    # --- PHASE 5: ADVANCED DP & MATH ---
+    "Longest Common Subsequence (LCS)",
+    "Longest Increasing Subsequence (LIS)",
+    "Matrix Chain Multiplication",
+    "DP on Trees",
+    "DP on Bitmasks",
+    "Bit Manipulation Basics",
+    "Math for DSA (GCD, Primes, Sieve of Eratosthenes)",
+    "Game Theory Basics"
 ]
 
 # ---------------------------
