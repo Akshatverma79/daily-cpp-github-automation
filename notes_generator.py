@@ -45,47 +45,51 @@ topic = dsa_topics[index % len(dsa_topics)]
 # ---------------------------
 # 3. Generate Notes with Gemini API
 # ---------------------------
+
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    raise ValueError("❌ API Key is missing! Check your GitHub Secrets.")
+    print("❌ Error: API Key is missing.")
+    exit(1)
 
-# FIX: Remove accidental spaces/newlines from the key
-api_key = api_key.strip() 
+# Clean the key
+api_key = api_key.strip()
 
-url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+print(f"🔑 Checking Key: {api_key[:5]}... (hidden)")
 
-prompt = f"""
-Generate a clean and simple DSA learning note.
-Topic: {topic}
-Language: C++
-Explain: concept, importance, small example, C++ implementation.
-Keep it short.
-"""
+# 1. Ask Google to list ALL available models for this key
+url = f"https://generativelanguage.googleapis.com/v1beta/models?key={api_key}"
 
-# Safety check for the 'requests' library
 try:
-    import requests
-except ImportError:
-    raise ImportError("❌ The 'requests' library is missing. You need to install it in your YAML file.")
+    response = requests.get(url)
+    data = response.json()
 
-response = requests.post(
-    url,
-    json={"contents": [{"parts": [{"text": prompt}]}]},
-    headers={"Content-Type": "application/json"}
-)
+    if "error" in data:
+        print(f"\n❌ API CONNECTION FAILED:")
+        print(f"Error Code: {data['error']['code']}")
+        print(f"Message: {data['error']['message']}")
+    else:
+        print("\n✅ API CONNECTION SUCCESSFUL!")
+        print("Your key has access to these models:")
+        available_models = [m['name'] for m in data.get('models', [])]
+        
+        found_flash = False
+        for model in available_models:
+            print(f" - {model}")
+            if "gemini-1.5-flash" in model:
+                found_flash = True
+        
+        print("\n-----------------------------------")
+        if found_flash:
+            print("🎉 GOOD NEWS: 'models/gemini-1.5-flash' IS available!")
+            print("If you see this, the error might be a typo in your previous URL.")
+        else:
+            print("⚠️ BAD NEWS: 'gemini-1.5-flash' is NOT in the list.")
+            print("This means your Project (in Google AI Studio) does not have 1.5 Flash enabled.")
+            print("Try using 'models/gemini-pro' instead, as it is usually available.")
 
-result = response.json()
-
-# FIX: Check if Google sent an error instead of crashing
-if "error" in result:
-    raise Exception(f"❌ Google API Error: {result['error']['message']}")
-
-# Proceed only if successful
-if "candidates" in result:
-    note = result["candidates"][0]["content"]["parts"][0]["text"]
-else:
-    raise Exception("❌ Unexpected response format from Google (No candidates found).")
+except Exception as e:
+    print(f"❌ Script crashed: {e}")
 
 # ---------------------------
 # 4. Save notes
