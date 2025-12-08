@@ -22,3 +22,22 @@ int main() {
     return 0;
 }
 ```
+
+
+## 🧠 Level: Beginner
+### Topic: Virtual Functions and Polymorphism
+
+I spent time understanding Virtual Functions and Polymorphism. A strong grasp of this topic makes debugging much easier. A strong grasp of this topic makes debugging much easier. A strong grasp of this topic makes debugging much easier. 
+
+🕒 2025-12-08 09:36:39
+
+### Example
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Daily C++ practice builds mastery!";
+    return 0;
+}
+```
