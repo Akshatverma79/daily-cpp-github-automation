@@ -69,7 +69,7 @@ int main() {{
     cout << "Daily C++ practice builds mastery!";
     return 0;
 }}
----
+```
 """
 
 with open("cpp_notes.md", "a", encoding="utf-8") as file:
