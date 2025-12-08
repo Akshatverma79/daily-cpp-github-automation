@@ -7,10 +7,10 @@
 ## 📖 Overview
 This repository serves as an **automated daily learning log** for Data Structures and Algorithms (DSA) in C++. 
 
-It leverages **GitHub Actions** and **Google's Gemini AI** to generate concise, high-quality study notes, code snippets, and explanations for various DSA topics. The system automatically commits these updates to the repository multiple times a day, maintaining an active and consistent contribution graph.
+It leverages **GitHub Actions** and **Google's Gemini AI** to generate concise, high-quality study notes, code snippets, and explanations for various DSA topics. The system automatically commits these updates to the repository twice a day, maintaining an active and consistent contribution graph.
 
 ## ⚙️ How It Works
-The automation pipeline runs on a scheduled cron job (5 times daily) and performs the following steps:
+The automation pipeline runs on a scheduled cron job (**2 times daily**) and performs the following steps:
 
 1.  **Topic Selection:** The script reads a `progress.json` file to pick the next topic from a curated DSA roadmap (e.g., *Arrays, Linked Lists, DP, Graphs*).
 2.  **AI Generation:** It sends a prompt to the **Gemini 2.5 Flash API**, requesting a definition, importance, and a C++ code example for the topic.
@@ -25,8 +25,9 @@ The automation pipeline runs on a scheduled cron job (5 times daily) and perform
 * **Version Control:** Git (Automated Pull/Rebase/Push)
 
 ## 📅 Schedule
-The workflow is configured to trigger automatically at the following UTC times:
-* `01:30` | `05:30` | `09:30` | `13:30` | `17:30`
+The workflow is configured to trigger automatically at the following times:
+* **Morning:** 11:30 AM IST (06:00 UTC)
+* **Evening:** 07:20 PM IST (13:50 UTC)
 
 ## 📂 Repository Structure
 * `cpp_notes.md`: The main file containing the accumulated learning notes.
