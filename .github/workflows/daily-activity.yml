@@ -20,6 +20,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Install Dependencies
+      run: pip install requests
+
     - name: Generate C++ Notes
       env: 
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

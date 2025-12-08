@@ -46,22 +46,28 @@ topic = dsa_topics[index % len(dsa_topics)]
 # 3. Generate Notes with Gemini API
 # ---------------------------
 api_key = os.getenv("GEMINI_API_KEY")
-url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + api_key
+
+if not api_key:
+    raise ValueError("❌ API Key is missing! Check your GitHub Secrets.")
+
+# FIX: Remove accidental spaces/newlines from the key
+api_key = api_key.strip() 
+
+url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
 prompt = f"""
 Generate a clean and simple DSA learning note.
-
 Topic: {topic}
 Language: C++
-
-Explain:
-- What the concept means
-- Why it matters
-- 1 example problem (small)
-- 1 simple C++ implementation
-
-Keep the style short and friendly.
+Explain: concept, importance, small example, C++ implementation.
+Keep it short.
 """
+
+# Safety check for the 'requests' library
+try:
+    import requests
+except ImportError:
+    raise ImportError("❌ The 'requests' library is missing. You need to install it in your YAML file.")
 
 response = requests.post(
     url,
@@ -70,7 +76,16 @@ response = requests.post(
 )
 
 result = response.json()
-note = result["candidates"][0]["content"]["parts"][0]["text"]
+
+# FIX: Check if Google sent an error instead of crashing
+if "error" in result:
+    raise Exception(f"❌ Google API Error: {result['error']['message']}")
+
+# Proceed only if successful
+if "candidates" in result:
+    note = result["candidates"][0]["content"]["parts"][0]["text"]
+else:
+    raise Exception("❌ Unexpected response format from Google (No candidates found).")
 
 # ---------------------------
 # 4. Save notes
