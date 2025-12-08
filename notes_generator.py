@@ -22,17 +22,43 @@ explanations = [
     "A strong grasp of this topic makes debugging much easier."
 ]
 
+intros = [
+    "Today I focused on",
+    "I spent time understanding",
+    "Revising the concept of",
+    "Learning about",
+    "Exploring"
+]
+
+# ✅ Learning progression
+day = datetime.now().day
+if day <= 10:
+    level = "Beginner"
+elif day <= 20:
+    level = "Intermediate"
+else:
+    level = "Advanced"
+
+# ✅ Variable content size
+sentence_count = random.randint(1, 3)
+
 topic = random.choice(topics)
-explanation = random.choice(explanations)
+base_explanation = random.choice(explanations)
+
+explanation = ""
+for _ in range(sentence_count):
+    explanation += base_explanation + " "
+
 time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 content = f"""
 
-## 🧠 {topic}
+## 🧠 Level: {level}
+### Topic: {topic}
+
+{random.choice(intros)} {topic}. {explanation}
 
 🕒 {time_now}
-
-{explanation}
 
 ### Example
 ```cpp
@@ -43,8 +69,6 @@ int main() {{
     cout << "Daily C++ practice builds mastery!";
     return 0;
 }}
-```
-
 ---
 """
 
