@@ -1,76 +1,99 @@
+import os
+import json
 import random
 from datetime import datetime
+import requests
 
-topics = [
-    "C++ Variables and Data Types",
-    "Pointers and Memory Management",
-    "Difference between Stack and Heap",
-    "Object-Oriented Programming Concepts",
-    "Constructors and Destructors",
-    "Virtual Functions and Polymorphism",
-    "Pass by Value vs Pass by Reference",
-    "STL: vector, map, set",
-    "Exception Handling in C++",
-    "Namespaces and Their Importance"
+# ---------------------------
+# 1. DSA Topic Roadmap
+# ---------------------------
+dsa_topics = [
+    "Arrays Basics",
+    "Arrays Problems",
+    "Time and Space Complexity",
+    "Pointers in C++",
+    "Recursion Basics",
+    "Recursion Problems",
+    "Linked List Basics",
+    "Doubly Linked List",
+    "Stacks Implementation",
+    "Queues Implementation",
+    "Binary Trees Basics",
+    "Tree Traversals",
+    "Binary Search Tree",
+    "Graphs Basics",
+    "Graph Traversals (BFS/DFS)",
+    "Dynamic Programming Intro",
+    "Knapsack Problems",
+    "Greedy Algorithms",
+    "Sliding Window Techniques"
 ]
 
-explanations = [
-    "This concept plays a crucial role in efficient C++ programming.",
-    "Understanding this helps avoid memory leaks and segmentation faults.",
-    "It is frequently used in real-world and competitive programming.",
-    "This improves code structure and maintainability.",
-    "A strong grasp of this topic makes debugging much easier."
-]
+# ---------------------------
+# 2. Progress Tracking
+# ---------------------------
+if not os.path.exists("progress.json"):
+    with open("progress.json", "w") as f:
+        json.dump({"index": 0}, f)
 
-intros = [
-    "Today I focused on",
-    "I spent time understanding",
-    "Revising the concept of",
-    "Learning about",
-    "Exploring"
-]
+with open("progress.json", "r") as f:
+    progress = json.load(f)
 
-# ✅ Learning progression
-day = datetime.now().day
-if day <= 10:
-    level = "Beginner"
-elif day <= 20:
-    level = "Intermediate"
-else:
-    level = "Advanced"
+index = progress["index"]
+topic = dsa_topics[index % len(dsa_topics)]
 
-# ✅ Variable content size
-sentence_count = random.randint(1, 3)
+# ---------------------------
+# 3. Generate Notes with Gemini API
+# ---------------------------
+api_key = os.getenv("GEMINI_API_KEY")
+url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + api_key
 
-topic = random.choice(topics)
-base_explanation = random.choice(explanations)
+prompt = f"""
+Generate a clean and simple DSA learning note.
 
-explanation = ""
-for _ in range(sentence_count):
-    explanation += base_explanation + " "
+Topic: {topic}
+Language: C++
 
+Explain:
+- What the concept means
+- Why it matters
+- 1 example problem (small)
+- 1 simple C++ implementation
+
+Keep the style short and friendly.
+"""
+
+response = requests.post(
+    url,
+    json={"contents": [{"parts": [{"text": prompt}]}]},
+    headers={"Content-Type": "application/json"}
+)
+
+result = response.json()
+note = result["candidates"][0]["content"]["parts"][0]["text"]
+
+# ---------------------------
+# 4. Save notes
+# ---------------------------
 time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 content = f"""
 
-## 🧠 Level: {level}
-### Topic: {topic}
-
-{random.choice(intros)} {topic}. {explanation}
-
+# 📘 DSA Learning Note  
+### 🧠 Topic: {topic}  
 🕒 {time_now}
 
-### Example
-```cpp
-#include <iostream>
-using namespace std;
+{note}
 
-int main() {{
-    cout << "Daily C++ practice builds mastery!";
-    return 0;
-}}
-```
+---
 """
 
 with open("cpp_notes.md", "a", encoding="utf-8") as file:
     file.write(content)
+
+# ---------------------------
+# 5. Update progress
+# ---------------------------
+progress["index"] = index + 1
+with open("progress.json", "w") as f:
+    json.dump(progress, f)
