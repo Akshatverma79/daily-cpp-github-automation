@@ -53,7 +53,7 @@ if not api_key:
 # FIX: Remove accidental spaces/newlines from the key
 api_key = api_key.strip() 
 
-url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key={api_key}"
+url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
 
 prompt = f"""
 Generate a clean and simple DSA learning note.
