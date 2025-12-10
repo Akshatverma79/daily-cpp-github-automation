@@ -484,3 +484,99 @@ int main() {
 Pointers are powerful, but remember: with great power comes great responsibility! Always ensure your pointers point to valid memory locations to avoid crashes.
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2025-12-10 06:34:32
+
+Here's a clean and simple note on Recursion Basics!
+
+---
+
+## Recursion Basics 🚀
+
+Hey there, future coding wizard! Let's demystify recursion.
+
+### 💡 What is Recursion?
+
+Imagine a function that solves a problem by calling *itself* to solve smaller, identical versions of that problem. It's like a set of Russian nesting dolls, where each doll contains a smaller version of itself, until you reach the tiny core doll.
+
+In simple terms: **A function calling itself.**
+
+**The two must-haves for any recursive function:**
+
+1.  **Base Case:** This is the "stop" condition. It's the simplest version of the problem that can be solved directly without further recursion. Without a base case, your function would call itself forever (and crash!).
+2.  **Recursive Step:** This is where the function breaks the problem down into a smaller sub-problem and calls itself with that smaller problem. It also defines how the result of the smaller problem contributes to the overall solution.
+
+### ✨ Why Does It Matter?
+
+*   **Elegance & Readability:** For certain problems (especially those with self-similar structures like trees or graphs), recursive solutions can be much more natural, concise, and easier to understand than iterative ones.
+*   **Problem-Solving Paradigm:** It's a fundamental concept in Computer Science. Many complex algorithms (like sorting, searching in trees, dynamic programming) are inherently recursive.
+*   **Powerful Tool:** Mastering recursion opens up a new way to think about and solve problems.
+
+### 📝 Example Problem: Factorial
+
+Let's calculate the factorial of a number `N`.
+The factorial of `N` (denoted `N!`) is the product of all positive integers less than or equal to `N`.
+
+*   `5! = 5 * 4 * 3 * 2 * 1 = 120`
+*   `3! = 3 * 2 * 1 = 6`
+*   `1! = 1`
+*   `0! = 1` (by definition)
+
+Notice a pattern?
+`N! = N * (N-1)!`
+
+*   `5! = 5 * 4!`
+*   `4! = 4 * 3!`
+*   `...`
+*   `1! = 1` (This looks like our **Base Case!**)
+*   `0! = 1` (Also a **Base Case!**)
+
+So, if `N` is `0` or `1`, the answer is `1`. Otherwise, it's `N` multiplied by the factorial of `N-1`. This is our **Recursive Step!**
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case: When should we stop?
+    // If n is 0 or 1, the factorial is 1.
+    if (n <= 1) {
+        return 1;
+    } 
+    // 2. Recursive Step: How do we break it down and call ourselves?
+    // Factorial of n is n multiplied by factorial of (n-1).
+    else {
+        return n * factorial(n - 1); 
+    }
+}
+
+int main() {
+    int num1 = 5;
+    int num2 = 0;
+    int num3 = 3;
+
+    std::cout << "Factorial of " << num1 << " is: " << factorial(num1) << std::endl; // Expected: 120
+    std::cout << "Factorial of " << num2 << " is: " << factorial(num2) << std::endl; // Expected: 1
+    std::cout << "Factorial of " << num3 << " is: " << factorial(num3) << std::endl; // Expected: 6
+
+    return 0;
+}
+```
+
+**Output:**
+```
+Factorial of 5 is: 120
+Factorial of 0 is: 1
+Factorial of 3 is: 6
+```
+
+---
+
+You got this! Recursion might feel a bit mind-bending at first, but with practice, it'll become a powerful tool in your DSA toolkit. Keep practicing those base cases and recursive steps! 💪
+
+---
