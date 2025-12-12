@@ -975,3 +975,181 @@ int main() {
 That's your quick intro to Doubly Linked Lists! Keep practicing, and you'll master them in no time! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Stacks Implementation  
+🕒 2025-12-12 06:34:33
+
+Hey there, aspiring coder! Let's get cozy with Stacks – a fundamental data structure that's super handy.
+
+---
+
+## Stacks: Your LIFO Sidekick in C++
+
+### 1. What's a Stack? (The Concept)
+
+Imagine a pile of plates:
+*   You can only add a new plate to the **top**.
+*   You can only take a plate from the **top**.
+
+This "Last In, First Out" (LIFO) behavior is exactly what a Stack is! The last item you added is always the first one you can remove.
+
+**Core Operations:**
+*   **Push:** Add an item to the top of the stack.
+*   **Pop:** Remove the item from the top of the stack.
+*   **Peek (or Top):** Look at the top item without removing it.
+*   **isEmpty:** Check if the stack has any items.
+*   **Size:** Get the number of items in the stack.
+
+### 2. Why Do Stacks Matter? (Real-World Use)
+
+Stacks are everywhere in computer science because their LIFO nature is perfect for specific tasks:
+
+*   **Browser History:** When you hit the "back" button, it's like popping the last visited page off a stack.
+*   **Undo/Redo:** Many applications use stacks to store actions, so "undo" pops the last action.
+*   **Function Call Stack:** When your program calls functions, they are pushed onto a stack. When a function finishes, it's popped off. This handles recursion beautifully!
+*   **Expression Evaluation:** Converting infix to postfix expressions, or evaluating expressions.
+
+### 3. Example Problem: Reverse a String
+
+**Problem:** Given a string, reverse it using a stack.
+
+**Why a stack?** Because LIFO naturally reverses order.
+
+**How it works:**
+1.  Push each character of the original string onto the stack.
+2.  Pop characters one by one from the stack and append them to a new string.
+    *   The first character pushed will be at the bottom.
+    *   The last character pushed will be at the top, and thus the first one popped.
+    *   This effectively reverses the order!
+
+**Example:** String "abc"
+1.  Push 'a'
+2.  Push 'b'
+3.  Push 'c'
+    *Stack: [a, b, c] (c is top)*
+4.  Pop 'c' -> result "c"
+5.  Pop 'b' -> result "cb"
+6.  Pop 'a' -> result "cba"
+    *Final reversed string: "cba"*
+
+### 4. Simple C++ Implementation
+
+Let's build our own basic `Stack` class using `std::vector` as the underlying storage. `std::vector` is a dynamic array that handles resizing for us, making it a great choice for a simple custom stack.
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // To use std::vector as our internal storage
+#include <string>   // For our example problem
+
+// Our custom Stack class
+class Stack {
+private:
+    std::vector<int> data; // Using a vector to store stack elements
+
+public:
+    // Pushes an element onto the top of the stack
+    void push(int value) {
+        data.push_back(value); // Add to the end of the vector
+        std::cout << "Pushed: " << value << std::endl;
+    }
+
+    // Removes the top element from the stack
+    void pop() {
+        if (isEmpty()) {
+            std::cout << "Stack is empty! Cannot pop." << std::endl;
+            return;
+        }
+        int popped_value = data.back(); // Get the value before removing
+        data.pop_back(); // Remove the last element (top of stack)
+        std::cout << "Popped: " << popped_value << std::endl;
+    }
+
+    // Returns the top element without removing it
+    int top() {
+        if (isEmpty()) {
+            std::cout << "Stack is empty! No top element." << std::endl;
+            // In a real application, you might throw an exception or return a special error value
+            return -1; // For simplicity, returning -1 for an empty stack
+        }
+        return data.back(); // Returns the last element
+    }
+
+    // Checks if the stack is empty
+    bool isEmpty() {
+        return data.empty(); // std::vector has an empty() method
+    }
+
+    // Returns the number of elements in the stack
+    int size() {
+        return data.size(); // std::vector has a size() method
+    }
+};
+
+// --- Example usage and problem solving ---
+int main() {
+    std::cout << "--- Custom Stack Demonstration ---" << std::endl;
+    Stack myStack;
+
+    myStack.push(10);
+    myStack.push(20);
+    myStack.push(30);
+
+    std::cout << "Top element is: " << myStack.top() << std::endl; // Should be 30
+    std::cout << "Stack size: " << myStack.size() << std::endl;   // Should be 3
+
+    myStack.pop(); // Popped: 30
+    std::cout << "Top element after pop: " << myStack.top() << std::endl; // Should be 20
+    std::cout << "Stack size: " << myStack.size() << std::endl;   // Should be 2
+
+    myStack.pop(); // Popped: 20
+    myStack.pop(); // Popped: 10
+    myStack.pop(); // Attempt to pop from empty stack
+
+    std::cout << "Is stack empty? " << (myStack.isEmpty() ? "Yes" : "No") << std::endl; // Should be Yes
+
+    std::cout << "\n--- Reverse String Problem ---" << std::endl;
+    std::string original_string = "hello";
+    Stack charStack; // We need a stack that can hold characters for this.
+                     // For simplicity of this note, let's treat chars as ints.
+                     // A templated Stack<char> would be better in production.
+
+    std::cout << "Original string: " << original_string << std::endl;
+
+    // Push each character onto the stack
+    for (char c : original_string) {
+        charStack.push(static_cast<int>(c)); // Pushing char as int
+    }
+
+    std::string reversed_string = "";
+    // Pop characters and build the reversed string
+    while (!charStack.isEmpty()) {
+        char c = static_cast<char>(charStack.top()); // Get top char (as int, convert back)
+        charStack.pop(); // Remove it
+        reversed_string += c; // Append to new string
+    }
+
+    std::cout << "Reversed string: " << reversed_string << std::endl; // Should be olleh
+
+    return 0;
+}
+```
+
+**Pro Tip:** C++ already provides a `std::stack` container adapter in the `<stack>` header. It wraps existing containers like `std::deque` (default) or `std::vector` to give them stack functionality. For most tasks, you'll use `std::stack` directly!
+
+```cpp
+#include <stack> // For std::stack
+// ... inside main ...
+std::stack<int> s; // Creates a stack of integers
+s.push(10);
+s.top(); // Accesses top
+s.pop(); // Removes top
+s.empty(); // Checks if empty
+```
+
+---
+
+And there you have it! Stacks are a powerful and intuitive concept. Keep practicing, and you'll master them in no time!
+
+---
