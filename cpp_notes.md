@@ -2243,3 +2243,155 @@ int main() {
 **Awesome!** You've just grasped the core idea of Dynamic Programming. Keep practicing, and you'll soon find DP solutions to many fascinating problems!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2025-12-16 06:35:24
+
+Hey there, future algorithm master! Let's dive into a classic: **Knapsack Problems**.
+
+---
+
+### 🎒 1. What's a Knapsack Problem? (The Concept)
+
+Imagine you have a backpack (your "knapsack") with a limited weight capacity. You're at a treasure trove, full of items, each with its own `weight` and `value`.
+
+Your mission: **pick the items that give you the *maximum total value* without exceeding your backpack's weight limit.**
+
+The most common type we focus on is **"0/1 Knapsack"**:
+*   For each item, you either take it entirely (1) or don't take it at all (0).
+*   No partial items allowed!
+
+It's all about making optimal choices under a constraint.
+
+---
+
+### 🚀 2. Why Does It Matter? (Importance)
+
+Knapsack problems are super practical and a cornerstone for understanding **Dynamic Programming**!
+
+*   **Resource Allocation:** Choosing which projects to fund with a limited budget (projects have "cost" as weight, "return" as value).
+*   **Logistics:** Packing a cargo container or truck for maximum value within its weight/volume limit.
+*   **Cutting Stock:** Optimizing how to cut materials to minimize waste.
+*   **Investment Decisions:** Selecting assets with varying risk (weight) and return (value).
+
+Mastering Knapsack helps build a strong foundation for tackling more complex optimization problems.
+
+---
+
+### 💡 3. Example Problem (Small & Simple)
+
+Let's say your knapsack capacity is `W = 5 kg`.
+You have these items:
+
+*   **Item 1:** (Weight = 2 kg, Value = 3)
+*   **Item 2:** (Weight = 3 kg, Value = 4)
+*   **Item 3:** (Weight = 4 kg, Value = 5)
+
+What's the maximum value you can get?
+
+**Solution:**
+If you pick **Item 1** (W=2, V=3) and **Item 2** (W=3, V=4):
+*   Total Weight = 2 + 3 = 5 kg (within capacity)
+*   Total Value = 3 + 4 = 7
+
+This is the optimal solution! You can't fit Item 3 with anything else to get a higher value.
+
+---
+
+### 💻 4. Simple C++ Implementation (0/1 Knapsack with DP)
+
+We'll use **Dynamic Programming** for the 0/1 Knapsack problem.
+
+The core idea: We build a table `dp[i][w]` which stores the maximum value we can get using the first `i` items with a knapsack capacity of `w`.
+
+**`dp[i][w]` state transition:**
+1.  **If the current item's weight (`weights[i-1]`) is greater than the current capacity `w`**:
+    *   We can't include the item. So, the max value is the same as if we considered only the first `i-1` items with capacity `w`.
+    *   `dp[i][w] = dp[i-1][w]`
+2.  **Else (we *can* include the item)**:
+    *   We have two choices:
+        *   **Don't include it:** Value is `dp[i-1][w]`
+        *   **Include it:** Value is `values[i-1]` + (max value from first `i-1` items with remaining capacity `w - weights[i-1]`). This is `values[i-1] + dp[i-1][w - weights[i-1]]`
+    *   We pick the maximum of these two choices:
+    *   `dp[i][w] = max(dp[i-1][w], values[i-1] + dp[i-1][w - weights[i-1]])`
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+// Function to solve the 0/1 Knapsack problem
+int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values) {
+    int n = weights.size(); // Number of items
+
+    // Create a 2D DP table: dp[i][w] stores max value using first i items
+    // and a knapsack capacity of w.
+    // Rows: n+1 (for 0 to n items)
+    // Cols: W+1 (for 0 to W capacity)
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
+
+    // Fill the DP table
+    for (int i = 1; i <= n; ++i) { // Iterate through items (1-indexed for dp table)
+        for (int w = 1; w <= W; ++w) { // Iterate through capacities
+            
+            // Current item's weight and value (using i-1 for 0-indexed vectors)
+            int currentWeight = weights[i - 1];
+            int currentValue = values[i - 1];
+
+            // If current item's weight is more than current capacity 'w'
+            if (currentWeight > w) {
+                // We cannot include this item. Max value is same as without this item.
+                dp[i][w] = dp[i - 1][w];
+            } else {
+                // We have two choices:
+                // 1. Don't include the current item: value is dp[i-1][w]
+                // 2. Include the current item: value is currentValue + dp[i-1][w - currentWeight]
+                //    (value of current item + max value from previous items with remaining capacity)
+                dp[i][w] = std::max(dp[i - 1][w], currentValue + dp[i - 1][w - currentWeight]);
+            }
+        }
+    }
+
+    // The maximum value is stored at dp[n][W]
+    return dp[n][W];
+}
+
+int main() {
+    // Example problem data
+    std::vector<int> weights = {2, 3, 4}; // Weights of items
+    std::vector<int> values = {3, 4, 5};  // Values of items
+    int W = 5;                           // Knapsack capacity
+
+    int max_value = knapsack(W, weights, values);
+
+    std::cout << "Knapsack Capacity: " << W << std::endl;
+    std::cout << "Items: " << std::endl;
+    for (size_t i = 0; i < weights.size(); ++i) {
+        std::cout << "  Item " << i + 1 << ": Weight=" << weights[i] << ", Value=" << values[i] << std::endl;
+    }
+    std::cout << "Maximum value in knapsack: " << max_value << std::endl; // Expected: 7
+
+    // Another example
+    std::vector<int> weights2 = {10, 20, 30};
+    std::vector<int> values2 = {60, 100, 120};
+    int W2 = 50;
+    int max_value2 = knapsack(W2, weights2, values2);
+    std::cout << "\n--- Another Example ---" << std::endl;
+    std::cout << "Knapsack Capacity: " << W2 << std::endl;
+    std::cout << "Items: " << std::endl;
+    for (size_t i = 0; i < weights2.size(); ++i) {
+        std::cout << "  Item " << i + 1 << ": Weight=" << weights2[i] << ", Value=" << values2[i] << std::endl;
+    }
+    std::cout << "Maximum value in knapsack: " << max_value2 << std::endl; // Expected: 220 (100+120)
+
+    return 0;
+}
+```
+
+---
+
+Knapsack problems are a fantastic way to grasp Dynamic Programming. Keep practicing, and you'll master them in no time! Happy coding! ✨
+
+---
