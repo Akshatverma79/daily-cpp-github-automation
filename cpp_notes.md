@@ -2553,3 +2553,133 @@ Maximum value in Knapsack: 240
 And there you have it! A quick look into Greedy Algorithms. Remember, they're powerful when applicable, but always double-check if that "local best" truly leads to the "global best" for your specific problem. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Sliding Window Techniques  
+🕒 2025-12-17 14:00:10
+
+Let's dive into the **Sliding Window** technique! It's a super useful pattern for solving problems on arrays and strings efficiently.
+
+---
+
+## DSA Notes: Sliding Window Techniques 🚀
+
+### What the Concept Means
+
+Imagine you have a long array or string, and you need to look at contiguous sub-parts of it (like a subarray or a substring). A **Sliding Window** is like having a "window" of a certain size (fixed or variable) that slides over your data.
+
+Instead of re-calculating everything for each new sub-part, you efficiently update the current window's state by **adding the new element** that enters the window and **removing the old element** that leaves it.
+
+Think of it as looking through a physical window – as you slide it, you don't rebuild the entire scene; you just update what you see on the edges.
+
+### Why It Matters
+
+This technique is a **game-changer for efficiency!**
+
+*   It helps you reduce time complexity. Many problems that might seem to require a brute-force O(N^2) or even O(N^3) approach (checking every possible subarray/substring) can be solved in **O(N)** time using a sliding window.
+*   This makes your code much faster, especially for large datasets, preventing "Time Limit Exceeded" errors.
+
+### 1 Example Problem (Small)
+
+**Problem:** Given an array of integers `nums` and an integer `k`, find the maximum sum of any contiguous subarray of size `k`.
+
+**Example:**
+`nums = [1, 4, 2, 10, 2, 3, 1, 0, 20]`
+`k = 3`
+
+**How we'd solve it with Sliding Window:**
+
+1.  **Initial Window:** Calculate the sum of the first `k` elements.
+    `[1, 4, 2]` -> Sum = `7`. Store this as `max_sum` and `current_window_sum`.
+
+2.  **Slide the Window:**
+    *   Move the window one step to the right.
+    *   The element `1` leaves, and `10` enters.
+    *   `current_window_sum` becomes: `7 - 1 + 10 = 16`.
+    *   `max_sum` is updated to `16` (since `16 > 7`).
+    *   Window: `[4, 2, 10]`
+
+3.  **Continue Sliding:**
+    *   Next step: `4` leaves, `2` enters.
+    *   `current_window_sum` becomes: `16 - 4 + 2 = 14`.
+    *   `max_sum` remains `16` (since `16 > 14`).
+    *   Window: `[2, 10, 2]`
+
+4.  ...and so on, until the window reaches the end of the array.
+
+By doing this, we avoid re-summing `k` elements in each step; we just do a constant number of additions and subtractions!
+
+### 1 Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector
+#include <numeric>  // Optional: For std::accumulate, though a loop is often clearer
+#include <algorithm> // For std::max
+
+// Function to find the maximum sum of a subarray of size k
+int maxSubarraySum(const std::vector<int>& nums, int k) {
+    // Handle edge cases: empty array, invalid k
+    if (nums.empty() || k <= 0 || k > nums.size()) {
+        return 0; // Or throw an exception, depending on problem requirements
+    }
+
+    long long current_window_sum = 0; // Use long long to prevent potential integer overflow
+    
+    // 1. Calculate the sum of the first window (0 to k-1)
+    for (int i = 0; i < k; ++i) {
+        current_window_sum += nums[i];
+    }
+
+    long long max_sum = current_window_sum; // Initialize max_sum with the first window's sum
+
+    // 2. Slide the window across the rest of the array
+    // 'i' represents the element *entering* the window
+    for (int i = k; i < nums.size(); ++i) {
+        // Add the new element entering the window (nums[i])
+        // Subtract the element leaving the window (nums[i - k])
+        current_window_sum += nums[i] - nums[i - k];
+        
+        // Update max_sum if the current window sum is greater
+        max_sum = std::max(max_sum, current_window_sum);
+    }
+
+    return static_cast<int>(max_sum); // Cast back to int if the problem specifies int return type
+}
+
+int main() {
+    std::vector<int> nums = {1, 4, 2, 10, 2, 3, 1, 0, 20};
+    int k = 3;
+    
+    std::cout << "Original Array: [";
+    for (size_t i = 0; i < nums.size(); ++i) {
+        std::cout << nums[i] << (i == nums.size() - 1 ? "" : ", ");
+    }
+    std::cout << "]\n";
+    std::cout << "Window size (k): " << k << std::endl;
+    
+    int result = maxSubarraySum(nums, k);
+    std::cout << "Maximum sum of a subarray of size " << k << ": " << result << std::endl; // Expected: 14 ({2,10,2})
+
+    std::cout << "\n--- Another Example ---\n";
+    std::vector<int> nums2 = {5, -2, 3, 1, 2};
+    int k2 = 2;
+    std::cout << "Original Array: [";
+    for (size_t i = 0; i < nums2.size(); ++i) {
+        std::cout << nums2[i] << (i == nums2.size() - 1 ? "" : ", ");
+    }
+    std::cout << "]\n";
+    std::cout << "Window size (k): " << k2 << std::endl;
+    int result2 = maxSubarraySum(nums2, k2);
+    std::cout << "Maximum sum of a subarray of size " << k2 << ": " << result2 << std::endl; // Expected: 4 ({3,1})
+
+    return 0;
+}
+```
+
+---
+
+That's the core idea of Sliding Window! It's a fantastic technique for optimizing problems involving contiguous sub-sequences. Keep practicing, and you'll spot it everywhere! Happy coding! ✨
+
+---
