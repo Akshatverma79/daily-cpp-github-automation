@@ -3098,3 +3098,258 @@ int main() {
 **Key Takeaway:** If a problem asks for an optimal numeric value (min/max), and you can write a `check()` function that has a monotonic property, then Binary Search on Answer is your friend!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Sorting Algorithms (Merge Sort, Quick Sort)  
+🕒 2025-12-20 06:31:53
+
+Hey there, future DSA master! 👋 Let's dive into two rockstar sorting algorithms: **Merge Sort** and **Quick Sort**. They're both super important and use a cool strategy called "Divide and Conquer."
+
+---
+
+## 1. Merge Sort: The Harmonious Combiner
+
+### Concept: What's the Big Idea?
+Imagine you have a messy stack of cards. Merge Sort says:
+1.  **Divide:** Keep splitting the stack in half until you have individual cards (stacks of 1 are inherently sorted!).
+2.  **Conquer (and Combine):** Now, start merging those tiny sorted stacks back together, always making sure the merged stack is sorted. You're merging *two already sorted* lists into one larger sorted list.
+
+It's like sorting two perfectly ordered piles of papers into one master sorted pile – much easier than sorting a huge messy pile from scratch!
+
+### Why it Matters: The Superpower!
+*   **Guaranteed Performance:** It always performs consistently well, even in the worst-case scenario! Its time complexity is always `O(N log N)`.
+*   **Stability:** It's a "stable" sort, meaning if you have two identical elements, their original relative order is preserved. This is neat for sorting objects with multiple properties.
+*   **External Sorting:** Great for when the data is too large to fit into memory (e.g., sorting a massive file on disk).
+
+### Example Problem: Sorting `[3, 1, 4, 2]`
+
+Let's trace `[3, 1, 4, 2]`:
+
+1.  **Divide:**
+    `[3, 1, 4, 2]`
+    `/       \`
+    `[3, 1]`   `[4, 2]`
+    `/  \`     `/  \`
+    `[3]` `[1]` `[4]` `[2]` (Base case: single elements are sorted!)
+
+2.  **Merge (Conquer):**
+    *   Merge `[3]` and `[1]` -> `[1, 3]`
+    *   Merge `[4]` and `[2]` -> `[2, 4]`
+    *   Merge `[1, 3]` and `[2, 4]` -> `[1, 2, 3, 4]`
+
+Boom! Sorted!
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min and std::copy
+
+// Helper function to merge two sorted sub-arrays
+void merge(std::vector<int>& arr, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    // Create temporary vectors
+    std::vector<int> left_arr(n1);
+    std::vector<int> right_arr(n2);
+
+    // Copy data to temp vectors
+    for (int i = 0; i < n1; ++i) {
+        left_arr[i] = arr[left + i];
+    }
+    for (int j = 0; j < n2; ++j) {
+        right_arr[j] = arr[mid + 1 + j];
+    }
+
+    // Merge the temp vectors back into arr[left...right]
+    int i = 0; // Initial index of first sub-array
+    int j = 0; // Initial index of second sub-array
+    int k = left; // Initial index of merged sub-array
+
+    while (i < n1 && j < n2) {
+        if (left_arr[i] <= right_arr[j]) {
+            arr[k] = left_arr[i];
+            i++;
+        } else {
+            arr[k] = right_arr[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Copy remaining elements of left_arr, if any
+    while (i < n1) {
+        arr[k] = left_arr[i];
+        i++;
+        k++;
+    }
+
+    // Copy remaining elements of right_arr, if any
+    while (j < n2) {
+        arr[k] = right_arr[j];
+        j++;
+        k++;
+    }
+}
+
+// Main Merge Sort function
+void mergeSort(std::vector<int>& arr, int left, int right) {
+    if (left >= right) { // Base case: 0 or 1 element is already sorted
+        return;
+    }
+
+    int mid = left + (right - left) / 2; // Avoids potential overflow for large left/right
+    
+    // Sort first and second halves recursively
+    mergeSort(arr, left, mid);
+    mergeSort(arr, mid + 1, right);
+
+    // Merge the sorted halves
+    merge(arr, left, mid, right);
+}
+
+// --- Test Code ---
+void printVector(const std::vector<int>& arr) {
+    for (int x : arr) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> data = {3, 1, 4, 2, 8, 5, 7, 0, 9, 6};
+    std::cout << "Original vector: ";
+    printVector(data);
+
+    mergeSort(data, 0, data.size() - 1);
+
+    std::cout << "Sorted vector (Merge Sort): ";
+    printVector(data);
+
+    // Another test
+    std::vector<int> data2 = {5, 4, 3, 2, 1};
+    std::cout << "Original vector 2: ";
+    printVector(data2);
+    mergeSort(data2, 0, data2.size() - 1);
+    std::cout << "Sorted vector 2 (Merge Sort): ";
+    printVector(data2);
+
+    return 0;
+}
+```
+
+---
+
+## 2. Quick Sort: The Pivot Master
+
+### Concept: What's the Big Idea?
+Quick Sort also uses "Divide and Conquer," but with a different twist:
+1.  **Choose a Pivot:** Pick an element from the array, called the "pivot."
+2.  **Partition:** Rearrange the array so that all elements smaller than the pivot come before it, and all elements greater than the pivot come after it. The pivot is now in its final sorted position!
+3.  **Conquer:** Recursively apply Quick Sort to the sub-array of smaller elements and the sub-array of greater elements.
+
+Think of it like sorting a classroom by height: pick one student (the pivot), then ask everyone shorter to stand on their left and everyone taller to stand on their right. Now the pivot student is in the right place, and you just need to sort the two smaller groups!
+
+### Why it Matters: The Speed Demon!
+*   **Fast in Practice:** On average, Quick Sort is one of the fastest sorting algorithms, often outperforming Merge Sort due to better "cache locality" (how data is accessed in memory). Its average time complexity is `O(N log N)`.
+*   **In-Place Sorting:** It typically requires very little extra memory (`O(log N)` for the recursion stack) because it rearranges elements within the original array.
+*   **Worst Case:** Be careful though! In the worst case (e.g., if you always pick the smallest or largest element as a pivot on an already sorted array), its performance drops to `O(N^2)`. Good pivot selection (like picking a random element or the median of three) helps avoid this.
+
+### Example Problem: Sorting `[5, 2, 8, 1, 9, 4]`
+
+Let's trace `[5, 2, 8, 1, 9, 4]`. We'll pick the last element as our pivot.
+
+1.  **Initial:** `[5, 2, 8, 1, 9, *4*]` (Pivot is `4`)
+2.  **Partition:**
+    *   `1` is < `4`, `2` is < `4`.
+    *   Rearrange: `[2, 1, | 4 | 5, 9, 8]` (Pivot `4` is now in its correct spot!)
+3.  **Recursive Calls:**
+    *   Quick Sort `[2, 1]` (sub-array of smaller elements)
+    *   Quick Sort `[5, 9, 8]` (sub-array of larger elements)
+
+Let's look at `[2, 1]` (Pivot `1`):
+    *   `[ | 1 | 2]`
+    *   Result: `[1, 2]`
+
+Let's look at `[5, 9, 8]` (Pivot `8`):
+    *   `[5, | 8 | 9]`
+    *   Result: `[5, 8, 9]`
+
+4.  **Combine:** Stitching everything back together: `[1, 2, 4, 5, 8, 9]`
+
+Pretty neat, right?
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::swap
+
+// Helper function to place the pivot in its correct position
+// and partition the array around it.
+int partition(std::vector<int>& arr, int low, int high) {
+    int pivot = arr[high]; // Choosing the last element as pivot
+    int i = (low - 1); // Index of smaller element
+
+    for (int j = low; j <= high - 1; ++j) {
+        // If current element is smaller than or equal to pivot
+        if (arr[j] <= pivot) {
+            i++; // Increment index of smaller element
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]); // Place pivot in its correct position
+    return (i + 1); // Return the partitioning index
+}
+
+// Main Quick Sort function
+void quickSort(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        // pi is partitioning index, arr[pi] is now at right place
+        int pi = partition(arr, low, high);
+
+        // Separately sort elements before partition and after partition
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// --- Test Code ---
+void printVector(const std::vector<int>& arr) {
+    for (int x : arr) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> data = {5, 2, 8, 1, 9, 4, 7, 3, 0, 6};
+    std::cout << "Original vector: ";
+    printVector(data);
+
+    quickSort(data, 0, data.size() - 1);
+
+    std::cout << "Sorted vector (Quick Sort): ";
+    printVector(data);
+
+    // Another test
+    std::vector<int> data2 = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    std::cout << "Original vector 2: ";
+    printVector(data2);
+    quickSort(data2, 0, data2.size() - 1);
+    std::cout << "Sorted vector 2 (Quick Sort): ";
+    printVector(data2);
+
+    return 0;
+}
+```
+
+---
+
+There you have it! Merge Sort and Quick Sort are incredibly powerful tools in your DSA toolkit. Understanding how they work and when to use them is key. Keep practicing! 💪
+
+---
