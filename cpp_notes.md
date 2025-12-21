@@ -3585,3 +3585,295 @@ int main() {
 That's it for the basics! You've just taken your first step into a world of endless text possibilities. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Matching (KMP, Rabin-Karp)  
+🕒 2025-12-21 13:58:05
+
+Alright, let's dive into String Matching with KMP and Rabin-Karp! These algorithms help us find if a smaller string (the "pattern") exists within a larger string (the "text").
+
+---
+
+## String Matching: KMP & Rabin-Karp
+
+Finding a specific word in a long document, searching for a DNA sequence, or looking for a file name – these are all string matching problems! When the strings get really long, a simple character-by-character check becomes too slow. That's where clever algorithms like KMP and Rabin-Karp come in.
+
+---
+
+### 1. Knuth-Morris-Pratt (KMP) Algorithm
+
+#### What it means
+
+Imagine you're searching for a pattern `P` in a text `T`. When you find a mismatch, instead of starting over from the next character in `T`, KMP cleverly uses information about the `P` itself to decide where to resume the search. It knows that some prefix of the pattern you've already matched might also be a suffix of that same matched part.
+
+It builds a special array (often called the `LPS` array, for "Longest Proper Prefix which is also a Suffix") for the pattern. This array tells you exactly how many characters to backtrack in your pattern if a mismatch occurs, avoiding redundant comparisons.
+
+#### Why it matters
+
+KMP is super efficient! It guarantees to run in **O(N + M)** time (where `N` is text length, `M` is pattern length), which is optimal. It avoids re-scanning text characters, making it perfect for finding patterns in very long texts where the pattern itself might have repeating parts.
+
+#### Example Problem
+
+**Text:** `AAAAABAAABA`
+**Pattern:** `AAABA`
+
+Let's find the LPS array for `AAABA`:
+*   `A`: LPS is `0` (no proper prefix/suffix)
+*   `AA`: LPS is `1` (`A` is prefix and suffix)
+*   `AAA`: LPS is `2` (`AA` is prefix and suffix)
+*   `AAAB`: LPS is `0` (no proper prefix/suffix)
+*   `AAABA`: LPS is `1` (`A` is prefix and suffix)
+
+So, the LPS array for `AAABA` is `[0, 1, 2, 0, 1]`.
+
+When `AAABA` is matched against `AAAAABAAABA`:
+
+1.  `AAAAA` (text) vs `AAABA` (pattern)
+    *   Matches `AAAA`
+    *   Mismatch at `B` (text) vs `A` (pattern, index 4).
+    *   At index 4 of pattern, LPS is `1`. We shift the pattern such that the `A` at index 1 of the pattern (which is `pattern[lps[3]]`) aligns with `text[4]`.
+    *   Effectively, we jump, and restart comparing from `text[4]` with `pattern[1]`.
+2.  `BAAABA` (text portion from `B`) vs `AABA` (pattern portion from `A` at index 1)
+    *   Eventually, a full match is found starting at `text[6]`!
+
+#### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+
+// Function to compute the LPS array
+std::vector<int> computeLPSArray(const std::string& pattern) {
+    int m = pattern.length();
+    std::vector<int> lps(m, 0); // LPS array
+    int length = 0; // Length of the previous longest prefix suffix
+    int i = 1;
+
+    // The loop calculates lps[i] for i = 1 to m-1
+    while (i < m) {
+        if (pattern[i] == pattern[length]) {
+            length++;
+            lps[i] = length;
+            i++;
+        } else {
+            // This is tricky. If there's a mismatch,
+            // we don't reset 'length' to 0 directly.
+            // We use the lps value of the previous character
+            // to find a shorter prefix that might match.
+            if (length != 0) {
+                length = lps[length - 1];
+            } else { // if length is 0, no common prefix/suffix
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+    return lps;
+}
+
+// KMP Search function
+void KMPSearch(const std::string& text, const std::string& pattern) {
+    int n = text.length();
+    int m = pattern.length();
+
+    if (m == 0) {
+        std::cout << "Pattern is empty." << std::endl;
+        return;
+    }
+    if (n == 0 || n < m) {
+        std::cout << "No matches found (text too short or empty)." << std::endl;
+        return;
+    }
+
+    std::vector<int> lps = computeLPSArray(pattern);
+
+    int i = 0; // Index for text
+    int j = 0; // Index for pattern
+
+    while (i < n) {
+        if (pattern[j] == text[i]) {
+            i++;
+            j++;
+        }
+
+        if (j == m) {
+            std::cout << "Found pattern at index " << (i - j) << std::endl;
+            // To find more occurrences, we use LPS array for the next starting point
+            j = lps[j - 1];
+        } else if (i < n && pattern[j] != text[i]) {
+            // Mismatch after j matches
+            // Do not match lps[0..lps[j-1]] characters,
+            // they will match anyway
+            if (j != 0) {
+                j = lps[j - 1];
+            } else { // if j == 0, no characters matched, just move to the next text char
+                i++;
+            }
+        }
+    }
+}
+
+/*
+int main() {
+    std::string text = "ABABDABACDABABCABAB";
+    std::string pattern = "ABABCABAB";
+    std::cout << "KMP Search:" << std::endl;
+    KMPSearch(text, pattern); // Expected: Found pattern at index 10
+
+    std::string text2 = "AAAAABAAABA";
+    std::string pattern2 = "AAABA";
+    std::cout << "\nKMP Search (Example):" << std::endl;
+    KMPSearch(text2, pattern2); // Expected: Found pattern at index 6
+    
+    std::string text3 = "GEEKSFORGEEKS";
+    std::string pattern3 = "GEEK";
+    std::cout << "\nKMP Search (Another example):" << std::endl;
+    KMPSearch(text3, pattern3); // Expected: Found pattern at index 0, 9
+    
+    std::string text4 = "ABCDEFG";
+    std::string pattern4 = "XYZ";
+    std::cout << "\nKMP Search (No match):" << std::endl;
+    KMPSearch(text4, pattern4); // Expected: No output
+    
+    return 0;
+}
+*/
+```
+
+---
+
+### 2. Rabin-Karp Algorithm
+
+#### What it means
+
+Rabin-Karp uses a "hashing" trick. Think of it like assigning a unique number (hash) to the pattern and to all possible sub-strings of the text that are the same length as the pattern.
+
+It computes a hash for the pattern and then a "rolling hash" for each `M`-length window in the text. If the hashes match, *then* it does a character-by-character comparison (to avoid "collisions" where different strings have the same hash value). If hashes don't match, it immediately moves to the next window, saving a lot of comparisons.
+
+#### Why it matters
+
+Rabin-Karp is excellent for practical scenarios, especially when you might be searching for *many* patterns at once (though the provided implementation only searches for one). On average, it's very fast, performing in **O(N + M)** time. Its strength is in avoiding most character comparisons by just comparing numbers (hashes), making it efficient for long texts with random patterns. Its worst-case time complexity can be O(N*M) if there are many hash collisions (e.g., all characters are the same), but this is rare with good hash functions and prime numbers.
+
+#### Example Problem
+
+**Text:** `GEEKSFORGEEKS`
+**Pattern:** `GEEK`
+
+Let `d = 256` (number of characters in ASCII) and `q = 101` (a prime number, for modulo operation).
+Pattern length `M = 4`.
+
+1.  **Calculate Pattern Hash:**
+    `hash('G') = 71`, `hash('E') = 69`, `hash('E') = 69`, `hash('K') = 75`
+    `pHash = (71*d^3 + 69*d^2 + 69*d^1 + 75*d^0) % q`
+
+2.  **Calculate Initial Text Window Hash (for `GEEK` at index 0):**
+    `tHash = (71*d^3 + 69*d^2 + 69*d^1 + 75*d^0) % q`
+    If `pHash == tHash`, verify character by character: `GEEK` == `GEEK` -> Match!
+
+3.  **Rolling Hash for next window (`EEKS`):**
+    Instead of re-calculating from scratch, we "roll" the hash:
+    `tHash = (d * (tHash - text[0] * h) + text[M]) % q`
+    where `h = d^(M-1) % q`.
+    So, `tHash` for `EEKS` is derived from `tHash` for `GEEK` by removing 'G' and adding 'S'.
+    Compare `pHash` with new `tHash`. If they match, verify characters.
+
+4.  Continue rolling the hash through `EKSF`, `KSFO`, `SFOR`, `ORGE`, `RGEE`, `GEEK`.
+    When we reach `GEEK` at index 9, their hashes will match, and a character-by-character check will confirm another match!
+
+#### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector> // Not strictly needed for this implementation, but common
+
+// Rabin-Karp Search function
+void RabinKarpSearch(const std::string& text, const std::string& pattern) {
+    int n = text.length();
+    int m = pattern.length();
+
+    if (m == 0) {
+        std::cout << "Pattern is empty." << std::endl;
+        return;
+    }
+    if (n == 0 || n < m) {
+        std::cout << "No matches found (text too short or empty)." << std::endl;
+        return;
+    }
+
+    int q = 101; // A prime number (large prime ensures fewer collisions)
+    int d = 256; // Number of characters in the alphabet (e.g., ASCII)
+
+    int h = 1; // Used for calculating (d^(M-1)) % q
+    // Calculate h = (d^(M-1)) % q
+    for (int i = 0; i < m - 1; i++) {
+        h = (h * d) % q;
+    }
+
+    long long pHash = 0; // Hash value for pattern
+    long long tHash = 0; // Hash value for text window
+
+    // Calculate initial hash values for pattern and first text window
+    for (int i = 0; i < m; i++) {
+        pHash = (d * pHash + pattern[i]) % q;
+        tHash = (d * tHash + text[i]) % q;
+    }
+
+    // Slide the pattern over text one by one
+    for (int i = 0; i <= n - m; i++) {
+        // If hashes match, then check character by character
+        if (pHash == tHash) {
+            bool match = true;
+            for (int j = 0; j < m; j++) {
+                if (text[i + j] != pattern[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                std::cout << "Found pattern at index " << i << std::endl;
+            }
+        }
+
+        // Calculate hash for next text window (remove leading char, add trailing char)
+        if (i < n - m) {
+            tHash = (d * (tHash - text[i] * h) + text[i + m]) % q;
+
+            // Ensure tHash is non-negative (C++ modulo can return negative results)
+            if (tHash < 0) {
+                tHash = (tHash + q);
+            }
+        }
+    }
+}
+
+/*
+int main() {
+    std::string text = "GEEKSFORGEEKS";
+    std::string pattern = "GEEK";
+    std::cout << "Rabin-Karp Search:" << std::endl;
+    RabinKarpSearch(text, pattern); // Expected: Found at index 0, 9
+
+    std::string text2 = "ABABDABACDABABCABAB";
+    std::string pattern2 = "ABABCABAB";
+    std::cout << "\nRabin-Karp Search (Another example):" << std::endl;
+    RabinKarpSearch(text2, pattern2); // Expected: Found at index 10
+    
+    std::string text3 = "AAAAABAAABA";
+    std::string pattern3 = "AAABA";
+    std::cout << "\nRabin-Karp Search (Example):" << std::endl;
+    RabinKarpSearch(text3, pattern3); // Expected: Found at index 6
+
+    std::string text4 = "ABCDEFG";
+    std::string pattern4 = "XYZ";
+    std::cout << "\nRabin-Karp Search (No match):" << std::endl;
+    RabinKarpSearch(text4, pattern4); // Expected: No output
+
+    return 0;
+}
+*/
+```
+
+---
