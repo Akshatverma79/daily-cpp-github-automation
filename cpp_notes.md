@@ -4189,3 +4189,124 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2025-12-23 06:35:37
+
+Hey there, future DSA master! Let's demystify Heaps and Priority Queues.
+
+---
+
+### **Heaps & Priority Queues**
+
+#### **1. What's the Concept?**
+
+*   **Heaps:**
+    *   Think of a **Heap** as a specialized tree-based data structure (usually a binary tree).
+    *   It's *partially ordered*, not fully sorted. The key property is that the parent node is always either greater than (Max-Heap) or less than (Min-Heap) its children.
+    *   **Max-Heap:** The largest item is always at the top (root).
+    *   **Min-Heap:** The smallest item is always at the top (root).
+    *   It's commonly implemented using an array, which makes it very efficient.
+
+*   **Priority Queues:**
+    *   A **Priority Queue** is an *abstract data type (ADT)*, like a regular queue, but with a twist: each element has a "priority."
+    *   Instead of "first-in, first-out," it's "highest-priority-out first."
+    *   You can `push` elements (add them) and `pop` the element with the highest (or lowest) priority.
+    *   **Heaps are the most common and efficient way to implement Priority Queues.** They allow O(log N) for insertions and deletions, and O(1) to peek at the top element.
+
+#### **2. Why Does It Matter?**
+
+Heaps and Priority Queues are super useful because they efficiently manage "who's next" based on importance.
+
+*   **Task Scheduling:** Imagine an operating system needing to run processes. High-priority tasks go first!
+*   **Event Simulation:** Simulating events where some events need to happen before others.
+*   **Graph Algorithms:** Essential for algorithms like Dijkstra's (shortest path) and Prim's (minimum spanning tree) to pick the next most promising node.
+*   **"Top K" Problems:** Finding the K largest or smallest elements in a collection efficiently.
+*   **Heapsort:** An efficient comparison-based sorting algorithm.
+
+#### **3. Example Problem: "Processing Urgent Tasks"**
+
+You have a list of tasks, each with an urgency level (a number, higher means more urgent). You need to process them, always handling the most urgent task first.
+
+**Input:** Urgency levels: `[10, 30, 20, 5]`
+
+**Expected Output Order:** `30, 20, 10, 5`
+
+#### **4. Simple C++ Implementation**
+
+C++'s Standard Library provides `std::priority_queue`, which uses a max-heap by default. Perfect for our "most urgent first" scenario!
+
+```cpp
+#include <iostream> // For input/output
+#include <queue>    // For std::priority_queue
+#include <vector>   // Default underlying container for priority_queue
+
+int main() {
+    std::cout << "--- Urgent Task Processor ---" << std::endl;
+
+    // Create a priority queue (max-heap by default)
+    // It will automatically keep the largest element at the top.
+    std::priority_queue<int> urgentTasks;
+
+    // Add task urgency levels
+    urgentTasks.push(10); // Task with urgency 10
+    urgentTasks.push(30); // Task with urgency 30
+    urgentTasks.push(20); // Task with urgency 20
+    urgentTasks.push(5);  // Task with urgency 5
+
+    std::cout << "Tasks added. Processing in order of urgency:" << std::endl;
+
+    // Process tasks until the queue is empty
+    while (!urgentTasks.empty()) {
+        int currentUrgency = urgentTasks.top(); // Peek at the most urgent task
+        std::cout << "Processing task with urgency: " << currentUrgency << std::endl;
+        urgentTasks.pop(); // Remove the most urgent task
+    }
+
+    std::cout << "All urgent tasks processed!" << std::endl;
+
+    // --- Bonus: How to create a Min-Heap (for "least urgent first") ---
+    std::cout << "\n--- Least Urgent Task Processor (Min-Heap) ---" << std::endl;
+    std::priority_queue<int, std::vector<int>, std::greater<int>> leastUrgentTasks;
+    leastUrgentTasks.push(10);
+    leastUrgentTasks.push(30);
+    leastUrgentTasks.push(20);
+    leastUrgentTasks.push(5);
+
+    while (!leastUrgentTasks.empty()) {
+        int currentUrgency = leastUrgentTasks.top();
+        std::cout << "Processing task with urgency: " << currentUrgency << std::endl;
+        leastUrgentTasks.pop();
+    }
+    std::cout << "All least urgent tasks processed!" << std::endl;
+
+
+    return 0;
+}
+```
+
+**Output of the code above:**
+```
+--- Urgent Task Processor ---
+Tasks added. Processing in order of urgency:
+Processing task with urgency: 30
+Processing task with urgency: 20
+Processing task with urgency: 10
+Processing task with urgency: 5
+All urgent tasks processed!
+
+--- Least Urgent Task Processor (Min-Heap) ---
+Processing task with urgency: 5
+Processing task with urgency: 10
+Processing task with urgency: 20
+Processing task with urgency: 30
+All least urgent tasks processed!
+```
+
+---
+
+That's the gist of Heaps and Priority Queues! They're powerful tools for managing ordered data efficiently, especially when you only care about the "top" element. Keep practicing!
+
+---
