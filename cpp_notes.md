@@ -4482,3 +4482,146 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2025-12-24 06:35:24
+
+Hey there, aspiring coder! Let's dive into Disjoint Set Union (DSU) – it's a super handy data structure for keeping track of connected components.
+
+---
+
+## DSU: Grouping Things Up Simply!
+
+### 💡 What DSU Means
+
+Imagine you have a bunch of individual items. Over time, some of these items get "connected" or "grouped" together. The cool thing is, **no item can belong to more than one group** – that's what "disjoint" means!
+
+DSU (also known as Union-Find) helps you efficiently manage these dynamic groups. It provides two main operations:
+
+1.  **`find(x)`**: Tell me which group item `x` belongs to. (It returns a "representative" element for that group).
+2.  **`unite(x, y)`** (or `union(x,y)`): Merge the group of `x` with the group of `y`. If they were already in the same group, nothing changes.
+
+**Think of it like this:** You have a bunch of single-person islands. `unite(A, B)` builds a bridge between island A and island B, merging them into one landmass. `find(A)` tells you which "main island" (representative) island A is now part of.
+
+### 🚀 Why DSU Matters
+
+DSU is incredibly powerful and fast for problems involving connectivity:
+
+*   **Efficient:** `find` and `unite` operations are nearly constant time on average, thanks to smart optimizations.
+*   **Graph Problems:** Perfect for algorithms like Kruskal's for Minimum Spanning Tree, or detecting cycles in a graph.
+*   **Network Connectivity:** Quickly determine if two nodes (computers, cities, etc.) are connected in a network.
+*   **Grouping:** Easily track communities, friend groups, or connected regions in a grid.
+
+### 📝 Example Problem: Social Network Friends
+
+Let's say you have 5 people: 1, 2, 3, 4, 5. Initially, everyone is an individual.
+
+1.  **People:** {1}, {2}, {3}, {4}, {5}
+2.  **Friendship 1:** Person 1 and Person 2 become friends.
+    *   `unite(1, 2)`
+    *   **Groups:** {1, 2}, {3}, {4}, {5}
+3.  **Friendship 2:** Person 3 and Person 4 become friends.
+    *   `unite(3, 4)`
+    *   **Groups:** {1, 2}, {3, 4}, {5}
+4.  **Friendship 3:** Person 2 and Person 4 become friends.
+    *   `unite(2, 4)`
+    *   *Here's the magic:* `find(2)` tells us 2 is with 1. `find(4)` tells us 4 is with 3. So, we merge the group of {1, 2} with the group of {3, 4}.
+    *   **Groups:** {1, 2, 3, 4}, {5}
+
+**Now, let's ask questions:**
+*   Are Person 1 and Person 5 friends? (`find(1) == find(5)`) -> **No** (1's group rep is different from 5's)
+*   Are Person 1 and Person 3 friends? (`find(1) == find(3)`) -> **Yes** (They share the same group rep)
+
+### 💻 Simple C++ Implementation
+
+Here's a lean C++ class for DSU, incorporating two key optimizations:
+
+1.  **Path Compression (in `find`):** When looking for a root, all nodes visited along the path are directly re-parented to the root. This flattens the tree, making future `find` calls faster.
+2.  **Union by Size (in `unite`):** Always attach the root of the smaller tree to the root of the larger tree. This keeps the trees shallow and balanced.
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota if you want to initialize parent array differently
+
+class DSU {
+private:
+    std::vector<int> parent; // parent[i] stores the parent of element i
+    std::vector<int> sz;     // sz[i] stores the size of the set if i is the root
+    int num_components;      // Tracks the total number of disjoint sets
+
+public:
+    // Constructor: Initializes 'n' elements, each in its own set.
+    // We use 1-based indexing for simplicity here, so size n+1.
+    DSU(int n) : num_components(n) {
+        parent.resize(n + 1);
+        std::iota(parent.begin(), parent.end(), 0); // parent[i] = i for all i
+        sz.assign(n + 1, 1); // Each set initially has size 1
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i) { // 'i' is the root of its set
+            return i;
+        }
+        // Path compression: set parent[i] directly to the root
+        return parent[i] = find(parent[i]);
+    }
+
+    // Unite operation with Union by Size
+    // Merges the sets containing 'i' and 'j'
+    void unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+
+        if (root_i != root_j) { // If they are not already in the same set
+            // Union by size: attach smaller tree under larger tree's root
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i points to the larger tree
+            }
+            parent[root_j] = root_i; // Make root_i the parent of root_j
+            sz[root_i] += sz[root_j]; // Update the size of the new combined set
+            num_components--;         // One less component after merging
+        }
+    }
+
+    // Helper: Check if two elements are in the same set
+    bool are_connected(int i, int j) {
+        return find(i) == find(j);
+    }
+
+    // Helper: Get the current number of disjoint components
+    int count_components() {
+        return num_components;
+    }
+};
+
+// --- Example Usage ---
+#include <iostream>
+
+int main() {
+    DSU social_network(5); // 5 people: 1, 2, 3, 4, 5
+
+    std::cout << "Initial components: " << social_network.count_components() << std::endl; // 5
+
+    social_network.unite(1, 2); // 1 and 2 become friends
+    std::cout << "After (1,2) unite, components: " << social_network.count_components() << std::endl; // 4
+    social_network.unite(3, 4); // 3 and 4 become friends
+    std::cout << "After (3,4) unite, components: " << social_network.count_components() << std::endl; // 3
+    social_network.unite(2, 4); // 2 and 4 become friends (indirectly connects 1,2,3,4)
+    std::cout << "After (2,4) unite, components: " << social_network.count_components() << std::endl; // 2
+
+    std::cout << "Are 1 and 5 friends? " << (social_network.are_connected(1, 5) ? "Yes" : "No") << std::endl; // No
+    std::cout << "Are 1 and 3 friends? " << (social_network.are_connected(1, 3) ? "Yes" : "No") << std::endl; // Yes
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! DSU is a fantastic tool for managing groups and connectivity efficiently. Happy coding!
+
+---
