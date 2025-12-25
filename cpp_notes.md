@@ -4798,3 +4798,139 @@ int main() {
 Segment Trees are powerful! Once you get the hang of range sums, you can extend them to handle range minimum, maximum, products, and more complex operations by changing how child results are combined. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Fenwick Trees (Binary Indexed Tree)  
+🕒 2025-12-25 06:34:57
+
+Here's a clean and simple note on Fenwick Trees!
+
+---
+
+## Fenwick Trees (Binary Indexed Trees): Your Array Superpower! 🚀
+
+### What is a Fenwick Tree?
+
+Imagine you have an array, and you constantly need to do two things:
+1.  **Update** a value at a specific index.
+2.  **Query** the sum of elements from the beginning of the array up to a certain index (prefix sum).
+
+A **Fenwick Tree**, also known as a **Binary Indexed Tree (BIT)**, is a clever data structure designed to do both these operations *super efficiently*! Instead of an array where each spot stores its own value, a Fenwick Tree uses an array where each spot stores a *sum of a range* of values.
+
+It's typically **1-indexed**, meaning the first element is at index 1, not 0.
+
+### Why Does It Matter? (Why It's Cool!)
+
+*   **Speed:** Both `update` and `query` operations take just **O(log N)** time, where N is the size of your array.
+    *   Compare this to a plain array: `update` is O(1), but `query` (prefix sum) is O(N).
+    *   Or, a prefix sum array: `query` is O(1), but `update` is O(N) because you'd have to recompute all subsequent prefix sums.
+*   **Space:** It only uses **O(N)** extra space (just one array of size N+1).
+*   **Simplicity:** It's often simpler to implement than more complex structures like Segment Trees for basic prefix sum operations.
+
+### The Magic Behind It: `lowbit`
+
+The core idea is the `lowbit` function: `x & (-x)`. This gives you the value of the **least significant bit (LSB)** of `x`.
+
+*   Example:
+    *   `lowbit(4)`: `4` in binary is `0100`. `-4` (two's complement) is `1100`. `0100 & 1100 = 0100` (which is 4).
+    *   `lowbit(6)`: `6` in binary is `0110`. `-6` is `1010`. `0110 & 1010 = 0010` (which is 2).
+    *   `lowbit(7)`: `7` in binary is `0111`. `-7` is `1001`. `0111 & 1001 = 0001` (which is 1).
+
+This `lowbit` value tells us the size of the range that a particular index in the Fenwick Tree is responsible for summing.
+
+*   **Update (`add(idx, delta)`):** When you update an index `idx` in your original conceptual array, you need to update all Fenwick Tree nodes that *include* `idx` in their sum range. You do this by repeatedly adding `lowbit(idx)` to `idx` until `idx` exceeds `N`.
+*   **Query (`query(idx)`):** To get the prefix sum up to `idx`, you sum up the values in the Fenwick Tree. You do this by repeatedly subtracting `lowbit(idx)` from `idx` until `idx` becomes 0.
+
+### Example Problem
+
+Let's work with an array of size 5, initially all zeros: `[0, 0, 0, 0, 0]`
+
+1.  **`update(1, 5)`**: Add 5 to the 1st element.
+    *   Conceptual array: `[5, 0, 0, 0, 0]`
+2.  **`update(3, 2)`**: Add 2 to the 3rd element.
+    *   Conceptual array: `[5, 0, 2, 0, 0]`
+3.  **`query(3)`**: What is the sum of the first 3 elements?
+    *   Expected: `5 + 0 + 2 = 7`
+4.  **`update(2, 1)`**: Add 1 to the 2nd element.
+    *   Conceptual array: `[5, 1, 2, 0, 0]`
+5.  **`query(5)`**: What is the sum of all 5 elements?
+    *   Expected: `5 + 1 + 2 + 0 + 0 = 8`
+
+### Simple C++ Implementation
+
+```cpp
+#include <vector>
+#include <iostream>
+
+// Our Fenwick Tree will be stored in this vector.
+// It's 1-indexed, so size N+1 is needed for an array of N elements.
+std::vector<int> bit; 
+int N_fenwick; // The maximum index we can use (size of the conceptual array)
+
+// Function to calculate the lowbit (least significant bit)
+// This is the magic! It tells us the "range size" for a BIT node.
+int lowbit(int x) {
+    return x & (-x);
+}
+
+// Function to add a 'delta' value to the element at 'idx'
+// All BIT nodes whose range includes 'idx' will be updated.
+void update(int idx, int delta) {
+    // We iterate upwards, adding lowbit(idx) to find parent nodes
+    // idx must be 1-indexed.
+    for (; idx <= N_fenwick; idx += lowbit(idx)) {
+        bit[idx] += delta;
+    }
+}
+
+// Function to get the prefix sum from index 1 up to 'idx'
+// We sum values from BIT nodes whose ranges contribute to the prefix sum.
+int query(int idx) {
+    // We iterate downwards, subtracting lowbit(idx) to find contributing nodes
+    // idx must be 1-indexed.
+    int sum = 0;
+    for (; idx > 0; idx -= lowbit(idx)) {
+        sum += bit[idx];
+    }
+    return sum;
+}
+
+int main() {
+    N_fenwick = 5; // Let's work with a conceptual array of size 5
+    bit.assign(N_fenwick + 1, 0); // Initialize BIT with zeros, size N_fenwick+1
+
+    std::cout << "--- Fenwick Tree Demonstration ---\n";
+    std::cout << "Conceptual array starts as: [0, 0, 0, 0, 0]\n\n";
+
+    // --- Example Operations ---
+
+    // 1. Update index 1 with value 5
+    std::cout << "1. Calling update(1, 5)\n";
+    update(1, 5); // Conceptual array: [5, 0, 0, 0, 0]
+    std::cout << "   Query sum up to index 1: " << query(1) << " (Expected: 5)\n";
+    std::cout << "   Query sum up to index 3: " << query(3) << " (Expected: 5)\n\n";
+
+    // 2. Update index 3 with value 2
+    std::cout << "2. Calling update(3, 2)\n";
+    update(3, 2); // Conceptual array: [5, 0, 2, 0, 0]
+    std::cout << "   Query sum up to index 1: " << query(1) << " (Expected: 5)\n";
+    std::cout << "   Query sum up to index 2: " << query(2) << " (Expected: 5)\n";
+    std::cout << "   Query sum up to index 3: " << query(3) << " (Expected: 7)\n";
+    std::cout << "   Query sum up to index 5: " << query(5) << " (Expected: 7)\n\n";
+
+    // 3. Update index 2 with value 1
+    std::cout << "3. Calling update(2, 1)\n";
+    update(2, 1); // Conceptual array: [5, 1, 2, 0, 0]
+    std::cout << "   Query sum up to index 1: " << query(1) << " (Expected: 5)\n";
+    std::cout << "   Query sum up to index 2: " << query(2) << " (Expected: 6)\n";
+    std::cout << "   Query sum up to index 3: " << query(3) << " (Expected: 8)\n";
+    std::cout << "   Query sum up to index 5: " << query(5) << " (Expected: 8)\n\n";
+
+    std::cout << "--- End of Demonstration ---\n";
+
+    return 0;
+}
+```
+
+---
