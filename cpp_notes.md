@@ -4934,3 +4934,170 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Shortest Path (Dijkstra's Algorithm)  
+🕒 2025-12-25 13:58:14
+
+Here's a clean and simple note on Dijkstra's Algorithm for finding the shortest path!
+
+---
+
+## Shortest Path: Dijkstra's Algorithm
+
+Dijkstra's Algorithm is a superstar in the world of pathfinding on graphs. Let's break it down!
+
+### 🎯 What is it? (The Concept)
+
+Imagine you're trying to find the quickest way from your home to every single shop in your city. Dijkstra's algorithm does exactly that:
+
+*   It finds the **shortest path** from a **single starting node** (your home) to **all other nodes** (every shop) in a weighted graph.
+*   **Key Constraint:** It only works for graphs where all **edge weights are non-negative** (no "free rides" or time travel backward!).
+*   It's a "greedy" algorithm, meaning it always makes the locally optimal choice hoping to find a global optimum.
+
+### 🤔 Why does it matter? (Importance)
+
+Dijkstra's is incredibly useful in many real-world scenarios:
+
+1.  **GPS & Navigation:** Finding the fastest route between two locations.
+2.  **Network Routing:** Determining the most efficient path for data packets in a computer network.
+3.  **Game AI:** Pathfinding for characters or objects in video games.
+4.  **Logistics:** Optimizing delivery routes or resource allocation.
+
+### 🚶 How it Works (Intuition)
+
+Think of it like exploring a city:
+
+1.  You start at your `Source` (distance 0). All other places are "infinitely" far away initially.
+2.  You always go to the **closest unvisited place** you know about.
+3.  From that place, you look at all its direct neighbors. If going through your current location makes a neighbor closer than you previously thought, you update its distance.
+4.  You mark the current place as "visited" and never need to check it again.
+5.  Repeat until all reachable places are visited.
+
+To efficiently find the "closest unvisited place," we use a **priority queue**!
+
+### 📝 Example Problem
+
+Let's find the shortest paths from Node 0 to all other nodes in this small graph:
+
+**Nodes:** 0, 1, 2, 3
+**Edges (format: `source -> destination (weight)`):**
+*   `0 -> 1 (weight 1)`
+*   `0 -> 2 (weight 4)`
+*   `1 -> 2 (weight 2)`
+*   `1 -> 3 (weight 5)`
+*   `2 -> 3 (weight 1)`
+
+**Expected Output (distances from Node 0):**
+*   Node 0: 0
+*   Node 1: 1 (via 0 -> 1)
+*   Node 2: 3 (via 0 -> 1 -> 2)
+*   Node 3: 4 (via 0 -> 1 -> 2 -> 3)
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>        // For std::priority_queue
+#include <limits>       // For std::numeric_limits<int>::max()
+
+// Define infinity for unreachable nodes
+const int INF = std::numeric_limits<int>::max();
+
+// Dijkstra's Algorithm function
+// n: number of nodes
+// adj: adjacency list where adj[u] contains pairs {v, weight} for edges u -> v
+// start_node: the source node
+std::vector<int> dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>>& adj, int start_node) {
+    // 1. Initialize distances:
+    //    - All distances are INF (infinity) initially.
+    //    - Distance to start_node is 0.
+    std::vector<int> dist(n, INF);
+    dist[start_node] = 0;
+
+    // 2. Priority Queue:
+    //    - Stores pairs of {distance, node_index}.
+    //    - `std::greater` makes it a min-priority queue (smallest distance at top).
+    //    - We push the start_node with its distance (0).
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> pq;
+    pq.push({0, start_node}); // {distance, node}
+
+    // 3. Main loop: Process nodes from the priority queue
+    while (!pq.empty()) {
+        int d = pq.top().first;  // Current shortest distance found to 'u'
+        int u = pq.top().second; // Current node being processed
+        pq.pop();
+
+        // Important optimization:
+        // If we've already found a shorter path to 'u' and processed it,
+        // then this entry from the priority queue is outdated. Skip it.
+        if (d > dist[u]) {
+            continue;
+        }
+
+        // 4. Explore neighbors (Relaxation step):
+        //    - For each neighbor 'v' of 'u':
+        //    - Check if going through 'u' provides a shorter path to 'v'.
+        for (const auto& edge : adj[u]) {
+            int v = edge.first;    // Neighbor node
+            int weight = edge.second; // Weight of edge u -> v
+
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight; // Update shortest distance to 'v'
+                pq.push({dist[v], v});      // Add 'v' to PQ with its new shorter distance
+            }
+        }
+    }
+
+    return dist; // Return the vector of shortest distances
+}
+
+int main() {
+    int num_nodes = 4; // Nodes 0, 1, 2, 3
+
+    // Adjacency list representation of the graph
+    // adj[u] will store {v, weight} for all edges u -> v
+    std::vector<std::vector<std::pair<int, int>>> adj(num_nodes);
+
+    // Add edges from the example problem:
+    adj[0].push_back({1, 1}); // 0 -> 1 (weight 1)
+    adj[0].push_back({2, 4}); // 0 -> 2 (weight 4)
+    adj[1].push_back({2, 2}); // 1 -> 2 (weight 2)
+    adj[1].push_back({3, 5}); // 1 -> 3 (weight 5)
+    adj[2].push_back({3, 1}); // 2 -> 3 (weight 1)
+
+    int start_node = 0; // We want shortest paths from Node 0
+
+    std::vector<int> shortest_distances = dijkstra(num_nodes, adj, start_node);
+
+    // Print the results
+    std::cout << "Shortest distances from Node " << start_node << ":\n";
+    for (int i = 0; i < num_nodes; ++i) {
+        if (shortest_distances[i] == INF) {
+            std::cout << "Node " << i << ": Unreachable\n";
+        } else {
+            std::cout << "Node " << i << ": " << shortest_distances[i] << "\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+**Output of the example code:**
+
+```
+Shortest distances from Node 0:
+Node 0: 0
+Node 1: 1
+Node 2: 3
+Node 3: 4
+```
+
+---
+
+And there you have it! Dijkstra's Algorithm in a nutshell. It's a fundamental algorithm, super effective for many real-world problems as long as those pesky negative edge weights stay away!
+
+---
