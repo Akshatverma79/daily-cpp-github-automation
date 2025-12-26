@@ -5291,3 +5291,179 @@ int main() {
 And there you have it! Bellman-Ford in a nutshell. It's a bit slower than Dijkstra's (O(V*E) vs O(E log V) or O(E + V log V)), but its ability to handle negative weights and detect negative cycles makes it invaluable! Happy pathfinding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2025-12-26 13:58:28
+
+Here's a clean and simple note on the Floyd-Warshall Algorithm!
+
+---
+
+## 🗺️ Floyd-Warshall Algorithm: Finding All Paths
+
+Imagine you have a map of cities and roads, and you want to know the shortest route between *any* two cities. That's exactly what Floyd-Warshall helps you do!
+
+### 🎯 What it means: The Big Picture
+
+Floyd-Warshall is an algorithm that finds the **shortest paths between all possible pairs of vertices** (nodes) in a graph. It's often called an "All-Pairs Shortest Path" (APSP) algorithm.
+
+It's a classic example of **Dynamic Programming**, meaning it solves the problem by breaking it down into smaller, overlapping subproblems and building up the solution.
+
+The core idea is:
+1.  Start with direct paths.
+2.  Then, for each node `k`, consider if passing through `k` makes any path `i` to `j` shorter.
+3.  Repeat for all `k`!
+
+It can handle graphs with **negative edge weights** but will fail if there are **negative cycles** (a path that loops back to itself, getting infinitely shorter).
+
+### 🌟 Why it matters: Super Useful!
+
+*   **Comprehensive:** If you need to know the optimal path from *every* point to *every other* point, this is your go-to.
+*   **Simple to Implement:** Once you grasp the dynamic programming concept, its implementation is surprisingly straightforward with three nested loops.
+*   **Versatile:** Used in network routing, transportation, finding transitive closures in graphs, and as a foundation for other graph problems.
+
+### 🚶‍♀️ The Big Idea (Dynamic Programming in Action)
+
+Let `dist[i][j]` be the shortest distance found so far from vertex `i` to vertex `j`.
+
+For every possible intermediate vertex `k` (from `0` to `V-1`):
+  For every possible starting vertex `i` (from `0` to `V-1`):
+    For every possible ending vertex `j` (from `0` to `V-1`):
+      `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`
+
+This means: the shortest path from `i` to `j` is either the path we already knew, OR it's the path from `i` to `k` PLUS the path from `k` to `j`.
+
+### 🧩 Example Problem: Tiny City Map
+
+Let's say we have 3 cities (0, 1, 2) and some roads:
+
+*   0 to 1: weight 4
+*   1 to 2: weight 1
+*   0 to 2: weight 10 (a direct but longer route)
+
+**Initial Distances (Adjacency Matrix):**
+(Use `INF` for unreachable paths)
+
+```
+       0    1    2
+    ----------------
+0 |    0    4   10
+1 |  INF    0    1
+2 |  INF  INF    0
+```
+
+**Step 1: Consider `k = 0` (City 0 as intermediate)**
+*   No path gets shorter by going through 0 (e.g., 1->0->2 is INF+10=INF, not better than 1->2).
+
+**Step 2: Consider `k = 1` (City 1 as intermediate)**
+*   **Path from 0 to 2 via 1:**
+    *   Current `dist[0][2]` is 10.
+    *   `dist[0][1] + dist[1][2]` = `4 + 1` = `5`.
+    *   `min(10, 5)` becomes `5`. So, `dist[0][2]` is updated to 5.
+*   No other paths get shorter.
+
+**Final Distances:**
+
+```
+       0    1    2
+    ----------------
+0 |    0    4    5  (0->1->2 is shorter than 0->2 directly)
+1 |  INF    0    1
+2 |  INF  INF    0
+```
+
+Now we know the shortest path from 0 to 2 is 5!
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int INF = 1e9; // A large number to represent infinity (unreachable paths)
+                     // Using 1e9 is safer than INT_MAX to avoid overflow during addition.
+
+void floydWarshall(int V, std::vector<std::vector<int>>& dist) {
+    // The core Floyd-Warshall logic
+    // k = intermediate vertex
+    // i = starting vertex
+    // j = ending vertex
+    for (int k = 0; k < V; ++k) {
+        for (int i = 0; i < V; ++i) {
+            for (int j = 0; j < V; ++j) {
+                // If path from i to k and k to j exists,
+                // and if going via k is shorter than the current path from i to j
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+}
+
+void printSolution(int V, const std::vector<std::vector<int>>& dist) {
+    std::cout << "Shortest Path Matrix:" << std::endl;
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF\t";
+            } else {
+                std::cout << dist[i][j] << "\t";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main() {
+    int V = 3; // Number of vertices
+
+    // Initialize the distance matrix
+    // dist[i][j] stores the shortest distance from i to j
+    std::vector<std::vector<int>> dist(V, std::vector<int>(V, INF));
+
+    // Initialize diagonal elements to 0 (distance from a node to itself)
+    for (int i = 0; i < V; ++i) {
+        dist[i][i] = 0;
+    }
+
+    // Add direct edges (from our example)
+    dist[0][1] = 4;
+    dist[1][2] = 1;
+    dist[0][2] = 10; // Direct but longer path from 0 to 2
+
+    std::cout << "Initial Distance Matrix:" << std::endl;
+    printSolution(V, dist);
+    std::cout << std::endl;
+
+    floydWarshall(V, dist);
+
+    printSolution(V, dist);
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Initial Distance Matrix:
+0       4       10      
+INF     0       1       
+INF     INF     0       
+
+Shortest Path Matrix:
+0       4       5       
+INF     0       1       
+INF     INF     0       
+```
+
+### 🧠 Key Takeaway
+
+Floyd-Warshall is an elegant DP solution for finding all-pairs shortest paths. Its simple three-nested-loop structure makes it easy to understand and implement, especially for dense graphs or when you need the complete distance matrix. Just remember `k` (intermediate) loop is on the outside!
+
+**Time Complexity:** O(V³) where V is the number of vertices.
+
+---
