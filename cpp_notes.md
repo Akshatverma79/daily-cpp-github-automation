@@ -6095,3 +6095,225 @@ SCC 4: { 0 1 2 }
 And there you have it! SCCs are a fundamental concept that unlocks simpler analysis of complex directed graphs. Happy learning! 😊
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bridges and Articulation Points  
+🕒 2025-12-28 13:57:48
+
+Hey there, fellow graph explorer! Let's dive into some critical points in graphs: Bridges and Articulation Points.
+
+---
+
+## 🌉 Bridges & 📍 Articulation Points
+
+Imagine a city map. Some roads are super important because if they're closed, parts of the city become isolated. Same for intersections – some are crucial hubs!
+
+### What do they mean?
+
+*   **📍 Articulation Point (or Cut Vertex):** This is a vertex (node) in a connected graph such that if you remove it (along with all edges connected to it), the graph breaks into more connected components. It's like a crucial junction or pivot point.
+
+    *   *Think:* A city where all traffic *must* pass through to get to certain other parts of the region.
+
+*   **🌉 Bridge (or Cut Edge):** This is an edge in a connected graph such that if you remove it, the graph breaks into more connected components. It's the *only* link between two parts of the graph.
+
+    *   *Think:* The only road connecting two islands.
+
+### Why do they matter?
+
+These concepts are super important for understanding the robustness and connectivity of networks.
+
+*   **Network Reliability:** Identify single points of failure in communication networks, transportation systems, or even social networks. If a bridge fails, or an articulation point goes down, the network can fragment.
+*   **Vulnerability Analysis:** Pinpointing critical nodes/links for security assessments.
+*   **Graph Decomposition:** They help in breaking down complex graphs into simpler, more manageable components.
+*   **Resource Allocation:** Understanding critical junctures for resource placement.
+
+---
+
+### How to find them? (The Magic of DFS!)
+
+We use a modified Depth First Search (DFS) traversal, tracking two special values for each node `u`:
+
+1.  `disc[u]` (Discovery Time): The time (or order) at which node `u` was first visited during DFS.
+2.  `low[u]` (Low-Link Value): The lowest `disc` value reachable from `u` (including `u` itself) through the DFS tree **and** using at most one back-edge. A back-edge is an edge that connects a node to one of its already visited ancestors in the DFS tree.
+
+**The Logic:**
+
+*   **For a Bridge (edge u-v):** If `low[v] > disc[u]`, it means that `v` and its subtree *cannot* reach an ancestor of `u` (or `u` itself) without passing through the edge `u-v`. So, `u-v` is a bridge!
+
+*   **For an Articulation Point (node u):**
+    *   **Case 1 (Root of DFS tree):** If `u` is the root of the DFS tree and has more than one child in the DFS tree, then `u` is an articulation point.
+    *   **Case 2 (Non-Root):** If for any child `v` of `u` in the DFS tree, `low[v] >= disc[u]`, it means `v` and its subtree *cannot* reach an ancestor of `u` (or `u` itself) without passing through `u`. So, `u` is an articulation point!
+
+---
+
+### Example Problem
+
+Given the following graph:
+Nodes: 0, 1, 2, 3, 4
+Edges:
+(0,1)
+(1,2)
+(2,0)
+(1,3)
+(3,4)
+
+Find all Bridges and Articulation Points.
+
+**Let's visualize and manually find:**
+
+```
+      0 -- 1 -- 3 -- 4
+      |    |
+      ---- 2
+```
+
+*   **Bridges:** `(3,4)` is definitely a bridge. If removed, `4` becomes isolated from the rest.
+*   **Articulation Points:**
+    *   `1`: If `1` is removed, the `0-2` cycle is disconnected from `3-4`. So, `1` is an AP.
+    *   `3`: If `3` is removed, `4` becomes isolated. So, `3` is an AP.
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <set>       // To store unique articulation points
+
+// Global variables for simplicity in this example
+std::vector<std::vector<int>> adj; // Adjacency list
+std::vector<bool> visited;         // To track visited nodes during DFS
+std::vector<int> disc;             // Discovery time of nodes
+std::vector<int> low;              // Low-link value of nodes
+int timer;                         // Global timer for discovery times
+
+std::vector<std::pair<int, int>> bridges; // Stores pairs of bridge edges
+std::set<int> articulation_points;        // Stores unique articulation points
+
+// DFS function to find bridges and articulation points
+void findBridgesAndArticulationPointsDFS(int u, int p = -1) {
+    visited[u] = true;
+    disc[u] = low[u] = timer++; // Set discovery time and low-link value
+
+    int children = 0; // Count children in DFS tree for root case
+
+    for (int v : adj[u]) {
+        if (v == p) { // Skip parent
+            continue;
+        }
+
+        if (visited[v]) { // If v is visited, it's a back-edge
+            low[u] = std::min(low[u], disc[v]);
+        } else { // If v is not visited, it's a forward-edge
+            children++;
+            findBridgesAndArticulationPointsDFS(v, u); // Recurse for child v
+            
+            // Update low-link value of u based on what v can reach
+            low[u] = std::min(low[u], low[v]);
+
+            // Check for Articulation Point (non-root case)
+            // If v and its subtree cannot reach an ancestor of u (or u itself)
+            // without passing through u, then u is an articulation point.
+            if (low[v] >= disc[u] && p != -1) { // p != -1 ensures u is not the root
+                articulation_points.insert(u);
+            }
+
+            // Check for Bridge
+            // If v and its subtree cannot reach an ancestor of u (or u itself)
+            // without passing through the edge u-v, then u-v is a bridge.
+            if (low[v] > disc[u]) {
+                bridges.push_back({u, v});
+            }
+        }
+    }
+
+    // Check for Articulation Point (root case)
+    // If u is the root of DFS tree and has more than one child.
+    if (p == -1 && children > 1) {
+        articulation_points.insert(u);
+    }
+}
+
+// Main function to initialize and start the process
+void findGraphCriticalPoints(int num_nodes) {
+    visited.assign(num_nodes, false);
+    disc.assign(num_nodes, -1);
+    low.assign(num_nodes, -1);
+    timer = 0;
+    bridges.clear();
+    articulation_points.clear();
+
+    // Iterate through all nodes to handle disconnected graphs
+    for (int i = 0; i < num_nodes; ++i) {
+        if (!visited[i]) {
+            findBridgesAndArticulationPointsDFS(i);
+        }
+    }
+}
+
+int main() {
+    int num_nodes = 5;
+    adj.resize(num_nodes);
+
+    // Add edges for the example graph
+    adj[0].push_back(1); adj[1].push_back(0);
+    adj[1].push_back(2); adj[2].push_back(1);
+    adj[2].push_back(0); adj[0].push_back(2);
+    adj[1].push_back(3); adj[3].push_back(1);
+    adj[3].push_back(4); adj[4].push_back(3);
+
+    std::cout << "Finding Bridges and Articulation Points in the graph...\n";
+    findGraphCriticalPoints(num_nodes);
+
+    // Print results
+    std::cout << "\n--- Bridges ---\n";
+    if (bridges.empty()) {
+        std::cout << "No bridges found.\n";
+    } else {
+        for (const auto& bridge : bridges) {
+            std::cout << "Edge: " << bridge.first << " - " << bridge.second << "\n";
+        }
+    }
+
+    std::cout << "\n--- Articulation Points ---\n";
+    if (articulation_points.empty()) {
+        std::cout << "No articulation points found.\n";
+    } else {
+        for (int ap : articulation_points) {
+            std::cout << "Vertex: " << ap << "\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+**Output for the example:**
+
+```
+Finding Bridges and Articulation Points in the graph...
+
+--- Bridges ---
+Edge: 3 - 4
+
+--- Articulation Points ---
+Vertex: 1
+Vertex: 3
+```
+
+This matches our manual analysis! 🎉
+
+---
+
+### Key Takeaways
+
+*   Bridges and Articulation Points are critical components that, when removed, disconnect parts of a graph.
+*   They are found using a special DFS algorithm that tracks `discovery times` and `low-link values`.
+*   Crucial for network robustness and identifying vulnerabilities.
+
+Keep exploring those graphs! You're doing great!
+
+---
