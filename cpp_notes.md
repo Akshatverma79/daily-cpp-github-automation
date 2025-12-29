@@ -6457,3 +6457,130 @@ int main() {
 And that's LCS in a nutshell! It's a fantastic problem to truly understand Dynamic Programming. Keep practicing, and you'll master it in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Increasing Subsequence (LIS)  
+🕒 2025-12-29 14:00:40
+
+Hey there, future DSA master! 👋 Let's break down Longest Increasing Subsequence (LIS) in a super friendly way.
+
+---
+
+## 🚀 **Longest Increasing Subsequence (LIS)**
+
+### 🤔 What's the concept?
+
+Imagine you have a list of numbers. An **increasing subsequence** is a sequence of numbers from that list where each number is greater than the one before it, AND they appear in the *original order* (though not necessarily next to each other).
+
+The **Longest Increasing Subsequence (LIS)** is simply the longest possible such sequence you can find in the given list.
+
+**Key Point:** "Subsequence" means you can skip numbers, but you can't change their original relative order.
+
+### 💡 Why does it matter?
+
+LIS is a classic problem in dynamic programming and comes up more often than you'd think!
+
+*   **Identifying Trends:** Useful in data analysis to spot rising trends (e.g., stock prices, temperature changes).
+*   **Bioinformatics:** Can be used in gene sequencing to find similarities between DNA strands.
+*   **Optimization:** Forms the basis for solving more complex problems where you need to find optimal arrangements or selections.
+
+### 📝 Let's see an example!
+
+**Problem:** Find the length of the LIS for the array `[10, 9, 2, 5, 3, 7, 101, 18]`
+
+**Walkthrough:**
+
+1.  **[10, 9, 2, 5, 3, 7, 101, 18]**
+2.  Can we start with 10? `[10, 101]` (length 2).
+3.  Can we start with 9? `[9, 101]` (length 2).
+4.  How about starting with 2?
+    *   `[2, 5, 7, 101]` (length 4) - Looks good!
+    *   `[2, 5, 7, 18]` (length 4) - Also good!
+    *   `[2, 3, 7, 101]` (length 4) - Another one!
+    *   `[2, 3, 7, 18]` (length 4) - Yet another!
+
+The longest increasing subsequence we found has a length of **4**.
+
+### 💻 Simple C++ Implementation (Dynamic Programming)
+
+The most straightforward way to solve this is using Dynamic Programming (DP).
+
+**Idea:**
+Let `dp[i]` be the length of the longest increasing subsequence *ending* at index `i`.
+
+1.  Initialize `dp` array: Each `dp[i]` is initially `1` (because the number `nums[i]` itself forms an increasing subsequence of length 1).
+2.  Iterate `i` from `0` to `n-1`:
+    *   For each `nums[i]`, iterate `j` from `0` to `i-1`:
+        *   If `nums[i]` is greater than `nums[j]`, it means `nums[i]` can extend the LIS ending at `j`.
+        *   So, `dp[i] = max(dp[i], dp[j] + 1)`.
+3.  The final answer is the maximum value in the entire `dp` array.
+
+**Time Complexity:** O(N^2) because of the nested loops.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max and std::max_element
+
+// Function to find the length of the Longest Increasing Subsequence
+int lengthOfLIS(std::vector<int>& nums) {
+    // Handle empty array case
+    if (nums.empty()) {
+        return 0;
+    }
+
+    int n = nums.size();
+    // dp[i] will store the length of the LIS ending at index i
+    std::vector<int> dp(n, 1); // Initialize all LIS lengths to 1 (the number itself)
+
+    int max_lis_length = 1; // At least one number, so min LIS length is 1
+
+    // Iterate through each number in the array
+    for (int i = 1; i < n; ++i) {
+        // For each nums[i], look at all previous numbers (nums[j])
+        for (int j = 0; j < i; ++j) {
+            // If nums[i] is greater than nums[j], it means nums[i] can extend the LIS ending at nums[j]
+            if (nums[i] > nums[j]) {
+                // Update dp[i] if we found a longer LIS ending at i
+                // by appending nums[i] to the LIS ending at nums[j]
+                dp[i] = std::max(dp[i], dp[j] + 1);
+            }
+        }
+        // Keep track of the overall maximum LIS length found so far
+        max_lis_length = std::max(max_lis_length, dp[i]);
+    }
+
+    return max_lis_length;
+}
+
+int main() {
+    std::vector<int> nums1 = {10, 9, 2, 5, 3, 7, 101, 18};
+    std::cout << "Array: ";
+    for (int num : nums1) std::cout << num << " ";
+    std::cout << "\nLength of LIS: " << lengthOfLIS(nums1) << std::endl; // Expected: 4
+
+    std::vector<int> nums2 = {0, 1, 0, 3, 2, 3};
+    std::cout << "\nArray: ";
+    for (int num : nums2) std::cout << num << " ";
+    std::cout << "\nLength of LIS: " << lengthOfLIS(nums2) << std::endl; // Expected: 4 ([0,1,2,3] or [0,1,3])
+
+    std::vector<int> nums3 = {7, 7, 7, 7, 7, 7, 7};
+    std::cout << "\nArray: ";
+    for (int num : nums3) std::cout << num << " ";
+    std::cout << "\nLength of LIS: " << lengthOfLIS(nums3) << std::endl; // Expected: 1
+
+    std::vector<int> nums4 = {};
+    std::cout << "\nArray: (empty)";
+    std::cout << "\nLength of LIS: " << lengthOfLIS(nums4) << std::endl; // Expected: 0
+
+    return 0;
+}
+
+```
+
+---
+
+And there you have it! LIS in a nutshell. It's a fundamental problem, and understanding this DP approach sets you up for many others. Happy coding! ✨
+
+---
