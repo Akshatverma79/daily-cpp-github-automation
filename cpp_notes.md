@@ -7047,3 +7047,161 @@ Minimum cost for assignment: 37
 And that's DP on Bitmasks in a nutshell! It's a fantastic technique for solving problems that involve subsets and require smart state management. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2025-12-31 13:59:02
+
+## Bit Manipulation Basics: Tiny Tools, Big Power!
+
+Hey there, future coding wizard! Let's dive into the fascinating world of Bit Manipulation. Don't let the name scare you; it's like learning to fine-tune your numbers at their most fundamental level.
+
+---
+
+### 🔍 What is Bit Manipulation?
+
+Imagine every number you use (like 5, 10, or 42) is secretly stored in your computer as a sequence of `0`s and `1`s (its binary representation).
+*   For example, `5` is `...00000101` in binary.
+*   `10` is `...00001010`.
+
+**Bit manipulation** is simply performing operations directly on these individual `0`s and `1`s (bits) that make up a number. Think of it like looking under the hood and tweaking the smallest switches!
+
+---
+
+### 💪 Why Does It Matter?
+
+1.  **Speed (🚀 Blazing Fast!):** Bitwise operations are super-fast because CPUs handle them directly. They are often much quicker than arithmetic operations (multiplication, division) for specific tasks.
+2.  **Memory Efficiency (🧠 Super Compact!):** You can store multiple true/false flags or small values within a single integer, saving memory.
+3.  **Specific Use Cases (🔧 Handy Tools!):**
+    *   Checking, setting, or clearing specific flags.
+    *   Optimizing algorithms (e.g., finding unique numbers, power of 2 checks).
+    *   Low-level programming (graphics, hardware control).
+    *   It's a common technique in competitive programming!
+
+---
+
+### 🛠️ Basic Bitwise Operations (The Core Toolkit!)
+
+Let's assume our number is `num` and `k` is the **0-indexed** position of the bit we're interested in (e.g., `k=0` is the rightmost bit).
+
+1.  **AND (`&`)**:
+    *   `1 & 1 = 1`, otherwise `0`.
+    *   **Use Case:** **Checking if a bit is set (is `1`)**. `num & (1 << k)` will be non-zero if the `k`-th bit is `1`, and zero otherwise.
+    *   **Example:** `10 (1010) & 8 (1000)` = `8 (1000)`
+
+2.  **OR (`|`)**:
+    *   `0 | 0 = 0`, otherwise `1`.
+    *   **Use Case:** **Setting a bit to `1`**. `num | (1 << k)` will set the `k`-th bit to `1` (if it wasn't already).
+    *   **Example:** `10 (1010) | 1 (0001)` = `11 (1011)`
+
+3.  **XOR (`^`)**:
+    *   `1 ^ 0 = 1`, `0 ^ 1 = 1` (different bits yield `1`). `1 ^ 1 = 0`, `0 ^ 0 = 0` (same bits yield `0`).
+    *   **Use Case:** **Toggling/Flipping a bit**. `num ^ (1 << k)` will flip the `k`-th bit (if it was `0` it becomes `1`, if `1` it becomes `0`). Also useful for finding unique elements.
+    *   **Example:** `10 (1010) ^ 2 (0010)` = `8 (1000)`
+
+4.  **NOT (`~`)**:
+    *   Flips all bits (`0` becomes `1`, `1` becomes `0`).
+    *   **Use Case:** Often used with masks to clear a bit. Be careful: `~num` on its own can be tricky due to two's complement representation.
+    *   **Example:** `~10 (0...1010)` = `...11110101` (a large negative number)
+
+5.  **Left Shift (`<<`)**:
+    *   `num << k` shifts bits of `num` `k` positions to the left, filling with `0`s on the right. Effectively multiplies `num` by `2^k`.
+    *   **Use Case:** Creating masks. `1 << k` gives you a number with only the `k`-th bit set (e.g., `1 << 2` is `0100` which is 4).
+    *   **Example:** `5 (0101) << 1` = `10 (1010)`
+
+6.  **Right Shift (`>>`)**:
+    *   `num >> k` shifts bits of `num` `k` positions to the right. Effectively divides `num` by `2^k` (integer division).
+    *   **Use Case:** Getting the value of the `k`-th bit (`(num >> k) & 1`).
+    *   **Example:** `10 (1010) >> 1` = `5 (0101)`
+
+---
+
+### 💡 Example Problem: Check and Toggle Bit
+
+Let's take a number, check if its `k`-th bit is set, and then toggle that `k`-th bit.
+
+**Problem:** Given an integer `num = 10` (binary `1010`) and a bit position `k = 1`.
+1.  Check if the 1st bit (0-indexed) of `num` is set.
+2.  Toggle the 1st bit of `num`.
+3.  Print the original and new number, and the check result.
+
+**Breakdown:**
+*   `num = 10` is `...00001010`
+*   `k = 1` means we're looking at the bit at position 1 (the second bit from the right).
+*   `1 << k` (our mask) will be `1 << 1` which is `0010` (decimal 2).
+
+---
+
+### 💻 C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Helper function to print binary for better understanding
+void printBinary(int n) {
+    for (int i = 31; i >= 0; --i) { // Assuming 32-bit int
+        std::cout << ((n >> i) & 1);
+        if (i % 8 == 0 && i != 0) std::cout << " "; // Group by bytes
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    int num = 10; // Binary: ...00001010
+    int k = 1;    // The 1st bit (0-indexed)
+
+    std::cout << "Original number: " << num << std::endl;
+    std::cout << "Binary: ";
+    printBinary(num);
+    std::cout << "---" << std::endl;
+
+    // 1. Check if the k-th bit is set
+    int mask_check = (1 << k); // Creates a mask like 0010 (for k=1)
+    bool isBitSet = (num & mask_check) != 0; 
+    // Alternative check: bool isBitSet = ((num >> k) & 1) != 0;
+
+    std::cout << "Checking " << k << "-th bit (using mask " << mask_check << "):" << std::endl;
+    if (isBitSet) {
+        std::cout << "The " << k << "-th bit IS set (is 1)." << std::endl;
+    } else {
+        std::cout << "The " << k << "-th bit IS NOT set (is 0)." << std::endl;
+    }
+    std::cout << "---" << std::endl;
+
+    // 2. Toggle the k-th bit
+    int mask_toggle = (1 << k); // Same mask for toggling
+    num = num ^ mask_toggle;     // XOR flips the bit
+
+    std::cout << "Number after toggling the " << k << "-th bit:" << std::endl;
+    std::cout << "New number: " << num << std::endl; // num is now 8
+    std::cout << "Binary: ";
+    printBinary(num);
+    std::cout << "---" << std::endl;
+
+    return 0;
+}
+```
+
+**Output for the above code:**
+
+```
+Original number: 10
+Binary: 00000000 00000000 00000000 00001010
+---
+Checking 1-th bit (using mask 2):
+The 1-th bit IS set (is 1).
+---
+Number after toggling the 1-th bit:
+New number: 8
+Binary: 00000000 00000000 00000000 00001000
+---
+```
+
+---
+
+### 🎉 Conclusion
+
+Bit manipulation might seem a bit abstract at first, but it's a powerful technique that will make your code faster and more efficient for certain problems. Start with these basics, practice, and you'll soon be wielding its power like a pro! Happy coding!
+
+---
