@@ -6901,3 +6901,149 @@ Maximum non-adjacent node sum: 50
 And that's DP on Trees in a nutshell! Keep practicing, and you'll master these tree-mendous problems! Happy coding! 🌳✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Bitmasks  
+🕒 2025-12-31 06:35:28
+
+Hey there, future DP master! 👋 Let's dive into **DP on Bitmasks** – a super cool technique for problems involving subsets.
+
+---
+
+### What is DP on Bitmasks?
+
+Imagine you have a small set of items (say, up to 20-25). How do you efficiently keep track of which items you've picked, visited, or processed?
+
+1.  **Bitmasks**: A bitmask is just an integer where each bit tells you if a specific item is 'in' or 'out' of a set.
+    *   If the `i`-th bit is `1`, it means item `i` is included.
+    *   If the `i`-th bit is `0`, it means item `i` is excluded.
+    *   Example: If `N=3`, a mask `101` (binary, which is `5` in decimal) means items `0` and `2` are included, but item `1` is not.
+
+2.  **DP on Bitmasks**: This technique uses these bitmasks as part of your Dynamic Programming state. Typically, `dp[mask]` will store the best (min/max) result for the *subset of items represented by that `mask`*.
+
+---
+
+### Why Does It Matter?
+
+It's a powerful tool when:
+
+*   You need to keep track of a **subset of items**.
+*   The order of selecting items *within* a subset is complex, or you need to know *all* previously picked items to make a decision.
+*   The number of items (N) is relatively small (usually N <= 20-25) because there are `2^N` possible masks, which can grow very quickly!
+*   It helps compress the state space of your DP.
+
+Commonly seen in problems like the Traveling Salesperson Problem (TSP), assignment problems, or problems involving choosing items with dependencies.
+
+---
+
+### Example Problem: Minimum Cost Assignment
+
+Let's say you have `N` people and `N` tasks. You're given a cost matrix `cost[i][j]` representing the cost of assigning person `i` to task `j`.
+
+**Goal**: Assign each person to exactly one task, and each task to exactly one person, such that the total cost is minimized.
+
+**How DP on Bitmasks helps:**
+
+We can define our DP state as:
+`dp[mask]` = The minimum cost to assign tasks represented by the `mask` to the first `k` people, where `k` is the number of set bits in `mask`.
+
+*   **Base Case**: `dp[0] = 0` (no tasks assigned, no cost). All other `dp` values are initialized to infinity.
+*   **Transitions**:
+    *   We iterate through all possible masks from `0` to `(1 << N) - 1`.
+    *   For each `mask`, let `person_idx = __builtin_popcount(mask)`. This `person_idx` tells us which person (0-indexed) we are currently trying to assign a task to.
+    *   If `dp[mask]` is still infinity, it means this state is unreachable, so we skip it.
+    *   Now, for `person_idx`, we iterate through all possible tasks `task_idx` (from `0` to `N-1`):
+        *   If `task_idx` is *not yet assigned* (i.e., the `task_idx`-th bit in `mask` is `0`), then we can assign `person_idx` to `task_idx`.
+        *   The new mask will be `new_mask = mask | (1 << task_idx)`.
+        *   We update `dp[new_mask] = min(dp[new_mask], dp[mask] + cost[person_idx][task_idx])`.
+*   **Final Answer**: `dp[(1 << N) - 1]` (the mask where all bits are set, meaning all tasks are assigned to all `N` people).
+
+**Complexity**: There are `2^N` states. For each state, we iterate `N` times to consider all possible next tasks. So, `O(N * 2^N)`.
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <limits>    // For std::numeric_limits
+
+const int INF = std::numeric_limits<int>::max();
+
+int main() {
+    // Let's use a small N for demonstration
+    // N people and N tasks
+    int N = 3; 
+
+    // cost[i][j] = cost of assigning person 'i' to task 'j'
+    // Example costs for N=3
+    std::vector<std::vector<int>> cost = {
+        {10, 20, 30}, // Person 0 costs for tasks 0, 1, 2
+        {15, 12, 18}, // Person 1 costs for tasks 0, 1, 2
+        {25, 10, 15}  // Person 2 costs for tasks 0, 1, 2
+    };
+
+    // dp[mask] stores the minimum cost to assign tasks represented by 'mask'
+    // to the first 'k' people, where k = number of set bits in 'mask'.
+    // There are 2^N possible masks.
+    std::vector<int> dp(1 << N, INF);
+
+    // Base case: No tasks assigned (mask = 0), cost is 0.
+    dp[0] = 0;
+
+    // Iterate through all possible masks
+    // A mask represents a subset of tasks that have been assigned.
+    for (int mask = 0; mask < (1 << N); ++mask) {
+        // If this state is unreachable, skip it
+        if (dp[mask] == INF) {
+            continue;
+        }
+
+        // 'person_idx' is the current person we are trying to assign a task to.
+        // It's determined by how many tasks (bits) are already set in the mask.
+        // __builtin_popcount(mask) counts the number of set bits (1s) in 'mask'.
+        int person_idx = __builtin_popcount(mask); 
+
+        // We assign tasks to people one by one, person_0, then person_1, etc.
+        // If person_idx == N, it means all N people have been assigned tasks.
+        if (person_idx == N) {
+            continue; // All people are assigned, no more transitions from this mask
+        }
+
+        // Try to assign 'person_idx' to each available task 'task_idx'
+        for (int task_idx = 0; task_idx < N; ++task_idx) {
+            // Check if 'task_idx' is NOT already assigned in the current 'mask'
+            // (mask & (1 << task_idx)) checks if the task_idx-th bit is set
+            if (!(mask & (1 << task_idx))) {
+                // If task_idx is available, assign person_idx to task_idx
+                // Create a new mask by setting the task_idx-th bit
+                int next_mask = mask | (1 << task_idx);
+                
+                // Update the minimum cost for 'next_mask'
+                dp[next_mask] = std::min(dp[next_mask], dp[mask] + cost[person_idx][task_idx]);
+            }
+        }
+    }
+
+    // The final answer is the minimum cost when all tasks are assigned,
+    // which corresponds to the mask where all N bits are set ((1 << N) - 1).
+    std::cout << "Minimum cost for assignment: " << dp[(1 << N) - 1] << std::endl;
+
+    return 0;
+}
+```
+
+**Output for the example costs:**
+```
+Minimum cost for assignment: 37
+```
+(This corresponds to: Person 0 -> Task 0 (10), Person 1 -> Task 1 (12), Person 2 -> Task 2 (15). Total = 10+12+15 = 37)
+
+---
+
+And that's DP on Bitmasks in a nutshell! It's a fantastic technique for solving problems that involve subsets and require smart state management. Keep practicing!
+
+---
