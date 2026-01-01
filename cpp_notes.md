@@ -7372,3 +7372,138 @@ int main() {
 That's a quick tour of GCD and Prime Numbers! These concepts are fundamental and will empower you to tackle many interesting problems in DSA. Keep practicing, and you'll master them in no time! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-01-01 13:58:46
+
+Let's dive into Game Theory basics – it's like learning to predict the future in a game, assuming everyone plays perfectly! 🤖
+
+---
+
+## Game Theory Basics: Predicting Optimal Moves!
+
+Ever wanted to outsmart your opponent in a game, knowing their every optimal move? That's what Game Theory helps us do in the world of DSA!
+
+### 1. What Does Game Theory Mean?
+
+In DSA, Game Theory usually deals with **mathematical models of strategic interaction** among rational players.
+
+*   **Players:** The people (or algorithms) making decisions.
+*   **Rules:** What actions are allowed.
+*   **Outcomes:** What happens based on the actions (win, lose, draw).
+*   **Optimal Strategy:** The best possible move a player can make, assuming their opponents also play optimally.
+
+We often look at **impartial games**, where the available moves depend only on the state of the game, not on which player is moving. Our goal is usually to determine if the first player has a winning strategy or not.
+
+### 2. Why Does It Matter?
+
+*   **Competitive Programming/Interviews:** Game theory problems are common. Knowing the core concepts can help you identify winning/losing positions quickly.
+*   **Strategic Thinking:** It trains you to think about all possible moves, counter-moves, and to work backward from end states.
+*   **Decision Making:** While complex real-world scenarios are hard to model, the underlying principles apply to optimizing decisions.
+
+### 3. Key Concept: Winning/Losing Positions
+
+The most fundamental idea is classifying game states:
+
+*   **P-position (Previous player winning position):** A position where the *previous* player (the one who just moved to this state) has a winning strategy. This means the *current* player (whose turn it is) will lose if the previous player plays optimally.
+*   **N-position (Next player winning position):** A position where the *next* player (the current player whose turn it is) has a winning strategy. This means the current player will win if they play optimally.
+
+To solve game theory problems, you often try to identify these positions recursively.
+
+### 4. Example Problem: The Nim Game
+
+The Nim game is a classic impartial game and a perfect starting point!
+
+**Problem:** You are given `N` piles of stones. Each pile `i` has `p_i` stones. Two players take turns. In each turn, a player must choose one pile and remove any positive number of stones from it. The player who takes the last stone wins. Determine if the first player has a winning strategy.
+
+**Key Idea (Bouton's Theorem - The Magic of XOR!):**
+A position in the Nim game is a **P-position (losing position for the current player)** if and only if the **Nim-sum** (the XOR sum of all pile sizes) is **0**. Otherwise, it's an **N-position (winning position for the current player)**.
+
+*   **If Nim-sum is 0:** Any move you make will change one pile's size, making the Nim-sum non-zero. You're forced to put your opponent in an N-position.
+*   **If Nim-sum is non-zero:** You can always make a move that results in a Nim-sum of 0, putting your opponent in a P-position. (Find the most significant bit in the Nim-sum, find a pile whose size has that bit set, and reduce that pile's size to `pile_size ^ nim_sum`).
+
+**So, the strategy is simple:** If the initial Nim-sum is non-zero, the first player wins. If it's zero, the second player wins (assuming optimal play).
+
+### 5. Simple C++ Implementation
+
+Let's implement the Nim-sum calculation for the Nim Game.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate, though a simple loop is fine too
+
+int main() {
+    std::cout << "--- Nim Game Solver ---" << std::endl;
+
+    int numPiles;
+    std::cout << "Enter the number of piles: ";
+    std::cin >> numPiles;
+
+    if (numPiles <= 0) {
+        std::cout << "There must be at least one pile." << std::endl;
+        return 1;
+    }
+
+    // Stores the sizes of each pile
+    std::vector<int> piles(numPiles);
+    std::cout << "Enter the size of each pile:" << std::endl;
+    for (int i = 0; i < numPiles; ++i) {
+        std::cout << "Pile " << i + 1 << ": ";
+        std::cin >> piles[i];
+        if (piles[i] < 0) {
+            std::cout << "Pile size cannot be negative. Exiting." << std::endl;
+            return 1;
+        }
+    }
+
+    // Calculate the Nim-sum (XOR sum) of all pile sizes
+    int nimSum = 0;
+    for (int pileSize : piles) {
+        nimSum ^= pileSize; // XOR each pile size
+    }
+
+    std::cout << "\nCalculated Nim-sum: " << nimSum << std::endl;
+
+    // Determine the winner based on the Nim-sum
+    if (nimSum != 0) {
+        std::cout << "The Nim-sum is non-zero. Therefore, the FIRST player has a winning strategy!" << std::endl;
+    } else {
+        std::cout << "The Nim-sum is zero. Therefore, the SECOND player has a winning strategy!" << std::endl;
+    }
+
+    std::cout << "-----------------------" << std::endl;
+
+    return 0;
+}
+```
+
+**How to Compile & Run (e.g., using g++):**
+1.  Save the code as `nim_game.cpp`.
+2.  Open your terminal/command prompt.
+3.  Compile: `g++ nim_game.cpp -o nim_game`
+4.  Run: `./nim_game`
+
+**Example Interaction:**
+
+```
+--- Nim Game Solver ---
+Enter the number of piles: 3
+Enter the size of each pile:
+Pile 1: 3
+Pile 2: 4
+Pile 3: 5
+
+Calculated Nim-sum: 2
+The Nim-sum is non-zero. Therefore, the FIRST player has a winning strategy!
+-----------------------
+```
+(Because 3 (011) XOR 4 (100) XOR 5 (101) = 2 (010))
+
+---
+
+This simple example shows how a deep theoretical concept (Nim-sum) can lead to a very clean and efficient solution for determining optimal play in certain types of games! Keep exploring, and you'll find more fascinating patterns!
+
+---
