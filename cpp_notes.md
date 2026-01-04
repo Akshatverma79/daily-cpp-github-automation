@@ -7979,3 +7979,92 @@ int main() {
 There you have it! Recursion in a nutshell. Keep practicing, and it'll click even more. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Problems  
+🕒 2026-01-04 13:57:46
+
+Hey there, future coding wizard! Let's unravel the magic of Recursion together. ✨
+
+---
+
+## DSA Notes: Recursion
+
+### What is Recursion? (The Concept)
+
+Imagine a function that solves a problem by calling *itself* to solve smaller, similar versions of the same problem. This "self-calling" behavior is recursion! It keeps breaking down the problem until it reaches a super easy case that it can solve directly, and then it builds up the solution from there.
+
+Every recursive function needs two key things:
+
+1.  **Base Case:** This is the simplest version of the problem that can be solved directly, *without* further recursion. This is crucial because it's the "stop sign" that prevents your function from calling itself infinitely!
+2.  **Recursive Step:** This is where the function calls itself with a smaller input, moving closer to the base case. It's the "break down the problem" part.
+
+### Why Does It Matter?
+
+Recursion makes complex problems feel super manageable! Think about problems that naturally break down into smaller, identical sub-problems (like traversing a tree, searching through nested structures, or calculating mathematical series). Recursion often provides a very elegant and intuitive solution, making your code cleaner and easier to read for these specific types of problems.
+
+### Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a non-negative integer `n`.
+The factorial of `n` (written as `n!`) is the product of all positive integers less than or equal to `n`.
+*   `5! = 5 * 4 * 3 * 2 * 1 = 120`
+*   `3! = 3 * 2 * 1 = 6`
+*   By definition, `0! = 1`.
+
+**How it breaks down recursively:**
+Notice that `5! = 5 * (4!)`. And `4! = 4 * (3!)`, and so on.
+This is our recursive step! `n! = n * (n-1)!`
+
+**Base Case:** We need a point to stop. When `n` becomes `0`, we know `0! = 1`. This is our base case!
+
+### C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case: The stopping condition
+    if (n == 0) {
+        return 1; // By definition, 0! is 1
+    }
+    // Optional: Handle negative input if needed, or assume valid input
+    if (n < 0) {
+        std::cout << "Factorial is not defined for negative numbers." << std::endl;
+        return -1; // Or throw an exception
+    }
+
+    // 2. Recursive Step: Call the function with a smaller input
+    // n! = n * (n-1)!
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 120
+
+    num = 0;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 1
+
+    num = 3;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 6
+
+    return 0;
+}
+```
+
+**Explanation:**
+*   The `factorial(int n)` function first checks if `n` is `0`. If it is, it hits the **base case** and returns `1`.
+*   If `n` is not `0`, it proceeds to the **recursive step**: `return n * factorial(n - 1);`. This means it multiplies `n` by the result of calling `factorial` with `n-1`.
+*   This process continues: `factorial(5)` calls `factorial(4)`, which calls `factorial(3)`, and so on, until `factorial(0)` is called.
+*   `factorial(0)` returns `1`.
+*   Then `factorial(1)` can calculate `1 * 1 = 1`.
+*   Then `factorial(2)` can calculate `2 * 1 = 2`.
+*   ...until `factorial(5)` calculates `5 * 24 = 120`.
+
+---
+
+**Quick Tip:** Always define your base case carefully to avoid infinite recursion (and a stack overflow!) – that's when your function keeps calling itself forever until your program crashes. Happy coding!
+
+---
