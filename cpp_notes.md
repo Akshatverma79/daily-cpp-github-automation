@@ -7896,3 +7896,86 @@ Value pointed to by myPointer (*myPointer): 100
 **Key Takeaway:** Pointers are powerful tools to interact directly with memory, enabling dynamic data structures and efficient operations. Master them, and you'll unlock a new level of control in your C++ programming!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-01-04 06:33:28
+
+Hey there, future DSA pro! 👋 Let's unlock the magic of **Recursion Basics**.
+
+---
+
+## Recursion Basics
+
+### 💡 What is Recursion?
+
+Imagine a function that solves a problem by calling *itself* to solve a smaller version of the same problem. That, in a nutshell, is recursion! You break a big problem into smaller, similar pieces until you hit a super simple case you already know how to solve.
+
+Every recursive solution needs two main parts:
+
+1.  **Base Case:** This is the simplest version of the problem that can be solved directly, *without* further recursion. This is crucial to stop the recursion and prevent an infinite loop!
+2.  **Recursive Step:** Where the function calls itself with a modified (usually smaller or simpler) input, moving closer to the base case.
+
+### 🚀 Why Does It Matter?
+
+Recursion often leads to very elegant and readable solutions for problems that have a naturally recursive structure. Think of tasks like:
+
+*   **Traversing Trees and Graphs:** Many operations on these structures are naturally recursive.
+*   **Divide and Conquer Algorithms:** Like Merge Sort or Quick Sort.
+*   **Backtracking:** Exploring all possible solutions.
+
+It helps you think about problems from a different perspective and can simplify complex logic!
+
+### 🎯 Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a non-negative integer `n`.
+The factorial of `n` (denoted as `n!`) is the product of all positive integers less than or equal to `n`.
+
+*   `5! = 5 * 4 * 3 * 2 * 1 = 120`
+*   `3! = 3 * 2 * 1 = 6`
+*   By definition, `0! = 1`.
+
+Notice the pattern: `n! = n * (n-1)!`
+
+*   **Base Case:** `0! = 1` or `1! = 1`. This is where we stop.
+*   **Recursive Step:** `n * factorial(n-1)`. We call `factorial` with a smaller input (`n-1`).
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case: If n is 0 or 1, the factorial is 1.
+    // This is the condition that stops the recursion.
+    if (n == 0 || n == 1) {
+        return 1;
+    } 
+    // 2. Recursive Step: For n > 1, factorial(n) = n * factorial(n-1)
+    // The function calls itself with a smaller value (n-1).
+    else {
+        return n * factorial(n - 1);
+    }
+}
+
+int main() {
+    int number = 5;
+    std::cout << "The factorial of " << number << " is: " << factorial(number) << std::endl; // Output: 120
+
+    int zero_number = 0;
+    std::cout << "The factorial of " << zero_number << " is: " << factorial(zero_number) << std::endl; // Output: 1
+
+    int one_number = 1;
+    std::cout << "The factorial of " << one_number << " is: " << factorial(one_number) << std::endl; // Output: 1
+
+    return 0;
+}
+```
+
+---
+
+There you have it! Recursion in a nutshell. Keep practicing, and it'll click even more. Happy coding! ✨
+
+---
