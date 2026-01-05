@@ -8068,3 +8068,123 @@ int main() {
 **Quick Tip:** Always define your base case carefully to avoid infinite recursion (and a stack overflow!) – that's when your function keeps calling itself forever until your program crashes. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-01-05 06:40:15
+
+Hey there, future coding wizard! 👋 Let's unlock the secrets of one of the coolest foundational data structures: **Linked Lists**!
+
+---
+
+### 🔗 Linked List Basics
+
+**1. What is a Linked List?**
+
+Imagine a treasure hunt where each clue tells you exactly where to find the *next* clue, instead of having all clues laid out in a fixed map. That's pretty much a Linked List!
+
+It's a sequence of "nodes" where:
+*   Each **Node** contains two main things:
+    *   **Data:** The actual value it stores (e.g., a number, a name).
+    *   **Next Pointer:** A reference (or link) to the *next* node in the sequence.
+*   The first node in the list is called the **Head**.
+*   The last node's "next" pointer points to `nullptr` (or `NULL`), signaling the end of the list.
+
+Unlike arrays, elements are not stored in contiguous memory locations. They're scattered but *linked* together!
+
+**2. Why Does It Matter? (Why is it useful?)**
+
+Think about arrays for a moment:
+*   They have a fixed size (you declare `int arr[10];` and that's it).
+*   Adding or removing an element in the middle requires shifting all subsequent elements, which can be slow!
+
+Linked Lists solve these pains:
+*   **Dynamic Size:** They can grow or shrink as needed, effortlessly! No need to pre-allocate memory.
+*   **Efficient Insertions/Deletions:** Adding or removing a node (especially at the beginning/end or if you have a pointer to the previous node) is super fast – just a few pointer updates!
+*   **Memory Efficiency:** They only use the memory they need for the elements currently in the list.
+
+They're perfect when you have frequent additions and removals, or when you don't know the exact size of your data upfront.
+
+**3. Let's Try an Example Problem!**
+
+**Problem:** How do you add a new node with a given value to the **beginning** of a Linked List?
+
+**Input:**
+*   A `head` pointer to an existing (possibly empty) Linked List.
+*   A `newValue` to be added.
+
+**Output:**
+*   The list with `newValue` as the new head.
+
+**Logic Steps:**
+1.  Create a `newNode` with `newValue`.
+2.  Make `newNode` point to the *current* `head` of the list.
+3.  Update the `head` of the list to be the `newNode`.
+
+**4. Simple C++ Implementation**
+
+Here's how we'd implement the `Node` structure and a function to insert at the beginning, along with a way to print the list:
+
+```cpp
+#include <iostream> // For input/output operations
+
+// 1. Define the Node structure
+struct Node {
+    int data;     // Data stored in the node
+    Node* next;   // Pointer to the next node in the list
+
+    // Constructor to easily create a new Node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// Function to insert a new node at the beginning of the list
+// We pass 'head' by reference (Node*&) because we might change where head points
+void insertAtBeginning(Node*& head, int newData) {
+    Node* newNode = new Node(newData); // Create the new node
+
+    newNode->next = head; // Make the new node point to the current head
+    head = newNode;       // Update the head to be the new node
+}
+
+// Function to print the entire Linked List
+void printList(Node* head) {
+    Node* current = head; // Start from the head
+    while (current != nullptr) { // Traverse until we hit the end
+        std::cout << current->data << " -> ";
+        current = current->next; // Move to the next node
+    }
+    std::cout << "nullptr" << std::endl; // Indicate the end of the list
+}
+
+int main() {
+    Node* head = nullptr; // Start with an empty list (head points to nothing)
+
+    std::cout << "Initial list: ";
+    printList(head); // Output: nullptr
+
+    insertAtBeginning(head, 10); // Insert 10
+    std::cout << "After inserting 10: ";
+    printList(head); // Output: 10 -> nullptr
+
+    insertAtBeginning(head, 20); // Insert 20
+    std::cout << "After inserting 20: ";
+    printList(head); // Output: 20 -> 10 -> nullptr
+
+    insertAtBeginning(head, 5);  // Insert 5
+    std::cout << "After inserting 5: ";
+    printList(head); // Output: 5 -> 20 -> 10 -> nullptr
+
+    // Important: In real applications, you'd need to deallocate memory
+    // to prevent memory leaks, typically by traversing and deleting nodes.
+    // For this basic example, we'll skip explicit deallocation in main.
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Your first step into understanding Linked Lists. This fundamental concept is crucial for many advanced data structures and algorithms. Keep practicing, and you'll master it in no time! Happy coding! ✨
+
+---
