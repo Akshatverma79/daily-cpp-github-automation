@@ -8418,3 +8418,165 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Stacks Implementation  
+🕒 2026-01-06 06:36:22
+
+Hey there, aspiring coder! Let's dive into Stacks – a fundamental data structure that's super useful.
+
+---
+
+### Stacks: LIFO in Action!
+
+#### 1. What a Stack Is (Concept)
+
+Imagine a stack of plates:
+*   You can only add a new plate **on top**.
+*   You can only remove a plate **from the top**.
+
+That's exactly what a Stack is in computer science! It follows the **LIFO** principle: **L**ast **I**n, **F**irst **O**ut. The last item you added is the first one you can take out.
+
+**Key Operations:**
+*   `push(item)`: Adds an item to the top of the stack.
+*   `pop()`: Removes and returns the item from the top of the stack.
+*   `top()` or `peek()`: Returns the item at the top without removing it.
+*   `isEmpty()`: Checks if the stack has any items.
+*   `size()`: Returns the number of items in the stack.
+
+#### 2. Why Stacks Matter
+
+Stacks are everywhere! They're simple but incredibly powerful:
+
+*   **Browser History:** When you click "back," it's like popping a page off a stack.
+*   **Undo/Redo Features:** Each action you perform is pushed onto an "undo" stack.
+*   **Function Call Stack:** When your program calls functions, they get pushed onto a stack. When a function finishes, it's popped off. This is crucial for how recursion works!
+*   **Expression Evaluation:** Used to convert infix expressions (like `2 + 3 * 4`) to postfix and evaluate them.
+
+#### 3. Example Problem: Web Page Navigation
+
+Let's say you're building a simple web browser history feature.
+
+1.  **Visit Google:** `push("Google.com")`
+    *   Stack: `[Google.com]`
+2.  **Visit YouTube:** `push("YouTube.com")`
+    *   Stack: `[Google.com, YouTube.com]` (YouTube is on top)
+3.  **Visit Wikipedia:** `push("Wikipedia.org")`
+    *   Stack: `[Google.com, YouTube.com, Wikipedia.org]` (Wikipedia is on top)
+4.  **Click "Back":** `pop()`
+    *   You land back on `YouTube.com` (the `pop()` returned "Wikipedia.org").
+    *   Stack: `[Google.com, YouTube.com]`
+5.  **Click "Back" again:** `pop()`
+    *   You land back on `Google.com` (the `pop()` returned "YouTube.com").
+    *   Stack: `[Google.com]`
+
+See how the last visited page is always the first one you go back from? That's LIFO!
+
+#### 4. Simple C++ Implementation
+
+In C++, you can build a Stack using an `std::vector` (or `std::list` or `std::deque`) as the underlying storage. For simplicity, we'll use `std::vector<int>`.
+
+C++ also provides `std::stack` as a ready-to-use adapter, but building our own helps understand the mechanics!
+
+```cpp
+#include <iostream> // For input/output (like cout)
+#include <vector>   // To use std::vector as our internal storage
+#include <stdexcept> // For throwing exceptions (e.g., trying to pop from empty stack)
+
+// A custom Stack implementation for integers
+class MyStack {
+private:
+    std::vector<int> data; // The underlying container for our stack elements
+
+public:
+    // Pushes an item onto the top of the stack
+    void push(int value) {
+        data.push_back(value); // std::vector's push_back adds to the end (which is our "top")
+        std::cout << "Pushed: " << value << std::endl;
+    }
+
+    // Removes and returns the item from the top of the stack
+    int pop() {
+        if (isEmpty()) {
+            throw std::runtime_error("Stack is empty! Cannot pop.");
+        }
+        int topElement = data.back(); // Get the last element (our "top")
+        data.pop_back();             // Remove the last element
+        std::cout << "Popped: " << topElement << std::endl;
+        return topElement;
+    }
+
+    // Returns the item at the top without removing it
+    int top() {
+        if (isEmpty()) {
+            throw std::runtime_error("Stack is empty! No top element.");
+        }
+        return data.back(); // Get the last element (our "top")
+    }
+
+    // Checks if the stack has any items
+    bool isEmpty() {
+        return data.empty(); // std::vector's empty() checks if it's empty
+    }
+
+    // Returns the number of items in the stack
+    int size() {
+        return data.size(); // std::vector's size() returns the number of elements
+    }
+};
+
+int main() {
+    MyStack browserHistory;
+
+    std::cout << "Is stack empty? " << (browserHistory.isEmpty() ? "Yes" : "No") << std::endl;
+
+    browserHistory.push(10); // Represents visiting Page 10
+    browserHistory.push(20); // Represents visiting Page 20
+    browserHistory.push(30); // Represents visiting Page 30
+
+    std::cout << "Stack size: " << browserHistory.size() << std::endl;
+    std::cout << "Top element: " << browserHistory.top() << std::endl; // Should be 30
+
+    browserHistory.pop(); // Go back from Page 30
+
+    std::cout << "Stack size after pop: " << browserHistory.size() << std::endl;
+    std::cout << "Top element after pop: " << browserHistory.top() << std::endl; // Should be 20
+
+    browserHistory.pop(); // Go back from Page 20
+    browserHistory.pop(); // Go back from Page 10
+
+    std::cout << "Is stack empty? " << (browserHistory.isEmpty() ? "Yes" : "No") << std::endl;
+
+    try {
+        browserHistory.pop(); // Try to pop from an empty stack
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Is stack empty? Yes
+Pushed: 10
+Pushed: 20
+Pushed: 30
+Stack size: 3
+Top element: 30
+Popped: 30
+Stack size after pop: 2
+Top element after pop: 20
+Popped: 20
+Popped: 10
+Is stack empty? Yes
+Error: Stack is empty! Cannot pop.
+```
+
+---
+
+And that's your quick dive into Stacks! Remember LIFO, and you'll master this fundamental data structure in no time. Happy coding!
+
+---
