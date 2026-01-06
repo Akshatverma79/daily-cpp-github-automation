@@ -8580,3 +8580,170 @@ Error: Stack is empty! Cannot pop.
 And that's your quick dive into Stacks! Remember LIFO, and you'll master this fundamental data structure in no time. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-01-06 14:00:55
+
+Alright, let's dive into Queues!
+
+---
+
+## Queues: The Waiting Line of Data Structures
+
+### What is a Queue? 🤔
+
+Imagine a waiting line at a coffee shop or a queue for concert tickets. The person who gets in line first is the first one to be served, right? That's exactly how a **Queue** works in programming!
+
+It's a linear data structure that follows the **FIFO** principle:
+*   **F**irst **I**n, **F**irst **O**ut.
+
+Think of it like this:
+*   **Enqueue**: Adding an item to the **rear** (back) of the queue.
+*   **Dequeue**: Removing an item from the **front** of the queue.
+*   **Front/Peek**: Looking at the item at the front without removing it.
+*   **isEmpty**: Checking if the queue has any items.
+*   **Size**: Getting the number of items in the queue.
+
+### Why Does It Matter? 🚀
+
+Queues are super useful for scenarios where you need to process items in the exact order they arrived.
+
+*   **Task Scheduling**: Operating systems use queues to manage tasks or print jobs. The first task submitted gets processed first.
+*   **Breadth-First Search (BFS)**: A common algorithm for graph traversal uses a queue to explore nodes level by level.
+*   **Buffering**: Handling data streams, where data comes in and needs to be processed sequentially.
+*   **Simulations**: Modeling real-world waiting lines.
+
+### Example Problem: Printer Queue 🖨️
+
+Let's say we have a printer, and multiple documents (jobs) are sent to it. The printer should process them in the order they were submitted.
+
+**Problem:** Simulate a printer queue where job IDs are submitted, and then processed.
+
+**Input:**
+Submit job `101`
+Submit job `102`
+Submit job `103`
+Process a job
+Submit job `104`
+Process a job
+Process a job
+Process a job
+
+**Expected Output:**
+Job 101 processed.
+Job 102 processed.
+Job 103 processed.
+Job 104 processed.
+
+### Simple C++ Implementation using `std::queue` ✨
+
+C++'s Standard Template Library (STL) provides a `std::queue` container adapter that makes working with queues a breeze. It's usually implemented using `std::deque` or `std::list` under the hood for efficient (O(1)) additions and removals from both ends.
+
+```cpp
+#include <iostream> // For input/output operations (like std::cout)
+#include <queue>    // Essential for using std::queue
+#include <string>   // To store job names/IDs easily
+
+// Main function where our program execution begins
+int main() {
+    // 1. Declare a queue to hold our printer jobs (integers representing job IDs)
+    std::queue<int> printerQueue;
+
+    std::cout << "--- Printer Queue Simulation ---" << std::endl;
+
+    // 2. Enqueue (add) some jobs
+    std::cout << "Submitting Job 101..." << std::endl;
+    printerQueue.push(101); // push() adds to the back (enqueue)
+
+    std::cout << "Submitting Job 102..." << std::endl;
+    printerQueue.push(102);
+
+    std::cout << "Submitting Job 103..." << std::endl;
+    printerQueue.push(103);
+
+    // 3. Check current queue status
+    std::cout << "\nQueue size: " << printerQueue.size() << std::endl;
+    // front() lets us peek at the first element without removing it
+    if (!printerQueue.empty()) {
+        std::cout << "Next job to process: " << printerQueue.front() << std::endl;
+    }
+
+    // 4. Dequeue (process) a job
+    std::cout << "\nProcessing a job..." << std::endl;
+    if (!printerQueue.empty()) { // Always check if queue is not empty before dequeuing
+        int processedJob = printerQueue.front(); // Get the job ID
+        printerQueue.pop();                     // Remove it from the front (dequeue)
+        std::cout << "Job " << processedJob << " processed." << std::endl;
+    } else {
+        std::cout << "Queue is empty! No jobs to process." << std::endl;
+    }
+
+    // 5. Submit another job
+    std::cout << "\nSubmitting Job 104..." << std::endl;
+    printerQueue.push(104);
+
+    // 6. Process remaining jobs
+    std::cout << "\nProcessing all remaining jobs:" << std::endl;
+    while (!printerQueue.empty()) { // Loop until the queue is empty
+        int processedJob = printerQueue.front();
+        printerQueue.pop();
+        std::cout << "Job " << processedJob << " processed." << std::endl;
+    }
+
+    // 7. Check if the queue is truly empty now
+    std::cout << "\nIs queue empty? " << (printerQueue.empty() ? "Yes" : "No") << std::endl;
+    
+    // Attempt to process from an empty queue
+    std::cout << "\nAttempting to process from an empty queue..." << std::endl;
+    if (!printerQueue.empty()) {
+        int processedJob = printerQueue.front();
+        printerQueue.pop();
+        std::cout << "Job " << processedJob << " processed." << std::endl;
+    } else {
+        std::cout << "Queue is empty! No jobs to process." << std::endl;
+    }
+
+
+    return 0; // Indicate successful program execution
+}
+```
+
+**How to Compile and Run (e.g., using g++):**
+1.  Save the code as `queue_example.cpp`.
+2.  Open your terminal or command prompt.
+3.  Compile: `g++ queue_example.cpp -o queue_example`
+4.  Run: `./queue_example`
+
+**Output of the code:**
+```
+--- Printer Queue Simulation ---
+Submitting Job 101...
+Submitting Job 102...
+Submitting Job 103...
+
+Queue size: 3
+Next job to process: 101
+
+Processing a job...
+Job 101 processed.
+
+Submitting Job 104...
+
+Processing all remaining jobs:
+Job 102 processed.
+Job 103 processed.
+Job 104 processed.
+
+Is queue empty? Yes
+
+Attempting to process from an empty queue...
+Queue is empty! No jobs to process.
+```
+
+---
+
+And there you have it! Queues are straightforward but incredibly powerful for managing ordered data processing. Keep coding!
+
+---
