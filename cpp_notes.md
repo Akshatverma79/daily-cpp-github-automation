@@ -11344,3 +11344,185 @@ Generating all binary strings of length 3:
 And that's Backtracking in a nutshell! Keep practicing, and it'll become second nature. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: N-Queens & Sudoku Solver  
+🕒 2026-01-16 14:01:48
+
+Hey there, future DSA wizard! Let's dive into N-Queens and Sudoku Solvers, which are awesome examples of a technique called **Backtracking**.
+
+---
+
+### What does "N-Queens & Sudoku Solver" mean?
+
+Both N-Queens and Sudoku Solver problems are classic puzzles that use a technique called **Backtracking** to find solutions.
+
+*   **Backtracking** is an algorithmic technique for solving problems recursively by trying to build a solution incrementally, one piece at a time. If a solution candidate fails to satisfy the problem's constraints (it hits a "dead end"), we "backtrack" (undo the last choice) and try a different option. It's like exploring a maze: you go down a path, if it's blocked, you go back to the last fork and try another path.
+
+*   **N-Queens Problem:** The goal is to place `N` non-attacking queens on an `N × N` chessboard. A queen can attack horizontally, vertically, and diagonally. So, no two queens can share the same row, column, or diagonal.
+
+*   **Sudoku Solver:** The goal is to fill a 9x9 grid with digits such that each column, each row, and each of the nine 3x3 subgrids that compose the grid contain all of the digits from 1 to 9.
+
+---
+
+### Why does it matter?
+
+Backtracking is a super fundamental technique in computer science!
+
+1.  **Versatility:** It's used in many real-world scenarios beyond just puzzles, like:
+    *   Finding paths in graphs.
+    *   Solving constraint satisfaction problems (e.g., scheduling).
+    *   Game AI (e.g., chess engines exploring moves).
+    *   Combinatorial optimization problems.
+2.  **Problem-Solving:** It teaches you a systematic way to explore solution spaces and handle complex constraints.
+3.  **Recursive Thinking:** Backtracking is often implemented recursively, which is a key programming paradigm to master.
+
+---
+
+### Example Problem: N-Queens (N=4)
+
+Let's try to place 4 queens on a 4x4 board.
+
+**Goal:** Place 'Q's so no two attack each other. '.' represents an empty square.
+
+```
+. . . .
+. . . .
+. . . .
+. . . .
+```
+
+**How Backtracking helps:**
+1.  Start placing queens column by column, from left to right.
+2.  For each column, try placing a queen in every row.
+3.  **Before placing:** Check if it's "safe" (no existing queen attacks this position).
+4.  **If safe:** Place the queen, then recursively try to place the next queen in the next column.
+5.  **If not safe, or if the recursive call fails:** Undo the placement (backtrack) and try the next row in the current column.
+6.  **Base case:** If all `N` queens are placed, we found a solution!
+
+For N=4, one solution looks like this:
+
+```
+. Q . .
+. . . Q
+Q . . .
+. . Q .
+```
+
+---
+
+### Simple C++ Implementation: N-Queens Solver (N=4)
+
+This code will find and print all solutions for the N-Queens problem for a given `N`.
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For std::vector
+#include <string>   // For std::string
+
+// Function to print the board
+void printBoard(const std::vector<std::string>& board) {
+    for (const std::string& row : board) {
+        std::cout << row << std::endl;
+    }
+    std::cout << std::endl; // Add a blank line for separation
+}
+
+// Function to check if a queen can be safely placed at board[row][col]
+bool isSafe(const std::vector<std::string>& board, int row, int col, int n) {
+    // 1. Check this row on the left side
+    for (int i = 0; i < col; ++i) {
+        if (board[row][i] == 'Q') {
+            return false;
+        }
+    }
+
+    // 2. Check upper-left diagonal
+    for (int r = row, c = col; r >= 0 && c >= 0; --r, --c) {
+        if (board[r][c] == 'Q') {
+            return false;
+        }
+    }
+
+    // 3. Check lower-left diagonal
+    for (int r = row, c = col; r < n && c >= 0; ++r, --c) {
+        if (board[r][c] == 'Q') {
+            return false;
+        }
+    }
+
+    // If no queen attacks this position, it's safe
+    return true;
+}
+
+// Recursive helper function to solve N-Queens
+void solve(std::vector<std::string>& board, int col, int n) {
+    // Base case: If all queens are placed (moved past the last column)
+    if (col >= n) {
+        printBoard(board); // We found a solution! Print it.
+        return;
+    }
+
+    // Try placing a queen in each row of the current column
+    for (int row = 0; row < n; ++row) {
+        // If it's safe to place a queen at board[row][col]
+        if (isSafe(board, row, col, n)) {
+            // Place the queen
+            board[row][col] = 'Q';
+
+            // Recursively try to place queens in the next column
+            solve(board, col + 1, n);
+
+            // BACKTRACK: If placing a queen here didn't lead to a solution,
+            // or if we're done exploring this path, remove the queen
+            // and try the next row.
+            board[row][col] = '.';
+        }
+    }
+}
+
+// Main function to start the N-Queens solver
+void solveNQueens(int n) {
+    // Initialize an N x N board with all '.' (empty)
+    std::vector<std::string> board(n, std::string(n, '.'));
+
+    // Start solving from the first column (column 0)
+    solve(board, 0, n);
+}
+
+int main() {
+    int n = 4; // Let's solve N-Queens for N=4
+    std::cout << "Solving N-Queens for N = " << n << std::endl << std::endl;
+    solveNQueens(n);
+
+    // You can try other values for N too!
+    // n = 8;
+    // std::cout << "\nSolving N-Queens for N = " << n << std::endl << std::endl;
+    // solveNQueens(n); // N=8 has 92 solutions!
+
+    return 0;
+}
+
+```
+
+**Explanation of the Code:**
+
+1.  **`printBoard`**: Just a utility function to show the chessboard nicely.
+2.  **`isSafe(board, row, col, n)`**: This is the crucial **constraint checking** function.
+    *   It checks three directions: the current `row` to the left, the `upper-left diagonal`, and the `lower-left diagonal`.
+    *   We only need to check to the *left* because we are placing queens column by column. Any queens to the right haven't been placed yet.
+3.  **`solve(board, col, n)`**: This is our **recursive backtracking function**.
+    *   **Base Case (`if (col >= n)`):** If `col` equals `n`, it means we've successfully placed a queen in every column from `0` to `n-1`. A solution is found, so we print the board.
+    *   **Recursive Step (`for (int row = 0; row < n; ++row)`):**
+        *   It iterates through each `row` in the current `col`.
+        *   If `isSafe` returns `true`, we `place` the queen (`'Q'`).
+        *   Then, we make a **recursive call** to `solve` for the `next column` (`col + 1`). This is exploring deeper into one path.
+        *   **`board[row][col] = '.';` (The Magic Sauce: Backtracking!)**: This is where the "backtracking" happens. If the recursive call `solve(board, col + 1, n)` returns (meaning either it found a solution and returned, or it hit a dead end), we *undo* our choice (`'Q' -> '.'`). This allows the loop to try placing the queen in the `next row` of the current `col`.
+4.  **`solveNQueens(n)`**: The entry point function that initializes the board and calls the recursive `solve` function.
+
+---
+
+And that's it! You've got a grasp of Backtracking through the N-Queens problem. The Sudoku solver follows a very similar logic, just with different `isSafe` (or `isValid`) rules. Keep practicing, and you'll master this powerful technique!
+
+---
