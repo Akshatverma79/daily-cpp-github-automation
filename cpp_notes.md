@@ -11881,3 +11881,147 @@ int main() {
 And there you have it! Tries are elegant and efficient for many string-related tasks. Keep exploring, and you'll find them in many interesting places! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-01-18 06:33:05
+
+Hey there, future DSA master! 👋 Let's dive into Disjoint Set Union (DSU), a super handy data structure.
+
+---
+
+## Disjoint Set Union (DSU): Keepin' Things Connected (or Not!)
+
+### What it means: The Core Idea
+
+Imagine you have a bunch of individual elements, like a group of people. DSU helps you keep track of which people belong to the same "group" (or set) and efficiently merge groups together. "Disjoint" means these groups don't overlap – a person belongs to exactly one group.
+
+Think of it like managing friendships:
+*   Initially, everyone is in their own "friend group."
+*   When two people become friends, their groups merge into one larger group.
+*   You can quickly ask: "Are Alice and Bob in the same friend group?"
+
+**The two main operations:**
+
+1.  **`find(x)`**: Figures out which "representative" (or leader) element the set containing `x` belongs to. If two elements have the same representative, they are in the same set.
+2.  **`unite(x, y)`**: Merges the sets containing `x` and `y` into a single set.
+
+### Why it Matters: Super Useful!
+
+DSU is incredibly efficient for problems involving dynamic connectivity. It's used in:
+
+*   **Graph Algorithms:** Like Kruskal's algorithm for finding Minimum Spanning Trees.
+*   **Network Connectivity:** Checking if two points in a network are connected.
+*   **Grouping/Clustering:** Grouping related items together.
+*   **Grid Problems:** Determining connected components in a grid.
+
+It achieves *almost* constant time complexity (amortized O(α(N)), where α is the inverse Ackermann function, which grows *incredibly* slowly) thanks to two clever optimizations:
+
+1.  **Path Compression:** Flattens the tree structure during `find` operations to speed up future lookups.
+2.  **Union by Size (or Rank):** When merging two sets, attaches the smaller tree under the root of the larger tree to keep the overall tree structure flatter.
+
+### 1 Example Problem: Social Network Connectivity
+
+**Problem:** You're given a social network where people can become friends. Initially, no one is friends. Given a series of "friendship" connections, determine if two specific people `A` and `B` are in the same connected "friend group."
+
+**Scenario:**
+*   People: `0, 1, 2, 3, 4`
+*   Connections:
+    *   `unite(0, 1)`: 0 and 1 become friends.
+    *   `unite(3, 4)`: 3 and 4 become friends.
+    *   `unite(1, 2)`: 1 and 2 become friends (0, 1, 2 are now one group).
+
+**Queries:**
+*   `find(0) == find(2)`? (Are 0 and 2 connected?) **Yes**
+*   `find(0) == find(3)`? (Are 0 and 3 connected?) **No**
+
+### 1 Simple C++ Implementation
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota
+#include <iostream>
+
+class DSU {
+private:
+    std::vector<int> parent; // Stores the parent of each element
+    std::vector<int> sz;     // Stores the size of the set (for union by size optimization)
+    // int numSets;            // Optional: To keep track of the total number of disjoint sets
+
+public:
+    // Constructor: Initialize n elements, each in its own set
+    DSU(int n) {
+        parent.resize(n);
+        std::iota(parent.begin(), parent.end(), 0); // Each element is its own parent initially (0, 1, 2, ...)
+
+        sz.assign(n, 1); // Each set initially has size 1
+        // numSets = n;
+    }
+
+    // Find operation with Path Compression:
+    // Finds the representative (root) of the set containing element 'i'
+    int find(int i) {
+        // If 'i' is its own parent, it's the representative of its set
+        if (parent[i] == i) {
+            return i;
+        }
+        // Otherwise, recursively find the representative and
+        // perform path compression by setting 'i's parent directly to the representative
+        return parent[i] = find(parent[i]);
+    }
+
+    // Unite operation with Union by Size:
+    // Merges the sets containing elements 'i' and 'j'
+    void unite(int i, int j) {
+        int root_i = find(i); // Find representative of i's set
+        int root_j = find(j); // Find representative of j's set
+
+        // If they are already in the same set, do nothing
+        if (root_i != root_j) {
+            // Union by Size: Attach the smaller tree under the root of the larger tree
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i always points to the larger set's representative
+            }
+            parent[root_j] = root_i; // Make root_i the parent of root_j
+            sz[root_i] += sz[root_j]; // Update the size of the combined set
+            // numSets--;                // Decrement total number of sets
+        }
+    }
+
+    // Optional: Check if two elements are in the same set
+    bool are_connected(int i, int j) {
+        return find(i) == find(j);
+    }
+};
+
+int main() {
+    int num_people = 5; // People 0, 1, 2, 3, 4
+    DSU social_network(num_people);
+
+    std::cout << "Initial state:\n";
+    std::cout << "0 and 1 connected? " << (social_network.are_connected(0, 1) ? "Yes" : "No") << std::endl; // No
+    std::cout << "3 and 4 connected? " << (social_network.are_connected(3, 4) ? "Yes" : "No") << std::endl; // No
+
+    std::cout << "\nMaking connections...\n";
+    social_network.unite(0, 1); // 0 and 1 become friends
+    std::cout << "Made 0 and 1 friends.\n";
+
+    social_network.unite(3, 4); // 3 and 4 become friends
+    std::cout << "Made 3 and 4 friends.\n";
+
+    social_network.unite(1, 2); // 1 and 2 become friends (indirectly connects 0, 1, 2)
+    std::cout << "Made 1 and 2 friends.\n";
+
+    std::cout << "\nChecking connectivity after merges:\n";
+    std::cout << "0 and 1 connected? " << (social_network.are_connected(0, 1) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "0 and 2 connected? " << (social_network.are_connected(0, 2) ? "Yes" : "No") << std::endl; // Yes (via 1)
+    std::cout << "3 and 4 connected? " << (social_network.are_connected(3, 4) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "0 and 3 connected? " << (social_network.are_connected(0, 3) ? "Yes" : "No") << std::endl; // No
+    std::cout << "1 and 4 connected? " << (social_network.are_connected(1, 4) ? "Yes" : "No") << std::endl; // No
+
+    return 0;
+}
+```
+
+---
