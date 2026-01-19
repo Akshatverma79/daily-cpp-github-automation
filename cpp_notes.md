@@ -12211,3 +12211,167 @@ int main() {
 That's the core idea of a Segment Tree! It's a powerful tool for problems involving range queries and point updates. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Fenwick Trees (Binary Indexed Tree)  
+🕒 2026-01-19 06:40:14
+
+Hello there, future DSA wizard! Let's unravel the magic of Fenwick Trees.
+
+---
+
+## Fenwick Trees (BIT): Your Fast Friend for Prefix Sums!
+
+A **Fenwick Tree**, also known as a **Binary Indexed Tree (BIT)**, is a clever data structure designed for efficiently handling two specific operations on an array:
+
+1.  **Point Updates:** Changing the value of a single element in the array.
+2.  **Prefix Sum Queries:** Finding the sum of elements from the beginning of the array up to a certain index.
+
+### What Does It Mean? (The Concept)
+
+Imagine you have an array `A`. A Fenwick Tree `BIT` is a compact representation that allows you to:
+*   Update `A[i]` by adding a value `delta`.
+*   Get `sum(A[1]...A[k])`.
+
+The magic comes from how it stores sums. Instead of each node storing just one element's value, or a simple range sum (like a Segment Tree), each `BIT[i]` node stores the sum of a specific range of elements from the original array. This range's size is determined by the "rightmost set bit" of `i`.
+
+**Key Idea:**
+*   To update `A[i]`, you don't just change one `BIT` node. You change all `BIT` nodes that "cover" index `i`.
+*   To query `sum(A[1]...A[k])`, you sum up values from a few `BIT` nodes that collectively form that prefix.
+
+Both operations use a bit manipulation trick: `i & (-i)` which gives you the value of the rightmost set bit of `i`. This helps navigate the tree efficiently.
+
+### Why Does It Matter? (Why is it cool?)
+
+1.  **Efficiency:** Both point updates and prefix sum queries take **O(log N)** time, where N is the size of the array.
+    *   *Naive Array:* O(1) update, O(N) prefix sum.
+    *   *Prefix Sum Array:* O(N) update, O(1) prefix sum.
+    *   *Fenwick Tree:* Best of both worlds for these operations!
+2.  **Space-Efficient:** It uses only **O(N)** extra space, just like the original array. This is often less than a Segment Tree (which uses O(4N) space).
+3.  **Simplicity (once you get the bit magic):** The implementation is surprisingly short and elegant.
+4.  **Versatility:** Can be extended for range updates (with two BITs), 2D problems, and more. A popular choice in competitive programming!
+
+### Example Problem
+
+Let's say we have an array `arr = [1, 2, 3, 4, 5]` (1-indexed for convenience, as BITs often are).
+
+1.  **Initial State:** `arr = [_, 1, 2, 3, 4, 5]`
+    *   `(Query) sum(1, 3)`: Should be `1 + 2 + 3 = 6`
+2.  **Update:** Change `arr[2]` to `7`. This means `arr[2]` increases by `5` (from `2` to `7`).
+    *   `arr` becomes `[_, 1, 7, 3, 4, 5]`
+3.  **New Query:**
+    *   `(Query) sum(1, 3)`: Should be `1 + 7 + 3 = 11`
+
+### Simple C++ Implementation
+
+Here's how you'd implement a Fenwick Tree to handle the example above:
+
+```cpp
+#include <vector>
+#include <iostream>
+#include <numeric> // For std::accumulate (just for initial check)
+
+// Fenwick Tree class
+class FenwickTree {
+private:
+    std::vector<int> bit; // The Fenwick Tree array (1-indexed)
+    int size;             // Size of the original array (N)
+
+public:
+    // Constructor: Initializes the Fenwick Tree with a given size
+    FenwickTree(int n) : size(n), bit(n + 1, 0) {}
+
+    // Function to build the Fenwick Tree from an initial array
+    // This is essentially doing 'size' point updates
+    void build(const std::vector<int>& nums) {
+        if (nums.size() != size) {
+            std::cerr << "Error: Initial array size mismatch!" << std::endl;
+            return;
+        }
+        for (int i = 0; i < size; ++i) {
+            // Update takes index (1-based) and value
+            update(i + 1, nums[i]); 
+        }
+    }
+
+    // Function to update the value at a specific index (1-based)
+    // 'delta' is the amount to add to the existing value at 'idx'
+    void update(int idx, int delta) {
+        // Iterate through all BIT nodes that cover 'idx'
+        // Add 'idx & (-idx)' to move to the next parent node
+        for (; idx <= size; idx += idx & (-idx)) {
+            bit[idx] += delta;
+        }
+    }
+
+    // Function to query the prefix sum up to a specific index (1-based)
+    // Returns sum(arr[1]...arr[idx])
+    int query(int idx) {
+        int sum = 0;
+        // Iterate through all BIT nodes that contribute to the prefix sum up to 'idx'
+        // Subtract 'idx & (-idx)' to move to the previous parent node
+        for (; idx > 0; idx -= idx & (-idx)) {
+            sum += bit[idx];
+        }
+        return sum;
+    }
+};
+
+int main() {
+    // Original array (0-indexed for convenience in main, but BIT uses 1-indexed)
+    std::vector<int> initial_array = {1, 2, 3, 4, 5};
+    int n = initial_array.size();
+
+    // Create a Fenwick Tree
+    FenwickTree ft(n);
+    
+    // Build the Fenwick Tree from the initial array
+    ft.build(initial_array);
+
+    std::cout << "Original array: ";
+    for (int x : initial_array) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // --- Example operations ---
+
+    // 1. Query sum(1, 3)
+    // (In 1-indexed: elements at index 1, 2, 3)
+    std::cout << "Sum from index 1 to 3: " << ft.query(3) << std::endl; // Expected: 1+2+3 = 6
+
+    // 2. Update arr[2] to 7. This means adding (7 - 2) = 5 to arr[2].
+    // Original value at initial_array[1] (which is index 2 in 1-based) was 2.
+    int old_val_at_idx2 = initial_array[1]; 
+    int new_val_at_idx2 = 7;
+    int delta = new_val_at_idx2 - old_val_at_idx2;
+    ft.update(2, delta); // Update 1-based index 2 by adding delta
+    initial_array[1] = new_val_at_idx2; // Keep original array conceptual for understanding
+
+    std::cout << "After updating array[2] to 7: ";
+    for (int x : initial_array) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // 3. Query sum(1, 3) again
+    std::cout << "New sum from index 1 to 3: " << ft.query(3) << std::endl; // Expected: 1+7+3 = 11
+
+    // Another query
+    std::cout << "Sum from index 1 to 5: " << ft.query(5) << std::endl; // Expected: 1+7+3+4+5 = 20
+
+    return 0;
+}
+```
+
+**Explanation of the Loops:**
+
+*   `idx += idx & (-idx)`: This moves `idx` to its "parent" in the implicit tree structure. `idx & (-idx)` isolates the rightmost set bit. Adding it essentially clears that bit and potentially sets higher bits, moving to the next range that covers the current `idx`.
+*   `idx -= idx & (-idx)`: This moves `idx` to its "previous parent" or the start of the next smaller range. Subtracting `idx & (-idx)` clears the rightmost set bit, effectively moving to a sub-problem that covers a smaller prefix.
+
+---
+
+That's a quick tour of Fenwick Trees! They're incredibly powerful once you get the hang of their bit manipulation magic. Happy coding!
+
+---
