@@ -13154,3 +13154,204 @@ Total Minimum Cost: 6
 Voila! That's your Minimum Spanning Tree using Kruskal's algorithm. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-01-21 14:17:54
+
+Hey there, future DSA wizard! Let's unravel the magic of **Topological Sort** using a super clean method called **Kahn's Algorithm**.
+
+---
+
+### 🗺️ Topological Sort (Kahn's Algorithm)
+
+####  مفهوم (What it means)
+
+Imagine you have a bunch of tasks, and some tasks *must* be completed before others. Topological Sort is a way to find a linear ordering of these tasks such that for every directed dependency (Task A must come before Task B), A appears before B in the ordering.
+
+**Key thing:** It only works for **Directed Acyclic Graphs (DAGs)** – graphs where all edges go one way and there are no cycles (you can't start at a node, follow edges, and end up back at the same node).
+
+#### أهميته (Why it matters)
+
+Topological Sort is super useful for:
+
+*   **Task Scheduling:** "Compile module A before module B."
+*   **Course Prerequisites:** "You need to take 'Intro to CS' before 'Data Structures'."
+*   **Dependency Resolution:** "Install library X before library Y."
+*   **Build Systems:** Figuring out the order to recompile files.
+
+#### خوارزمية كان (Kahn's Algorithm: The Idea)
+
+Kahn's algorithm is intuitive:
+
+1.  **Find the starting points:** What tasks have no prerequisites? (i.e., no incoming dependencies). These are nodes with an "in-degree" of 0.
+2.  **Process them:** Add these tasks to your sorted list and "remove" them from the graph.
+3.  **Update dependencies:** When you remove a task, it might free up other tasks whose *only* prerequisite was the task you just finished. Decrement the in-degree of all their neighbors.
+4.  **Repeat:** Any neighbor whose in-degree now becomes 0 is a new starting point. Add them to your processing list.
+
+We typically use a **queue** to manage the nodes that are ready to be processed.
+
+#### مثال بسيط (1 Small Example Problem)
+
+Let's say we have courses and their prerequisites:
+
+*   **A** needs nothing.
+*   **B** needs **A**.
+*   **C** needs **A**.
+*   **D** needs **B** and **C**.
+
+**Graph representation:**
+`A -> B`
+`A -> C`
+`B -> D`
+`C -> D`
+
+**Let's trace with Kahn's:**
+
+1.  **Initial In-degrees:**
+    *   A: 0
+    *   B: 1 (from A)
+    *   C: 1 (from A)
+    *   D: 2 (from B, C)
+
+2.  **Queue:** Add A (in-degree 0) $\implies$ `[A]`
+    **Sorted List:** `[]`
+
+3.  **Dequeue A:**
+    *   Add A to Sorted List: `[A]`
+    *   Neighbors of A: B, C.
+    *   Decrement in-degree of B (becomes 0). Add B to Queue: `[B]`
+    *   Decrement in-degree of C (becomes 0). Add C to Queue: `[B, C]`
+
+4.  **Dequeue B:**
+    *   Add B to Sorted List: `[A, B]`
+    *   Neighbors of B: D.
+    *   Decrement in-degree of D (becomes 1).
+
+5.  **Dequeue C:**
+    *   Add C to Sorted List: `[A, B, C]`
+    *   Neighbors of C: D.
+    *   Decrement in-degree of D (becomes 0). Add D to Queue: `[D]`
+
+6.  **Dequeue D:**
+    *   Add D to Sorted List: `[A, B, C, D]`
+    *   Neighbors of D: None.
+
+7.  **Queue is empty.**
+
+**Final Sorted List:** `[A, B, C, D]` (Another valid one could be `[A, C, B, D]`)
+
+**Cycle Detection:** If the size of your `Sorted List` at the end is less than the total number of nodes, it means there was a cycle in the graph, and a topological sort is not possible.
+
+#### تطبيق C++ (1 Simple C++ Implementation)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <numeric> // For iota
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSort(int numNodes, const std::vector<std::vector<int>>& edges) {
+    // 1. Build Adjacency List and Calculate In-degrees
+    std::vector<std::vector<int>> adj(numNodes);
+    std::vector<int> in_degree(numNodes, 0);
+
+    for (const auto& edge : edges) {
+        int u = edge[0]; // From node
+        int v = edge[1]; // To node
+        adj[u].push_back(v);
+        in_degree[v]++; // Node 'v' has one more prerequisite
+    }
+
+    // 2. Initialize Queue with all nodes having in-degree 0
+    std::queue<int> q;
+    for (int i = 0; i < numNodes; ++i) {
+        if (in_degree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 3. Process nodes
+    std::vector<int> result;
+    int nodes_processed_count = 0; // To check for cycles
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u);
+        nodes_processed_count++;
+
+        // For each neighbor 'v' of 'u'
+        for (int v : adj[u]) {
+            in_degree[v]--; // 'u' is now processed, so 'v' has one less prerequisite
+            if (in_degree[v] == 0) {
+                q.push(v); // If 'v' now has no prerequisites, add it to the queue
+            }
+        }
+    }
+
+    // 4. Check for cycles
+    if (nodes_processed_count != numNodes) {
+        // A cycle exists if we couldn't process all nodes
+        std::cout << "Error: Graph contains a cycle, topological sort not possible." << std::endl;
+        return {}; // Return an empty vector to indicate failure
+    }
+
+    return result;
+}
+
+int main() {
+    // Example from above: A=0, B=1, C=2, D=3
+    // A -> B (0 -> 1)
+    // A -> C (0 -> 2)
+    // B -> D (1 -> 3)
+    // C -> D (2 -> 3)
+
+    int numNodes = 4;
+    std::vector<std::vector<int>> edges = {
+        {0, 1}, // A -> B
+        {0, 2}, // A -> C
+        {1, 3}, // B -> D
+        {2, 3}  // C -> D
+    };
+
+    std::vector<int> sorted_order = topologicalSort(numNodes, edges);
+
+    if (!sorted_order.empty()) {
+        std::cout << "Topological Order: ";
+        for (int node : sorted_order) {
+            std::cout << node << " ";
+        }
+        std::cout << std::endl; // Expected: 0 1 2 3 or 0 2 1 3
+    }
+
+    // Example with a cycle (for testing cycle detection)
+    /*
+    std::cout << "\nTesting a graph with a cycle:" << std::endl;
+    int numNodesCycle = 3;
+    std::vector<std::vector<int>> edgesCycle = {
+        {0, 1},
+        {1, 2},
+        {2, 0} // Cycle: 0 -> 1 -> 2 -> 0
+    };
+    std::vector<int> sorted_order_cycle = topologicalSort(numNodesCycle, edgesCycle);
+    if (sorted_order_cycle.empty()) {
+        std::cout << "Cycle detected as expected." << std::endl;
+    }
+    */
+
+    return 0;
+}
+```
+
+---
+
+**Complexity:**
+*   **Time:** O(V + E), where V is the number of vertices (nodes) and E is the number of edges. We visit each vertex and each edge essentially once.
+*   **Space:** O(V + E) for the adjacency list and in-degree array.
+
+And that's Kahn's Algorithm for Topological Sort! Simple, effective, and a must-have in your DSA toolbox. Happy coding!
+
+---
