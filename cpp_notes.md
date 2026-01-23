@@ -13929,3 +13929,152 @@ int main() {
 And that's LCS in a nutshell! It's a fundamental DP problem that truly highlights the power of breaking down a big problem into smaller, overlapping subproblems. Keep practicing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Increasing Subsequence (LIS)  
+🕒 2026-01-23 14:13:11
+
+Hey there, future coding rockstar! 👋 Let's break down a classic DSA problem: **Longest Increasing Subsequence (LIS)**. It's super common in interviews and a great way to flex your Dynamic Programming muscles!
+
+---
+
+## Longest Increasing Subsequence (LIS) - Your Friendly Guide!
+
+### 🎯 What is LIS?
+
+Imagine you have a jumbled list of numbers. An **Increasing Subsequence** is a sequence of numbers from that list where each number is strictly greater than the one before it, AND they appear in the *same relative order* as in the original list.
+
+The **Longest Increasing Subsequence (LIS)** is simply the longest possible such subsequence you can find.
+
+**Key things to remember:**
+*   **Subsequence:** Elements don't have to be next to each other in the original list. You "pick" them out.
+*   **Increasing:** Each number must be strictly greater than the previous one in your chosen subsequence.
+
+**Example:**
+`nums = [3, 1, 4, 1, 5, 9, 2, 6]`
+
+*   `[3, 4, 5, 9]` is an increasing subsequence.
+*   `[1, 5, 6]` is an increasing subsequence.
+*   `[3, 1, 4]` is NOT an increasing subsequence because `3` is not less than `1`.
+*   The LIS here is `[1, 4, 5, 9]` (length 4) or `[1, 2, 6]` (length 3, no) or `[3, 4, 5, 9]` (length 4) -- actually, it's `[1, 4, 5, 9]` or `[3, 4, 5, 9]` (both length 4). Let's pick `[1, 4, 5, 9]` to show how it can skip numbers.
+
+### Why Does It Matter?
+
+*   **Interview Favorite:** It's a very common DP question to test your logical thinking.
+*   **Foundational:** Understanding LIS helps you tackle more complex DP problems.
+*   **Real-world (briefly):** Can be applied in bioinformatics (gene sequencing), data analysis (trend detection), etc.
+
+---
+
+### 📝 Let's Try an Example Problem!
+
+**Problem:** Given an integer array `nums`, return the length of the longest strictly increasing subsequence.
+
+**Input:** `nums = [10, 22, 9, 33, 21, 50, 41, 60]`
+
+**What's the LIS here?**
+
+Let's try to spot one:
+*   `[10, 22, 33, 50, 60]` -> Length 5
+*   `[10, 22, 33, 41, 60]` -> Length 5
+*   `[9, 21, 41, 60]` -> Length 4
+
+It looks like the **LIS length is 5**.
+
+### 💡 How to Solve It? (Simple C++ Implementation - O(N^2) Dynamic Programming)
+
+The most straightforward way to solve LIS is using Dynamic Programming.
+
+1.  **`dp` Array:** Create a `dp` array of the same size as `nums`. `dp[i]` will store the length of the LIS **ending at index `i`**.
+
+2.  **Initialization:** Every element itself can be an LIS of length 1. So, initialize all `dp[i]` to `1`.
+
+3.  **Iteration:**
+    *   Go through each number `nums[i]` (from `i = 0` to `n-1`).
+    *   For each `nums[i]`, look at all the numbers `nums[j]` that came *before* it (where `j < i`).
+    *   If `nums[i]` is greater than `nums[j]`, it means `nums[i]` can extend the LIS that ended at `nums[j]`.
+    *   So, we update `dp[i] = max(dp[i], 1 + dp[j])`. (We take the maximum because there might be multiple ways to extend previous subsequences, and we want the longest one).
+
+4.  **Result:** After filling the `dp` array, the maximum value in `dp` will be the length of the overall LIS.
+
+---
+
+### 💻 C++ Code Time!
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector
+#include <algorithm> // For std::max and std::max_element
+
+// Function to find the length of the LIS
+int lengthOfLIS(const std::vector<int>& nums) {
+    // If the array is empty, the LIS length is 0
+    if (nums.empty()) {
+        return 0;
+    }
+
+    int n = nums.size();
+    // dp[i] will store the length of the LIS ending at index i
+    std::vector<int> dp(n, 1); // Initialize all LIS lengths to 1 (each element is an LIS of itself)
+
+    int max_len = 1; // At least one element means an LIS of length 1
+
+    // Fill the dp array
+    for (int i = 0; i < n; ++i) {
+        // For each element nums[i], check all previous elements nums[j]
+        for (int j = 0; j < i; ++j) {
+            // If nums[i] is greater than nums[j], it means nums[i] can extend the LIS ending at nums[j]
+            if (nums[i] > nums[j]) {
+                // Update dp[i] to be the maximum of its current value
+                // or 1 (for nums[i] itself) + the LIS length ending at nums[j]
+                dp[i] = std::max(dp[i], 1 + dp[j]);
+            }
+        }
+        // After checking all previous elements for nums[i], update the overall maximum length found so far
+        max_len = std::max(max_len, dp[i]);
+    }
+
+    // The maximum value in the dp array is the length of the LIS
+    return max_len;
+    // Alternative for returning max_len if you don't update it in the loop:
+    // return *std::max_element(dp.begin(), dp.end());
+}
+
+// Main function to test our implementation
+int main() {
+    std::vector<int> nums1 = {10, 22, 9, 33, 21, 50, 41, 60};
+    std::cout << "LIS length for [10, 22, 9, 33, 21, 50, 41, 60]: "
+              << lengthOfLIS(nums1) << std::endl; // Expected: 5
+
+    std::vector<int> nums2 = {0, 1, 0, 3, 2, 3};
+    std::cout << "LIS length for [0, 1, 0, 3, 2, 3]: "
+              << lengthOfLIS(nums2) << std::endl; // Expected: 4 ([0, 1, 2, 3])
+
+    std::vector<int> nums3 = {7, 7, 7, 7, 7, 7, 7};
+    std::cout << "LIS length for [7, 7, 7, 7, 7, 7, 7]: "
+              << lengthOfLIS(nums3) << std::endl; // Expected: 1
+
+    std::vector<int> nums4 = {};
+    std::cout << "LIS length for []: "
+              << lengthOfLIS(nums4) << std::endl; // Expected: 0
+
+    std::vector<int> nums5 = {1, 3, 6, 7, 9, 4, 10, 5, 6};
+    std::cout << "LIS length for [1, 3, 6, 7, 9, 4, 10, 5, 6]: "
+              << lengthOfLIS(nums5) << std::endl; // Expected: 6 ([1, 3, 6, 7, 9, 10])
+
+    return 0;
+}
+```
+
+---
+
+### 🎉 Key Takeaways
+
+*   LIS is about finding the longest subsequence where elements are in increasing order and maintain their relative positions.
+*   The O(N^2) DP solution uses `dp[i]` to track the LIS length **ending at index `i`**.
+*   It's a fantastic problem to solidify your understanding of Dynamic Programming!
+
+You've just tackled LIS! Great job! Keep practicing, and these concepts will become second nature. Happy coding! ✨
+
+---
