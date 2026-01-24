@@ -14078,3 +14078,178 @@ int main() {
 You've just tackled LIS! Great job! Keep practicing, and these concepts will become second nature. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Matrix Chain Multiplication  
+🕒 2026-01-24 06:33:37
+
+Hey there, future DP master! 👋 Let's dive into **Matrix Chain Multiplication (MCM)** – a classic problem that sounds fancy but is all about smart ordering.
+
+---
+
+### What is Matrix Chain Multiplication (MCM)?
+
+Imagine you have a bunch of matrices, say `A`, `B`, and `C`, and you want to multiply them: `A x B x C`.
+Matrix multiplication is **associative**, meaning `(A x B) x C` is the same as `A x (B x C)` in terms of the final result.
+
+**BUT**, the *number of individual (scalar) multiplications* needed can be vastly different depending on the order you perform them!
+
+**MCM is about finding the most efficient way (the optimal parenthesization) to multiply a given sequence of matrices to minimize the total number of scalar multiplications.**
+
+We are *not* actually performing the matrix multiplications, just figuring out the best order to do them.
+
+---
+
+### Why Does It Matter?
+
+1.  **Efficiency:** For large matrices, the difference in operations can be astronomical, leading to huge performance gains. Think about scientific simulations or graphics rendering.
+2.  **Classic Dynamic Programming:** It's a textbook example of Dynamic Programming. It teaches you how to break down a larger problem into smaller, overlapping subproblems and build up a solution. Great for interviews!
+3.  **Compiler Optimization:** Compilers might use similar logic to optimize the order of operations in your code.
+
+---
+
+### Example Problem
+
+Let's say we have three matrices with these dimensions:
+*   **A:** $10 \times 20$
+*   **B:** $20 \times 5$
+*   **C:** $5 \times 50$
+
+Recall: To multiply an $M \times N$ matrix by an $N \times P$ matrix, the result is $M \times P$, and it takes $M \times N \times P$ scalar multiplications.
+
+Let's check the two possible parenthesizations:
+
+1.  **`(A x B) x C`**
+    *   First, `A x B`:
+        *   Dimensions: $(10 \times 20) \times (20 \times 5)$
+        *   Cost: $10 \times 20 \times 5 = 1000$ operations.
+        *   Resulting matrix `AB` is $10 \times 5$.
+    *   Next, `(AB) x C`:
+        *   Dimensions: $(10 \times 5) \times (5 \times 50)$
+        *   Cost: $10 \times 5 \times 50 = 2500$ operations.
+    *   **Total Cost: $1000 + 2500 = 3500$**
+
+2.  **`A x (B x C)`**
+    *   First, `B x C`:
+        *   Dimensions: $(20 \times 5) \times (5 \times 50)$
+        *   Cost: $20 \times 5 \times 50 = 5000$ operations.
+        *   Resulting matrix `BC` is $20 \times 50$.
+    *   Next, `A x (BC)`:
+        *   Dimensions: $(10 \times 20) \times (20 \times 50)$
+        *   Cost: $10 \times 20 \times 50 = 10000$ operations.
+    *   **Total Cost: $5000 + 10000 = 15000$**
+
+Clearly, `(A x B) x C` (cost 3500) is much better than `A x (B x C)` (cost 15000)!
+MCM helps us find this optimal order for *any* number of matrices.
+
+---
+
+### Simple C++ Implementation
+
+The core idea is to use a 2D array `dp[i][j]` to store the minimum cost to multiply matrices from index `i` to `j`.
+
+**Input representation:**
+If you have `N` matrices `M1, M2, ..., MN`, their dimensions can be represented by a single array `p` of size `N+1`.
+`p[0]` = rows of M1
+`p[1]` = columns of M1 AND rows of M2
+`p[2]` = columns of M2 AND rows of M3
+...
+`p[N]` = columns of MN
+
+So, matrix `Mi` has dimensions `p[i-1] x p[i]`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <climits>   // For INT_MAX
+
+// Function to find the minimum number of scalar multiplications
+// p: vector representing the dimensions. p[i] is the number of columns of matrix i and rows of matrix i+1.
+//    If we have N matrices M1, M2, ..., MN, then p will have N+1 elements.
+//    Mi has dimensions p[i-1] x p[i]. (Using 1-based indexing for matrices here for easier mapping to problem)
+int matrixChainOrder(const std::vector<int>& p) {
+    int n = p.size() - 1; // Number of matrices (M1 to Mn)
+
+    // dp[i][j] stores the minimum number of scalar multiplications
+    // needed to compute the matrix chain from M[i] to M[j].
+    // We use (n+1) x (n+1) to make 1-based indexing easier.
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(n + 1, 0));
+
+    // Length of the chain (L)
+    // L=1 means a single matrix, cost is 0. (dp[i][i] is already initialized to 0)
+    // L=2 means multiplying 2 matrices, L=3 means 3, ..., L=n means all n matrices.
+    for (int L = 2; L <= n; ++L) {
+        // i is the starting matrix index of the current chain
+        for (int i = 1; i <= n - L + 1; ++i) {
+            // j is the ending matrix index of the current chain
+            int j = i + L - 1;
+            dp[i][j] = INT_MAX; // Initialize with a very large value
+
+            // Try all possible split points 'k' within the chain [i, j]
+            // We split the chain into (M[i]...M[k]) and (M[k+1]...M[j])
+            for (int k = i; k <= j - 1; ++k) {
+                // Cost calculation:
+                // cost = cost(M[i]...M[k]) // This is dp[i][k]
+                //      + cost(M[k+1]...M[j]) // This is dp[k+1][j]
+                //      + cost to multiply the two resulting matrices
+                //          (dimensions are p[i-1] x p[k]) * (p[k] x p[j])
+                //          which is p[i-1] * p[k] * p[j]
+                int cost = dp[i][k] + dp[k + 1][j] + p[i - 1] * p[k] * p[j];
+                if (cost < dp[i][j]) {
+                    dp[i][j] = cost;
+                }
+            }
+        }
+    }
+    // The minimum cost to multiply all matrices from M1 to Mn is stored in dp[1][n]
+    return dp[1][n];
+}
+
+int main() {
+    // Dimensions for the example matrices (A, B, C):
+    // A: 10x20, B: 20x5, C: 5x50
+    // The 'p' array is {rows of A, columns of A/rows of B, columns of B/rows of C, columns of C}
+    std::vector<int> p1 = {10, 20, 5, 50}; // N=3 matrices
+    int minOperations1 = matrixChainOrder(p1);
+    std::cout << "For matrices {10x20, 20x5, 5x50}:" << std::endl;
+    std::cout << "Minimum scalar multiplications needed: " << minOperations1 << std::endl; // Expected: 3500
+
+    std::cout << "\n--------------------\n";
+
+    // Another common example: 4 matrices
+    // A1: 30x35, A2: 35x15, A3: 15x5, A4: 5x10
+    std::vector<int> p2 = {30, 35, 15, 5, 10}; // N=4 matrices
+    int minOperations2 = matrixChainOrder(p2);
+    std::cout << "For matrices {30x35, 35x15, 15x5, 5x10}:" << std::endl;
+    std::cout << "Minimum scalar multiplications needed: " << minOperations2 << std::endl; // Expected: 15125
+
+    return 0;
+}
+
+```
+
+**Explanation of the Code:**
+
+1.  **`dp` Table:** `dp[i][j]` stores the minimum cost to multiply matrices `Mi` through `Mj`.
+2.  **Base Cases:** `dp[i][i]` is 0 (cost to multiply a single matrix is zero). This is handled by initializing the `dp` table with zeros.
+3.  **Outer Loop (`L`):** This loop iterates through the "chain length" – how many matrices we are trying to multiply together. We start with `L=2` (multiplying 2 matrices) up to `L=n` (multiplying all `n` matrices).
+4.  **Middle Loop (`i`):** This loop determines the starting matrix `Mi` of the current chain of length `L`.
+5.  **Calculate `j`:** `j` is the ending matrix `Mj` of the current chain. `j = i + L - 1`.
+6.  **Inner Loop (`k`):** This is the core of the DP. For each chain `Mi...Mj`, we try every possible split point `k`. We're essentially trying to parenthesize like `(Mi...Mk) * (Mk+1...Mj)`.
+7.  **Cost Calculation:**
+    *   `dp[i][k]`: Minimum cost to multiply `Mi` through `Mk`.
+    *   `dp[k+1][j]`: Minimum cost to multiply `Mk+1` through `Mj`.
+    *   `p[i-1] * p[k] * p[j]`: Cost to multiply the *results* of `(Mi...Mk)` (which will be `p[i-1] x p[k]`) and `(Mk+1...Mj)` (which will be `p[k] x p[j]`).
+8.  **`INT_MAX`:** We initialize `dp[i][j]` with `INT_MAX` because we want to find the *minimum* cost, so any valid cost will be smaller.
+9.  **Return Value:** Finally, `dp[1][n]` contains the minimum cost to multiply all matrices from `M1` to `Mn`.
+
+**Time Complexity:** O(N³) - Three nested loops, each running up to N times.
+**Space Complexity:** O(N²) - For the `dp` table.
+
+---
+
+Hope this makes MCM clearer and less intimidating! Happy coding!
+
+---
