@@ -14253,3 +14253,166 @@ int main() {
 Hope this makes MCM clearer and less intimidating! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Trees  
+🕒 2026-01-24 13:57:30
+
+Let's dive into **DP on Trees**! It's a super useful technique for tree problems.
+
+---
+
+### 🌳 DP on Trees
+
+#### What is it?
+Imagine you have a tree, and you need to calculate some property for each node, where that property depends on the properties of its children (or sometimes its parent). That's where DP on Trees comes in!
+
+It's essentially **Dynamic Programming combined with Tree Traversal**, usually Depth-First Search (DFS).
+*   **The "DP" part**: We avoid re-calculating the same information multiple times. When we visit a node, we often calculate its property *after* its children's properties are known. We store these results (memoization).
+*   **The "Tree" part**: We use the natural recursive structure of a tree. A node's state often depends on its immediate children's states.
+
+Think of it as solving subproblems (properties of subtrees) first, and then combining those solutions to solve the larger problem (properties of the whole tree).
+
+#### Why does it matter?
+*   **Efficiency**: Many tree problems can be solved optimally (e.g., in linear time, O(N)) using this approach.
+*   **Common Pattern**: It's a very common technique in competitive programming and technical interviews. Mastering it opens doors to solving a wide range of tree-related challenges.
+*   **Intuitive**: Once you get the hang of it, the recursive nature often feels very natural for tree structures.
+
+#### 📝 Example Problem: Tree Height
+
+Let's find the **height of each node's subtree** in a given tree.
+*   The height of a leaf node (a node with no children) is **0**.
+*   The height of any other node is **1 + the maximum height among its children**.
+
+**Input**: A tree represented by an adjacency list.
+**Output**: The height of the subtree rooted at each node.
+
+**How we'd think about it:**
+1.  To find the height of `node A`, we need the heights of `node A`'s children.
+2.  To find the height of `node B` (a child of `A`), we need the heights of `node B`'s children, and so on.
+3.  This naturally suggests a **post-order traversal** (process children first, then the parent). DFS is perfect for this!
+4.  We'll use an array `dp[]` to store the calculated height for each node.
+
+#### 💡 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+// dp[i] will store the height of the subtree rooted at node i
+std::vector<int> dp;
+// adj[i] stores the list of neighbors for node i
+std::vector<std::vector<int>> adj;
+
+// DFS function to calculate subtree heights
+// u: current node
+// p: parent of current node (to avoid going back up the tree)
+int dfs_height(int u, int p) {
+    // If we've already calculated the height for 'u', just return it (memoization!)
+    if (dp[u] != -1) {
+        return dp[u];
+    }
+
+    int max_child_height = 0; // Initialize to 0 (height of a leaf)
+
+    // Iterate over all neighbors (children) of the current node 'u'
+    for (int v : adj[u]) {
+        if (v == p) {
+            continue; // Skip the parent, we only want to go deeper
+        }
+        // Recursively call DFS for children and update max_child_height
+        // 1 + dfs_height(v, u) because there's an edge from u to v
+        max_child_height = std::max(max_child_height, 1 + dfs_height(v, u));
+    }
+
+    // Store and return the calculated height for node 'u'
+    // If 'u' is a leaf, max_child_height will remain 0, which is correct.
+    // If 'u' has children, it's 1 + max height of its children.
+    dp[u] = max_child_height;
+    return dp[u];
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int n; // Number of nodes
+    std::cout << "Enter the number of nodes: ";
+    std::cin >> n;
+
+    // Adjust vector sizes for 1-based indexing (nodes 1 to n)
+    adj.resize(n + 1);
+    dp.assign(n + 1, -1); // Initialize DP array with -1 to indicate uncomputed
+
+    std::cout << "Enter the edges (u v), specify " << n - 1 << " edges for a tree:\n";
+    for (int i = 0; i < n - 1; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u); // Assuming an undirected tree
+    }
+
+    // Assuming node 1 is the root, and its parent is 0 (a dummy value)
+    std::cout << "\nCalculating subtree heights...\n";
+    dfs_height(1, 0); 
+
+    std::cout << "\nSubtree Heights:\n";
+    for (int i = 1; i <= n; ++i) {
+        std::cout << "Node " << i << ": Height = " << dp[i] << "\n";
+    }
+
+    return 0;
+}
+```
+
+**Example Run:**
+
+Let's say we have this tree (node 1 is root):
+```
+    1
+   / \
+  2   3
+ / \   \
+4   5   6
+```
+
+**Input:**
+```
+Enter the number of nodes: 6
+Enter the edges (u v), specify 5 edges for a tree:
+1 2
+1 3
+2 4
+2 5
+3 6
+```
+
+**Output:**
+```
+Calculating subtree heights...
+
+Subtree Heights:
+Node 1: Height = 2
+Node 2: Height = 1
+Node 3: Height = 1
+Node 4: Height = 0
+Node 5: Height = 0
+Node 6: Height = 0
+```
+This is correct! Nodes 4, 5, 6 are leaves (height 0). Node 2 has children 4, 5 (max height 0), so 2's height is 1+0=1. Node 3 has child 6 (max height 0), so 3's height is 1+0=1. Node 1 has children 2, 3 (max heights 1, 1), so 1's height is 1+max(1,1)=2.
+
+---
+
+**Key Takeaways for DP on Trees:**
+
+1.  **DFS is your friend**: Most problems involve a recursive DFS.
+2.  **Define the recurrence**: How does `dp[u]` depend on `dp[v]` for children `v` of `u`?
+3.  **Base Cases**: What are the `dp` values for leaf nodes (or the smallest subproblems)?
+4.  **Memoize**: Store results (`dp` array or map) to avoid redundant computation.
+5.  **Direction**: Often, you compute children's values *before* the parent's (post-order traversal). Sometimes, a second DFS pass is needed to compute things based on parent info (pre-order).
+
+Happy coding! 🚀
+
+---
