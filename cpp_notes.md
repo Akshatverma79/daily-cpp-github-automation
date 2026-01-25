@@ -14582,3 +14582,135 @@ int main() {
 DP on Bitmasks is a powerful tool when you're dealing with a small number of items and their various subset combinations. It elegantly handles complex interdependencies by encoding the "state" of visited items directly into your DP table's index. Keep `N` in mind, and you'll be set to tackle these fascinating problems! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-01-25 13:58:19
+
+Hey there, future coding wizard! 👋 Let's dive into the tiny world of **Bit Manipulation**.
+
+---
+
+### 🚀 Bit Manipulation Basics
+
+**What is it?**
+
+Imagine every number isn't just a value, but a series of tiny light switches (0s and 1s) representing its binary form. Bit manipulation is simply **working directly with these individual 0s and 1s** of a number. Instead of doing arithmetic like `+`, `-`, `*`, `/`, you're using special operators to play with the bits themselves.
+
+*   `5` in decimal is `0...0101` in binary.
+*   `6` in decimal is `0...0110` in binary.
+
+**Why does it matter?**
+
+1.  **Super Fast! ⚡:** Processors love bitwise operations. They're often much faster than their arithmetic counterparts because they operate at the lowest level directly supported by hardware.
+2.  **Space Optimization:** You can pack multiple true/false flags into a single integer, saving memory.
+3.  **Algorithmic Efficiency:** Many clever algorithms in competitive programming, cryptography, and low-level systems rely heavily on bit manipulation for speed and elegance.
+4.  **Unique Properties:** Some problems become trivial or much simpler with bitwise thinking (e.g., checking parity, swapping numbers without a temp variable).
+
+---
+
+### Core Bitwise Operations (The "Tools")
+
+Here are the basic operators you'll be using:
+
+*   **AND (`&`)**:
+    *   `1 & 1 = 1`
+    *   `1 & 0 = 0`
+    *   `0 & 1 = 0`
+    *   `0 & 0 = 0`
+    *   *Useful for:* Checking if a specific bit is set, masking.
+*   **OR (`|`)**:
+    *   `1 | 1 = 1`
+    *   `1 | 0 = 1`
+    *   `0 | 1 = 1`
+    *   `0 | 0 = 0`
+    *   *Useful for:* Setting a specific bit, combining flags.
+*   **XOR (`^`)**:
+    *   `1 ^ 1 = 0`
+    *   `1 ^ 0 = 1`
+    *   `0 ^ 1 = 1`
+    *   `0 ^ 0 = 0`
+    *   *Useful for:* Toggling a specific bit, finding the unique element, swapping.
+*   **Left Shift (`<<`)**: `n << k` moves bits of `n` to the left by `k` positions. Equivalent to multiplying `n` by `2^k`.
+    *   `1 << k` creates a number with only the `k`-th bit set (useful for masks).
+    *   Example: `1 << 2` (binary `01`) becomes `100` (binary `100`, which is `4` in decimal).
+*   **Right Shift (`>>`)**: `n >> k` moves bits of `n` to the right by `k` positions. Equivalent to dividing `n` by `2^k` (integer division).
+    *   Example: `5 >> 1` (binary `101`) becomes `10` (binary `10`, which is `2` in decimal).
+
+---
+
+### 💡 Example Problem: Check if the K-th Bit is Set
+
+**Problem:** Given an integer `n` and an integer `k`, determine if the `k`-th bit (0-indexed from the right) of `n` is set (i.e., is `1`).
+
+**Input:**
+`n = 5` (binary `101`)
+`k = 0`
+
+**Expected Output:** `true` (The 0-th bit of `101` is `1`)
+
+**Input:**
+`n = 5` (binary `101`)
+`k = 1`
+
+**Expected Output:** `false` (The 1-st bit of `101` is `0`)
+
+---
+
+### 💻 Simple C++ Implementation
+
+Here's how we can solve the problem using bit manipulation:
+
+```cpp
+#include <iostream>
+
+// Function to check if the k-th bit is set
+bool isKthBitSet(int n, int k) {
+    // 1. Create a mask:
+    //    '1 << k' generates a number with only the k-th bit set.
+    //    Example: if k=0, mask is 001
+    //             if k=1, mask is 010
+    //             if k=2, mask is 100
+    int mask = (1 << k);
+
+    // 2. Perform a bitwise AND operation:
+    //    'n & mask' will be non-zero ONLY if the k-th bit of 'n' is also set.
+    //    If the k-th bit of 'n' is 0, the result will be 0.
+    //    If the k-th bit of 'n' is 1, the result will be 'mask' itself (which is non-zero).
+    return (n & mask) != 0;
+}
+
+int main() {
+    int n1 = 5; // Binary: 101
+    int k1 = 0; // 0-th bit is 1
+    std::cout << "Is " << n1 << "'s " << k1 << "-th bit set? "
+              << (isKthBitSet(n1, k1) ? "True" : "False") << std::endl; // Expected: True
+
+    int n2 = 5; // Binary: 101
+    int k2 = 1; // 1-st bit is 0
+    std::cout << "Is " << n2 << "'s " << k2 << "-th bit set? "
+              << (isKthBitSet(n2, k2) ? "True" : "False") << std::endl; // Expected: False
+
+    int n3 = 10; // Binary: 1010
+    int k3 = 3; // 3-rd bit is 1
+    std::cout << "Is " << n3 << "'s " << k3 << "-th bit set? "
+              << (isKthBitSet(n3, k3) ? "True" : "False") << std::endl; // Expected: True
+
+    return 0;
+}
+```
+
+**Explanation of `(n & (1 << k)) != 0;`:**
+
+1.  `1 << k`: This creates a "mask." If `k` is 0, `1 << 0` is `0001`. If `k` is 1, `1 << 1` is `0010`. If `k` is 2, `1 << 2` is `0100`. This mask has only the `k`-th bit turned ON.
+2.  `n & mask`: When you `AND` `n` with this mask, all bits in `n` *except* the `k`-th bit will be `AND`-ed with a `0` from the mask, resulting in `0`. The `k`-th bit of `n` will be `AND`-ed with `1` from the mask.
+    *   If `n`'s `k`-th bit is `1`, then `1 & 1 = 1`. The result of `n & mask` will be equal to `mask` itself (which is non-zero).
+    *   If `n`'s `k`-th bit is `0`, then `0 & 1 = 0`. The result of `n & mask` will be `0`.
+3.  `!= 0`: We check if the result of the `AND` operation is non-zero. If it is, the `k`-th bit was set!
+
+---
+
+Bit manipulation might seem a bit tricky at first, but with practice, it becomes a powerful tool in your DSA arsenal! Keep experimenting! ✨
+
+---
