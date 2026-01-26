@@ -14840,3 +14840,112 @@ int main() {
 That's a quick intro to GCD and Primes! These concepts might seem simple, but their applications in DSA are vast and powerful. Keep practicing, and you'll master them in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-01-26 14:16:48
+
+Let's dive into Game Theory basics for DSA! It's super fun because it makes you think strategically.
+
+---
+
+### Game Theory Basics 🎮
+
+Game Theory in DSA usually deals with **deterministic, perfect information games**.
+This means:
+*   **Deterministic:** No randomness (like dice rolls).
+*   **Perfect Information:** Both players know everything about the game state.
+*   **Two Players:** Usually "Player 1" and "Player 2" (or "Alice" and "Bob").
+*   **Turn-Based:** Players take turns making moves.
+*   **Finite:** The game will eventually end.
+*   **Zero-Sum:** One player's gain is the other's loss (common in competitive programming, where one player wins and the other loses).
+
+The goal is to figure out the **optimal strategy** for a player, usually to determine if the first player can win, lose, or achieve a certain score, assuming both players play perfectly.
+
+---
+
+### Why it Matters 🧠
+
+*   **Strategic Thinking:** It trains your brain to anticipate opponent's moves and plan ahead.
+*   **Problem Solving:** Many competitive programming problems are game theory problems. Knowing the concepts helps you identify them.
+*   **Optimal Play:** You learn to determine winning/losing positions, which often leads to elegant recursive or dynamic programming solutions.
+*   **Connects to DP/Recursion:** Game theory problems are often solved by defining states (e.g., "how many stones are left?") and determining if that state is a winning or losing state for the *current* player.
+
+---
+
+### Example Problem: Stone Game (Nim-like) 🪨
+
+**Problem:** You and an opponent are playing a game with `N` stones. On each turn, a player can remove either **1, 2, or 3 stones**. The player who takes the last stone wins. Determine if the first player can win if both play optimally.
+
+**Let's analyze small `N` values:**
+
+*   **`N = 1`**: Player 1 takes 1, Player 1 wins. (Winning State)
+*   **`N = 2`**: Player 1 takes 2, Player 1 wins. (Winning State)
+*   **`N = 3`**: Player 1 takes 3, Player 1 wins. (Winning State)
+*   **`N = 4`**:
+    *   Player 1 takes 1 (leaves 3): Player 2 takes 3, Player 2 wins.
+    *   Player 1 takes 2 (leaves 2): Player 2 takes 2, Player 2 wins.
+    *   Player 1 takes 3 (leaves 1): Player 2 takes 1, Player 2 wins.
+    *   No matter what Player 1 does, Player 2 wins. So, if `N=4`, Player 1 *loses*. (Losing State)
+*   **`N = 5`**:
+    *   Player 1 wants to leave Player 2 in a losing state (`N=4`).
+    *   Player 1 takes 1 stone (leaves 4). Now it's Player 2's turn with 4 stones.
+    *   Since `N=4` is a losing state for the player whose turn it is, Player 2 will lose, and thus Player 1 wins! (Winning State)
+
+**Key Insight:** A player wins if they can make a move that leaves the **opponent** in a losing state. A player loses if *all* possible moves lead to the opponent being in a winning state.
+
+From our analysis, we can see a pattern: `N=4` is a losing state. What about `N=8`? If Player 1 starts with 8 stones and takes 1, 2, or 3, they will leave 7, 6, or 5 stones. All of these are winning states for Player 2 (as Player 2 can then reduce them to 4, a losing state for Player 1). So `N=8` is also a losing state.
+
+It seems that any `N` that is a **multiple of 4** is a losing state for the current player!
+
+---
+
+### Simple C++ Implementation 💻
+
+```cpp
+#include <iostream>
+
+// Function to determine if the first player can win
+// in the Stone Game (Nim-like)
+bool canFirstPlayerWin(int n_stones) {
+    // Basic idea:
+    // If the number of stones 'n_stones' is a multiple of 4,
+    // the first player will always lose if both play optimally.
+    // Why?
+    // - If P1 takes 1, n_stones-1 (e.g., 4->3). P2 takes 3, wins.
+    // - If P1 takes 2, n_stones-2 (e.g., 4->2). P2 takes 2, wins.
+    // - If P1 takes 3, n_stones-3 (e.g., 4->1). P2 takes 1, wins.
+    // In general, if N is a multiple of 4:
+    // P1 takes K (where K is 1, 2, or 3). Remaining stones = N - K.
+    // N - K will *never* be a multiple of 4.
+    // P2 then takes (4 - K) stones. Remaining stones = (N - K) - (4 - K) = N - 4.
+    // This leaves P1 with a new pile that is also a multiple of 4, but smaller.
+    // This strategy ensures P2 always leaves P1 with a multiple of 4.
+    // Eventually, P1 will be left with 4 stones, and P2 will win as explained above.
+
+    // If 'n_stones' is NOT a multiple of 4, the first player can always win.
+    // They just need to take 'n_stones % 4' stones.
+    // This will leave the opponent with 'n_stones - (n_stones % 4)' stones,
+    // which is a multiple of 4 (a losing state for the opponent).
+    // For example, if n_stones = 5, n_stones % 4 = 1.
+    // P1 takes 1 stone, leaves 4 for P2. P2 loses.
+    // P1 wins!
+
+    return (n_stones % 4 != 0);
+}
+
+int main() {
+    std::cout << "Can P1 win with 1 stone? " << (canFirstPlayerWin(1) ? "Yes" : "No") << std::endl;   // Yes
+    std::cout << "Can P1 win with 2 stones? " << (canFirstPlayerWin(2) ? "Yes" : "No") << std::endl;   // Yes
+    std::cout << "Can P1 win with 3 stones? " << (canFirstPlayerWin(3) ? "Yes" : "No") << std::endl;   // Yes
+    std::cout << "Can P1 win with 4 stones? " << (canFirstPlayerWin(4) ? "Yes" : "No") << std::endl;   // No
+    std::cout << "Can P1 win with 5 stones? " << (canFirstPlayerWin(5) ? "Yes" : "No") << std::endl;   // Yes
+    std::cout << "Can P1 win with 8 stones? " << (canFirstPlayerWin(8) ? "Yes" : "No") << std::endl;   // No
+    std::cout << "Can P1 win with 10 stones? " << (canFirstPlayerWin(10) ? "Yes" : "No") << std::endl; // Yes
+
+    return 0;
+}
+```
+
+---
