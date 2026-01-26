@@ -14714,3 +14714,129 @@ int main() {
 Bit manipulation might seem a bit tricky at first, but with practice, it becomes a powerful tool in your DSA arsenal! Keep experimenting! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Math for DSA (GCD, Primes)  
+🕒 2026-01-26 06:38:58
+
+Hey there, future DSA wizard! 👋 Let's unlock some fundamental math concepts that are super useful in competitive programming and algorithm design. Don't worry, we'll keep it clean and simple!
+
+---
+
+## Math for DSA: GCD & Primes
+
+### 1. Greatest Common Divisor (GCD)
+
+#### What it means
+The **Greatest Common Divisor (GCD)** of two or more integers (not all zero) is the largest positive integer that divides each of the integers without leaving a remainder. Think of it as the biggest number that both numbers 'share' as a factor.
+
+#### Why it matters
+*   **Simplifying Fractions:** A classic use case.
+*   **Least Common Multiple (LCM):** GCD is used to easily find LCM (`LCM(a, b) = (a * b) / GCD(a, b)`).
+*   **Number Theory Problems:** It's a fundamental building block for many problems involving modular arithmetic, prime factorization, and more complex algorithms.
+*   **Euclidean Algorithm:** The standard way to compute GCD is highly efficient, making it a go-to tool.
+
+#### Example Problem
+Find the GCD of 48 and 18.
+*   Factors of 48: 1, 2, 3, 4, **6**, 8, 12, 16, 24, 48
+*   Factors of 18: 1, 2, 3, **6**, 9, 18
+The largest number common to both lists is **6**. So, `GCD(48, 18) = 6`.
+
+#### Simple C++ Implementation
+The Euclidean algorithm is the most efficient way to compute GCD. It's often implemented recursively.
+
+```cpp
+#include <iostream> // For input/output
+#include <numeric>  // For std::gcd (C++17 onwards)
+
+// Custom implementation of GCD using Euclidean algorithm
+int findGCD(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b; // Remainder
+        a = temp;
+    }
+    return a;
+}
+
+int main() {
+    int num1 = 48;
+    int num2 = 18;
+
+    std::cout << "GCD of " << num1 << " and " << num2 << " (custom): "
+              << findGCD(num1, num2) << std::endl;
+
+    // C++17 onwards has std::gcd in <numeric>!
+    std::cout << "GCD of " << num1 << " and " << num2 << " (std::gcd): "
+              << std::gcd(num1, num2) << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+### 2. Prime Numbers
+
+#### What it means
+A **prime number** is a natural number greater than 1 that has no positive divisors other than 1 and itself.
+*   **Examples:** 2, 3, 5, 7, 11, 13, etc.
+*   **Not Prime (Composite):** 4 (divisors: 1, 2, 4), 6 (divisors: 1, 2, 3, 6), etc.
+*   **Note:** 0 and 1 are not considered prime numbers.
+
+#### Why it matters
+*   **Fundamental Building Blocks:** Every integer greater than 1 is either prime itself or can be written as a unique product of prime numbers (Fundamental Theorem of Arithmetic). This is *huge*!
+*   **Cryptography:** Many modern encryption techniques (like RSA) rely on the difficulty of factoring large numbers into their prime components.
+*   **Number Theory Problems:** Primes are central to many problems involving divisibility, modular arithmetic, and combinatorial counting.
+*   **Optimizations:** Knowing prime factors can simplify complex calculations.
+
+#### Example Problem
+Is 13 a prime number?
+*   To check, we try dividing 13 by numbers from 2 up to the square root of 13 (which is about 3.6).
+*   Is 13 divisible by 2? No (remainder 1).
+*   Is 13 divisible by 3? No (remainder 1).
+*   Since we've checked up to its square root and found no divisors, 13 is a prime number.
+
+#### Simple C++ Implementation
+To check if a single number `n` is prime, we can use trial division up to `sqrt(n)`.
+
+```cpp
+#include <iostream> // For input/output
+#include <cmath>    // For std::sqrt
+
+// Function to check if a number is prime
+bool isPrime(int n) {
+    if (n <= 1) { // 0 and 1 are not prime
+        return false;
+    }
+    // Check for divisibility from 2 up to sqrt(n)
+    // If n has a divisor greater than sqrt(n), it must also have one smaller than sqrt(n)
+    for (int i = 2; i * i <= n; ++i) { 
+        if (n % i == 0) {
+            return false; // Found a divisor, so it's not prime
+        }
+    }
+    return true; // No divisors found, it's prime
+}
+
+int main() {
+    int testNum1 = 13;
+    int testNum2 = 10;
+    int testNum3 = 2; // Smallest prime
+    int testNum4 = 1; // Not prime
+
+    std::cout << testNum1 << " is prime? " << (isPrime(testNum1) ? "Yes" : "No") << std::endl;
+    std::cout << testNum2 << " is prime? " << (isPrime(testNum2) ? "Yes" : "No") << std::endl;
+    std::cout << testNum3 << " is prime? " << (isPrime(testNum3) ? "Yes" : "No") << std::endl;
+    std::cout << testNum4 << " is prime? " << (isPrime(testNum4) ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+That's a quick intro to GCD and Primes! These concepts might seem simple, but their applications in DSA are vast and powerful. Keep practicing, and you'll master them in no time! Happy coding! ✨
+
+---
