@@ -14949,3 +14949,88 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Arrays Basics  
+🕒 2026-01-27 06:37:06
+
+Alright, DSA adventurer! Let's dive into the absolute bedrock of data structures: **Arrays**!
+
+---
+
+### 📚 Arrays Basics (C++)
+
+#### 📌 1. What is an Array?
+
+Imagine a row of mailboxes, all identical and lined up neatly, right next to each other. Each mailbox has a number (starting from 0). You can put one letter (data item) into each mailbox.
+
+That's an array!
+
+*   It's a **collection of items** (elements) of the **same data type** (all integers, or all strings, etc.).
+*   These items are stored in **contiguous memory locations** – meaning they sit right next to each other in your computer's memory, just like those mailboxes.
+*   You access each item using an **index**, which is its position number (0, 1, 2, ...). In C++, indices always start at `0`.
+
+**Think of it as:** A fixed-size list where everything is ordered and easy to find by its position.
+
+#### 🎯 2. Why Do Arrays Matter?
+
+Arrays are fundamental and super important because:
+
+*   **Fast Access:** Want to grab the 3rd item? No problem, you can jump straight to it in constant time (O(1)) because the computer knows exactly where it is in memory.
+*   **Building Block:** Many other complex data structures (like strings, vectors, matrices) are built using arrays or array-like concepts.
+*   **Simplicity:** They're simple to understand and implement, making them a great starting point for storing collections of data.
+*   **Memory Efficiency:** Because elements are contiguous, they can sometimes be more cache-friendly and efficient.
+
+#### 💡 3. Example Problem: Summing Array Elements
+
+**Problem:** You have a list of daily temperatures. Calculate the total sum of these temperatures.
+
+**Input:** `temperatures = [10, 15, 20, 5, 25]`
+
+**Expected Output:** `75` (10 + 15 + 20 + 5 + 25)
+
+#### 💻 4. Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations (like printing to console)
+
+int main() {
+    // 1. Declare and initialize an array of integers (our temperatures)
+    // The compiler figures out the size (5 elements) automatically here.
+    int temperatures[] = {10, 15, 20, 5, 25};
+
+    // 2. Calculate the size of the array
+    // sizeof(temperatures) gives total bytes of the array.
+    // sizeof(temperatures[0]) gives bytes of one element.
+    // Dividing them gives the number of elements.
+    int arraySize = sizeof(temperatures) / sizeof(temperatures[0]);
+
+    // 3. Initialize a variable to store the sum
+    int totalSum = 0;
+
+    // 4. Loop through the array
+    // 'i' goes from 0 up to (but not including) arraySize
+    for (int i = 0; i < arraySize; ++i) {
+        // Access each element using its index 'i'
+        // Add the current element to totalSum
+        totalSum += temperatures[i]; // Same as: totalSum = totalSum + temperatures[i];
+    }
+
+    // 5. Print the result
+    std::cout << "The sum of temperatures is: " << totalSum << std::endl;
+
+    return 0; // Indicate that the program finished successfully
+}
+```
+
+**Output of the code:**
+```
+The sum of temperatures is: 75
+```
+
+---
+
+That's your first step into the world of arrays! Keep practicing, and you'll master them in no time. Happy coding!
+
+---
