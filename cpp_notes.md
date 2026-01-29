@@ -15350,3 +15350,96 @@ int main() {
 Pointers can be tricky at first, but understanding them is a superpower for C++ and DSA! Keep practicing, and you'll master them in no time. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-01-29 06:50:16
+
+Hey there, future coding wizard! Let's unravel the magic of **Recursion Basics**.
+
+---
+
+## Recursion Basics: Unlocking Self-Reference 🔄
+
+Imagine a function that solves a problem by calling *itself* to solve smaller, identical versions of that problem. It's like a set of Russian nesting dolls, each containing a smaller version of itself until you reach the smallest, simplest one. That's recursion in a nutshell!
+
+### What it Means (The Concept)
+
+Recursion is a programming technique where a function solves a problem by **calling itself** with a smaller input until it reaches a **base case**.
+
+Every recursive function needs two crucial parts:
+
+1.  **Base Case:** This is the *stop condition*. It's the simplest version of the problem that can be solved directly without any further recursive calls. Without a base case, your function would call itself forever (and crash!).
+2.  **Recursive Step:** This is where the function breaks down the original problem into a smaller, similar subproblem and then calls itself to solve that subproblem. It combines the result of the subproblem with some computation to get the final answer.
+
+### Why it Matters (The Importance)
+
+Recursion is more than just a fancy trick; it's a powerful tool because:
+
+*   **Elegance:** For certain problems, recursive solutions can be incredibly clean, concise, and easy to read, directly mirroring the mathematical definition of the problem.
+*   **Natural Fit:** Many problems (like traversing trees, exploring paths in a graph, or dynamic programming problems) are inherently recursive. Thinking recursively simplifies their solution.
+*   **Foundation:** It's fundamental for understanding more advanced algorithms and data structures.
+
+---
+
+### Example Problem: Factorial Calculation
+
+Let's find the factorial of a non-negative integer `n`.
+The factorial of `n` (denoted as `n!`) is the product of all positive integers less than or equal to `n`.
+
+*   **Definition:**
+    *   `0! = 1` (This is our **Base Case**!)
+    *   `n! = n * (n-1)!` for `n > 0` (This is our **Recursive Step**!)
+
+*   **Walkthrough (e.g., 3!):**
+    *   `factorial(3)` calls `3 * factorial(2)`
+    *   `factorial(2)` calls `2 * factorial(1)`
+    *   `factorial(1)` calls `1 * factorial(0)`
+    *   `factorial(0)` hits the **Base Case** and returns `1`.
+    *   Now, the calls unwind:
+        *   `factorial(1)` gets `1` from `factorial(0)`, returns `1 * 1 = 1`.
+        *   `factorial(2)` gets `1` from `factorial(1)`, returns `2 * 1 = 2`.
+        *   `factorial(3)` gets `2` from `factorial(2)`, returns `3 * 2 = 6`.
+
+So, `3! = 6`. Perfect!
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial recursively
+int factorial(int n) {
+    // 1. Base Case: If n is 0, return 1.
+    if (n == 0) {
+        return 1;
+    } 
+    // 2. Recursive Step: If n is greater than 0,
+    //    return n multiplied by the factorial of (n-1).
+    else {
+        return n * factorial(n - 1);
+    }
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 120
+
+    int zero_num = 0;
+    std::cout << "Factorial of " << zero_num << " is: " << factorial(zero_num) << std::endl; // Output: 1
+
+    int one_num = 1;
+    std::cout << "Factorial of " << one_num << " is: " << factorial(one_num) << std::endl; // Output: 1
+    
+    return 0;
+}
+```
+
+---
+
+That's the core idea of recursion! Remember those two crucial parts: a **base case** to stop, and a **recursive step** to break it down. Keep practicing, and you'll master this powerful concept!
+
+---
