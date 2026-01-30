@@ -15643,3 +15643,185 @@ int main() {
 That's your first step into Linked Lists! You've learned what they are, why they're cool, and even implemented a basic node and a way to walk through your very own list. Keep practicing, you got this! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-01-30 14:23:53
+
+Hey there, future DSA wizard! 👋 Let's dive into Doubly Linked Lists in a super friendly way.
+
+---
+
+## Doubly Linked List (DLL)
+
+### What it Means: The Concept 🧐
+
+Imagine a regular linked list (Singly Linked List) like a train where each car only knows which car is *ahead* of it. You can only move forward!
+
+A **Doubly Linked List** is like a train where **each car knows both the car in front AND the car behind it**. This means you can move **forward and backward** through the list.
+
+*   Each element (called a **node**) in a DLL stores:
+    *   Its own **data**.
+    *   A pointer to the **next** node (`next`).
+    *   A pointer to the **previous** node (`prev`).
+
+*   The first node's `prev` pointer is `nullptr`.
+*   The last node's `next` pointer is `nullptr`.
+
+### Why it Matters: The Superpowers ✨
+
+DLLs are awesome because they give you flexibility!
+
+1.  **Two-Way Traversal:** The most obvious benefit! You can start from any point and go forwards or backwards. Super handy for things like:
+    *   Browser history (forward/back buttons).
+    *   Undo/Redo functionalities in software.
+    *   Music or video playlists (next/previous song/video).
+
+2.  **Efficient Deletion:** Deleting a node is simpler and faster (O(1) given the node pointer) compared to a Singly Linked List because you don't need to traverse from the head to find the *previous* node. You already have a pointer to it!
+
+3.  **Easier Insertion:** While slightly more complex than SLL due to managing two pointers, inserting before a given node is also O(1) if you have the node pointer.
+
+### Example Problem (Small): Reverse Printing 🔄
+
+**Problem:** Given a Doubly Linked List, print all its elements in reverse order.
+
+**Why it's easy with DLL:** Because each node knows its `prev`! You just traverse to the *end* of the list, then start moving backward using the `prev` pointers, printing as you go.
+
+### Simple C++ Implementation 🛠️
+
+Let's build a basic Doubly Linked List that can add elements to the front and print them both forwards and backwards.
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;
+    Node* next; // Pointer to the next node
+    Node* prev; // Pointer to the previous node
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// 2. Define the Doubly Linked List class
+class DoublyLinkedList {
+private:
+    Node* head; // Pointer to the first node
+
+public:
+    // Constructor for the list
+    DoublyLinkedList() : head(nullptr) {}
+
+    // Destructor to free memory (important for linked lists!)
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = nullptr; // Ensure head is null after deletion
+    }
+
+    // --- Core Operations ---
+
+    // 1. Insert a new node at the beginning of the list
+    void insertAtHead(int val) {
+        Node* newNode = new Node(val);
+        if (head == nullptr) {
+            // If list is empty, new node is the head
+            head = newNode;
+        } else {
+            // New node's next points to current head
+            newNode->next = head;
+            // Current head's prev points to new node
+            head->prev = newNode;
+            // New node becomes the new head
+            head = newNode;
+        }
+        std::cout << "Inserted " << val << " at head." << std::endl;
+    }
+
+    // 2. Print the list from head to tail (forward traversal)
+    void printForward() {
+        if (head == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+        Node* current = head;
+        std::cout << "List (Forward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->next;
+        }
+        std::cout << "nullptr" << std::endl;
+    }
+
+    // 3. Print the list from tail to head (backward traversal - Solves example problem!)
+    void printBackward() {
+        if (head == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+
+        // First, traverse to the end of the list to find the tail
+        Node* current = head;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+
+        // Now, current is at the tail, traverse backwards
+        std::cout << "List (Backward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->prev;
+        }
+        std::cout << "nullptr" << std::endl;
+    }
+};
+
+// --- Main function to test our Doubly Linked List ---
+int main() {
+    DoublyLinkedList dll;
+
+    dll.insertAtHead(5);
+    dll.insertAtHead(10);
+    dll.insertAtHead(15);
+    dll.insertAtHead(20); // List: 20 <-> 15 <-> 10 <-> 5 <-> nullptr
+
+    dll.printForward();  // Expected: 20 <-> 15 <-> 10 <-> 5 <-> nullptr
+    dll.printBackward(); // Expected: 5 <-> 10 <-> 15 <-> 20 <-> nullptr
+
+    std::cout << "\nInserting more..." << std::endl;
+    dll.insertAtHead(25); // List: 25 <-> 20 <-> 15 <-> 10 <-> 5 <-> nullptr
+    dll.printForward();
+    dll.printBackward();
+
+    // The destructor will automatically clean up memory when dll goes out of scope.
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Inserted 5 at head.
+Inserted 10 at head.
+Inserted 15 at head.
+Inserted 20 at head.
+List (Forward): 20 <-> 15 <-> 10 <-> 5 <-> nullptr
+List (Backward): 5 <-> 10 <-> 15 <-> 20 <-> nullptr
+
+Inserting more...
+Inserted 25 at head.
+List (Forward): 25 <-> 20 <-> 15 <-> 10 <-> 5 <-> nullptr
+List (Backward): 5 <-> 10 <-> 15 <-> 20 <-> 25 <-> nullptr
+```
+
+---
+
+That's your quick and friendly guide to Doubly Linked Lists! They're super useful for many real-world applications where you need the flexibility to move both ways. Keep coding! 💪
+
+---
