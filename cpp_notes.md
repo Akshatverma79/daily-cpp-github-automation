@@ -15993,3 +15993,131 @@ int main() {
 That's your quick dive into Stacks! Remember LIFO, and you're good to go. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-01-31 14:11:46
+
+Let's dive into Queues! They're super common and very intuitive once you get the hang of them.
+
+---
+
+### DSA Notes: Queues (C++ Implementation)
+
+#### 1. What is a Queue? 🤔
+
+Imagine a **line at a movie theater** or a **checkout counter** at a grocery store. The first person to join the line is the first person to be served, right? That's exactly what a Queue is!
+
+*   **Concept:** A Queue is a linear data structure that follows the **First In, First Out (FIFO)** principle.
+    *   **First In:** The element that was added first will be removed first.
+    *   **First Out:** The element that's been waiting the longest gets processed next.
+
+*   **Key Operations:**
+    *   **Enqueue (Push):** Add an element to the **rear (back)** of the queue.
+    *   **Dequeue (Pop):** Remove an element from the **front** of the queue.
+    *   **Front:** Look at the element at the front without removing it.
+    *   **isEmpty:** Check if the queue has any elements.
+    *   **Size:** Get the number of elements in the queue.
+
+#### 2. Why Does It Matter? (Use Cases) 🚀
+
+Queues are everywhere in computing because they ensure fair and orderly processing.
+
+*   **Task Scheduling:** Managing tasks for a CPU, printer, or server.
+*   **Breadth-First Search (BFS):** A graph traversal algorithm.
+*   **Message Queues:** In operating systems or distributed systems, handling messages in the order they arrive.
+*   **Buffer Management:** Storing data temporarily before it's processed.
+
+#### 3. Example Problem: Printer Queue 🖨️
+
+Let's say you have a printer, and multiple users send documents to it. The printer needs to process these documents in the exact order they were submitted.
+
+**Scenario:**
+1.  User A sends "Report.pdf"
+2.  User B sends "Presentation.pptx"
+3.  The printer finishes "Report.pdf"
+4.  User C sends "Invoice.docx"
+5.  The printer finishes "Presentation.pptx"
+6.  The printer finishes "Invoice.docx"
+
+This is a perfect fit for a Queue!
+
+#### 4. Simple C++ Implementation (using `std::queue`) 💻
+
+C++ provides a handy `std::queue` container adapter, which by default uses `std::deque` internally. It's the simplest way to use a queue in C++.
+
+```cpp
+#include <iostream> // For input/output
+#include <queue>    // For std::queue
+
+int main() {
+    // 1. Create a queue of strings to hold document names
+    std::queue<std::string> printerQueue;
+
+    std::cout << "--- Printer Queue Simulation ---" << std::endl;
+
+    // 2. Enqueue (Add) documents to the queue (printer job arrives)
+    std::cout << "User A sends: Report.pdf" << std::endl;
+    printerQueue.push("Report.pdf");
+
+    std::cout << "User B sends: Presentation.pptx" << std::endl;
+    printerQueue.push("Presentation.pptx");
+
+    std::cout << "Current queue size: " << printerQueue.size() << std::endl;
+    std::cout << "Next document to print: " << printerQueue.front() << "\n" << std::endl;
+
+    // 3. Dequeue (Remove) documents as they are printed
+    std::cout << "Printer is processing: " << printerQueue.front() << std::endl;
+    printerQueue.pop(); // Report.pdf is printed and removed
+
+    std::cout << "User C sends: Invoice.docx" << std::endl;
+    printerQueue.push("Invoice.docx"); // Invoice.docx is added to the back
+
+    std::cout << "Current queue size: " << printerQueue.size() << std::endl;
+    std::cout << "Next document to print: " << printerQueue.front() << "\n" << std::endl;
+
+    std::cout << "Printer is processing: " << printerQueue.front() << std::endl;
+    printerQueue.pop(); // Presentation.pptx is printed and removed
+
+    std::cout << "Current queue size: " << printerQueue.size() << std::endl;
+    std::cout << "Next document to print: " << printerQueue.front() << "\n" << std::endl;
+
+    std::cout << "Printer is processing: " << printerQueue.front() << std::endl;
+    printerQueue.pop(); // Invoice.docx is printed and removed
+
+    // 4. Check if the queue is empty
+    std::cout << "\nIs printer queue empty? " << (printerQueue.empty() ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+**Output of the code:**
+
+```
+--- Printer Queue Simulation ---
+User A sends: Report.pdf
+User B sends: Presentation.pptx
+Current queue size: 2
+Next document to print: Report.pdf
+
+Printer is processing: Report.pdf
+User C sends: Invoice.docx
+Current queue size: 2
+Next document to print: Presentation.pptx
+
+Printer is processing: Presentation.pptx
+Current queue size: 1
+Next document to print: Invoice.docx
+
+Printer is processing: Invoice.docx
+
+Is printer queue empty? Yes
+```
+
+---
+
+And there you have it! Queues are simple, effective, and fundamental for managing ordered processes in programming. Keep practicing!
+
+---
