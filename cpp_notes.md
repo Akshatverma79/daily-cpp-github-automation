@@ -16679,3 +16679,174 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graphs Basics  
+🕒 2026-02-02 14:31:03
+
+Hey there, future algorithm master! 👋 Let's dive into the fascinating world of **Graphs**!
+
+---
+
+### 🌐 Graphs Basics: Connecting the Dots!
+
+A graph is one of the most fundamental and versatile data structures. Think of it as a bunch of points connected by lines.
+
+---
+
+#### 📌 1. What is a Graph?
+
+Imagine your social media network. You are a person, and your friendships are the connections. That's essentially a graph!
+
+*   **Nodes (or Vertices):** These are the "points" or individual entities in your graph. (e.g., people in a social network, cities on a map, web pages).
+*   **Edges:** These are the "lines" or connections between nodes. (e.g., a friendship, a road between cities, a hyperlink).
+
+**Example Visual:**
+```
+     A --- B
+     |     |
+     C --- D
+```
+Here, A, B, C, D are nodes. (A,B), (B,D), (D,C), (C,A) are edges.
+
+---
+
+#### 🤔 2. Why Do Graphs Matter?
+
+Graphs are *everywhere* in the real world and in computer science!
+
+*   **Modeling Relationships:** They're perfect for representing how things are connected.
+*   **Real-World Applications:**
+    *   **Social Networks:** Friendships, followers.
+    *   **GPS/Maps:** Cities as nodes, roads as edges (finding shortest routes!).
+    *   **Internet:** Web pages as nodes, hyperlinks as edges.
+    *   **Computer Networks:** Computers as nodes, cables/wireless as edges.
+    *   **Dependency Management:** Task A must finish before Task B.
+*   **Problem Solving:** Many important problems boil down to graph problems: finding shortest paths, determining connectivity, scheduling tasks, etc.
+
+---
+
+#### 🛠️ 3. How Do We Represent Graphs?
+
+There are two main ways to store a graph in memory:
+
+1.  **Adjacency Matrix:** A 2D array where `matrix[i][j]` is 1 if there's an edge between node `i` and `j`, and 0 otherwise.
+    *   *Good for:* Quick check if an edge exists.
+    *   *Bad for:* Sparse graphs (lots of 0s, wastes space).
+
+2.  **Adjacency List:** An array/vector where each element `adj[i]` is a list (or vector) of all nodes connected to node `i`. This is generally more memory-efficient for most graphs.
+    *   *Good for:* Iterating through all neighbors of a node.
+    *   *Bad for:* Checking if an edge exists (might need to scan a list).
+
+**We'll focus on the Adjacency List for its simplicity and common use!**
+
+---
+
+#### 🌟 4. Example Problem: Social Network Connections
+
+**Problem:** You're given a list of people and their friendships. Represent this social network and then find all friends of a specific person.
+
+**Input:**
+*   First line: `N` (number of people), `M` (number of friendships).
+*   Next `M` lines: Two integers `u` and `v`, indicating that person `u` and person `v` are friends. (Assume people are numbered from 0 to N-1).
+*   Last line: `P` (the person whose friends you want to find).
+
+**Example Input:**
+```
+5 4      // 5 people (0-4), 4 friendships
+0 1      // 0 is friends with 1
+1 2      // 1 is friends with 2
+0 3      // 0 is friends with 3
+3 4      // 3 is friends with 4
+0        // Find friends of person 0
+```
+
+**Expected Output:**
+```
+Friends of person 0: 1 3
+```
+*(Note: Order of friends might vary)*
+
+---
+
+#### 💻 5. Simple C++ Implementation (Adjacency List)
+
+This C++ code builds the adjacency list for the social network and then prints friends for a given person.
+
+```cpp
+#include <iostream> // For input/output operations (cin, cout)
+#include <vector>   // For using std::vector
+
+int main() {
+    // Make I/O faster (optional, but good practice in competitive programming)
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int N; // Number of people (nodes/vertices)
+    int M; // Number of friendships (edges)
+
+    std::cout << "Enter number of people (N) and friendships (M): ";
+    std::cin >> N >> M;
+
+    // Create an adjacency list:
+    // It's a vector where each element is another vector.
+    // adj[i] will store a list of all people person 'i' is friends with.
+    std::vector<std::vector<int>> adj(N); 
+
+    std::cout << "Enter " << M << " friendships (e.g., '0 1' for person 0 and 1 being friends):\n";
+    // Read M friendships and build the graph
+    for (int i = 0; i < M; ++i) {
+        int u, v; // u and v are friends
+        std::cin >> u >> v;
+
+        // Since friendship is mutual (undirected graph):
+        // Add v to u's friend list
+        adj[u].push_back(v);
+        // Add u to v's friend list
+        adj[v].push_back(u);
+    }
+
+    int personToFindFriendsFor;
+    std::cout << "Enter the person (0 to " << N-1 << ") whose friends you want to find: ";
+    std::cin >> personToFindFriendsFor;
+
+    // Check if the person exists
+    if (personToFindFriendsFor >= 0 && personToFindFriendsFor < N) {
+        std::cout << "Friends of person " << personToFindFriendsFor << ": ";
+        // Iterate through the adjacency list for the specified person
+        for (int friendOfPerson : adj[personToFindFriendsFor]) {
+            std::cout << friendOfPerson << " ";
+        }
+        std::cout << std::endl;
+    } else {
+        std::cout << "Invalid person ID." << std::endl;
+    }
+
+    return 0;
+}
+
+```
+
+**How to Compile & Run (e.g., using g++):**
+
+1.  Save the code as `graph_basics.cpp`
+2.  Open your terminal/command prompt.
+3.  Navigate to the directory where you saved the file.
+4.  Compile: `g++ graph_basics.cpp -o graph_basics`
+5.  Run: `./graph_basics` (on Linux/macOS) or `graph_basics.exe` (on Windows)
+
+---
+
+### 🎉 What's Next?
+
+You've just taken your first step into graph theory! This basic understanding is crucial for more advanced graph algorithms like:
+*   **Breadth-First Search (BFS)**
+*   **Depth-First Search (DFS)**
+*   **Dijkstra's Algorithm (shortest paths)**
+*   **Minimum Spanning Trees (MST)**
+*   And many more!
+
+Keep practicing, and you'll soon be solving complex problems with the power of graphs! Happy coding! 🚀
+
+---
