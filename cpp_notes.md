@@ -17984,3 +17984,234 @@ int main() {
 And there you have it! Binary Search on Answer is a powerful tool once you identify problems with that magical monotonic property. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Sorting Algorithms (Merge Sort, Quick Sort)  
+🕒 2026-02-07 06:43:10
+
+Hey there, future DSA master! 👋 Let's dive into two fundamental sorting algorithms: Merge Sort and Quick Sort. They're both super important because they're efficient and illustrate the powerful "Divide and Conquer" strategy.
+
+---
+
+## **Sorting Algorithms: Merge Sort & Quick Sort**
+
+Sorting is all about arranging elements in a specific order (ascending or descending). It's a foundational task in computer science, used everywhere from organizing your music library to speeding up search operations.
+
+---
+
+### 1. Merge Sort
+
+**Concept:**
+Merge Sort is a **Divide and Conquer** algorithm. It works by:
+1.  **Dividing:** Recursively splitting the array into two halves until you have individual elements (which are inherently sorted).
+2.  **Conquering (Merging):** Merging these sorted sub-arrays back together to produce a new sorted array. The magic happens in the "merge" step, where two already sorted lists are combined efficiently.
+
+**Why it Matters:**
+*   **Guaranteed Performance:** It always runs in **O(N log N)** time complexity, making it very reliable even for worst-case scenarios.
+*   **Stability:** It's a **stable sort**, meaning if two elements have equal values, their relative order in the original array is preserved in the sorted array.
+*   **External Sorting:** Great for sorting large datasets that don't fit into memory (e.g., sorting files on disk).
+*   **Space Complexity:** O(N) because it needs a temporary array for merging.
+
+**Example Problem:**
+Let's sort `[38, 27, 43, 3, 9, 82, 10]`
+
+1.  **Divide:**
+    `[38, 27, 43, 3]` | `[9, 82, 10]`
+    `[38, 27]` | `[43, 3]` | `[9, 82]` | `[10]`
+    `[38]` | `[27]` | `[43]` | `[3]` | `[9]` | `[82]` | `[10]`
+    (Now all single elements are "sorted")
+
+2.  **Merge:**
+    `[27, 38]` | `[3, 43]` | `[9, 82]` | `[10]`
+    `[3, 27, 38, 43]` | `[9, 10, 82]`
+    Finally: `[3, 9, 10, 27, 38, 43, 82]`
+
+**Simple C++ Implementation:**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::copy
+
+// Helper function to merge two sorted sub-arrays
+void merge(std::vector<int>& arr, int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+
+    // Create temporary arrays
+    std::vector<int> L(n1);
+    std::vector<int> R(n2);
+
+    // Copy data to temp arrays L[] and R[]
+    for (int i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+
+    // Merge the temp arrays back into arr[left..right]
+    int i = 0; // Initial index of first sub-array
+    int j = 0; // Initial index of second sub-array
+    int k = left; // Initial index of merged sub-array
+
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+
+    // Copy the remaining elements of L[], if any
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+
+    // Copy the remaining elements of R[], if any
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+
+// Main Merge Sort function
+void mergeSort(std::vector<int>& arr, int left, int right) {
+    if (left < right) {
+        // Find the middle point
+        int mid = left + (right - left) / 2;
+
+        // Sort first and second halves
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+
+        // Merge the sorted halves
+        merge(arr, left, mid, right);
+    }
+}
+
+// Helper to print the vector
+void printVector(const std::vector<int>& arr) {
+    for (int x : arr) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> data = {38, 27, 43, 3, 9, 82, 10};
+    std::cout << "Original array: ";
+    printVector(data);
+
+    mergeSort(data, 0, data.size() - 1);
+
+    std::cout << "Sorted array (Merge Sort): ";
+    printVector(data); // Expected: 3 9 10 27 38 43 82 
+
+    return 0;
+}
+```
+
+---
+
+### 2. Quick Sort
+
+**Concept:**
+Quick Sort is another powerful **Divide and Conquer** algorithm. It works by:
+1.  **Choosing a Pivot:** Selecting an element from the array, called the "pivot."
+2.  **Partitioning:** Rearranging the array such that all elements smaller than the pivot come before it, and all elements greater come after it. Elements equal to the pivot can go on either side. After partitioning, the pivot is in its final sorted position.
+3.  **Conquering (Recursion):** Recursively applying Quick Sort to the sub-arrays of smaller elements and greater elements.
+
+**Why it Matters:**
+*   **Speed (in practice):** Often the fastest sorting algorithm in practice for large arrays, despite its worst-case O(N^2) complexity. This is due to its efficient cache performance and smaller constant factors compared to Merge Sort.
+*   **In-Place:** It typically sorts "in-place," meaning it requires minimal additional memory (O(log N) for the recursion stack).
+*   **Widely Used:** Many standard library sorting functions (like `std::sort` in C++) are based on Quick Sort or hybrids of it (like Introsort).
+*   **Average Case:** Its average time complexity is **O(N log N)**.
+
+**Example Problem:**
+Let's sort `[10, 80, 30, 90, 40, 50, 70]` using the last element as the pivot.
+
+1.  **Initial Array:** `[10, 80, 30, 90, 40, 50, **70**]` (Pivot is 70)
+2.  **Partition:** We want `... <= 70 ...` `70` `... >= 70 ...`
+    *   Iterate through elements, moving smaller ones to the left.
+    *   After one pass, you might get something like:
+        `[10, 30, 40, 50, **70**, 90, 80]` (70 is now in its correct place!)
+3.  **Recursion:**
+    *   Recursively sort the left sub-array: `[10, 30, 40, 50]`
+    *   Recursively sort the right sub-array: `[90, 80]`
+    *   Eventually, all elements will be in their correct sorted positions.
+
+**Simple C++ Implementation:**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::swap
+
+// Helper function to partition the array around a pivot
+int partition(std::vector<int>& arr, int low, int high) {
+    int pivot = arr[high]; // Choosing the last element as the pivot
+    int i = (low - 1);     // Index of smaller element
+
+    for (int j = low; j <= high - 1; j++) {
+        // If current element is smaller than or equal to pivot
+        if (arr[j] <= pivot) {
+            i++; // Increment index of smaller element
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]); // Place pivot in its correct position
+    return (i + 1); // Return the partitioning index
+}
+
+// Main Quick Sort function
+void quickSort(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        // pi is partitioning index, arr[pi] is now at correct position
+        int pi = partition(arr, low, high);
+
+        // Separately sort elements before partition and after partition
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// Helper to print the vector
+void printVector(const std::vector<int>& arr) {
+    for (int x : arr) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> data = {10, 80, 30, 90, 40, 50, 70};
+    std::cout << "Original array: ";
+    printVector(data);
+
+    quickSort(data, 0, data.size() - 1);
+
+    std::cout << "Sorted array (Quick Sort): ";
+    printVector(data); // Expected: 10 30 40 50 70 80 90
+
+    std::vector<int> data2 = {5, 4, 3, 2, 1};
+    std::cout << "Original array: ";
+    printVector(data2);
+    quickSort(data2, 0, data2.size() - 1);
+    std::cout << "Sorted array (Quick Sort): ";
+    printVector(data2); // Expected: 1 2 3 4 5
+
+    return 0;
+}
+```
+
+---
+
+That's a wrap on Merge Sort and Quick Sort! Both are fantastic tools in your DSA toolkit, each with its own strengths. Keep practicing, and you'll master them in no time! Happy coding! ✨
+
+---
