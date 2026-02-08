@@ -18334,3 +18334,88 @@ u: 1
 And there you have it! Hashing and HashMaps make quick work of many problems, turning slow searches into lightning-fast lookups. Keep practicing, and you'll master them in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Manipulation Basics  
+🕒 2026-02-08 06:51:47
+
+Hello there, aspiring developer! Let's dive into the super common and useful world of **String Manipulation Basics**.
+
+---
+
+### **String Manipulation Basics**
+
+#### 1. What does it mean?
+
+Imagine a "string" as a sequence of characters – like words, sentences, or even just names. For example, "hello" is a string made of 'h', 'e', 'l', 'l', 'o'.
+
+**String manipulation** simply means performing operations on these sequences. This could be anything from:
+*   Checking its **length**.
+*   Accessing individual **characters** (e.g., getting the first letter).
+*   **Combining** two strings (like "hello" + " world" = "hello world").
+*   **Changing** characters (e.g., making everything uppercase).
+*   **Finding** specific characters or smaller sequences within a string.
+
+#### 2. Why does it matter?
+
+Strings are EVERYWHERE in programming!
+*   **User Input:** When you type your name into a form, it's a string.
+*   **Data Processing:** Reading data from files often involves parsing strings.
+*   **Web Development:** URLs, HTML content, user comments are all strings.
+*   **Game Development:** Player names, dialogue, item descriptions.
+*   **Log Files:** Analyzing error messages or system events.
+
+Mastering basic string manipulation is a fundamental skill that you'll use in almost any project!
+
+#### 3. Example Problem: Reverse a String
+
+**Problem:** Given a string, return a new string that has all the characters in reverse order.
+
+**Example:**
+*   Input: `"hello"`
+*   Output: `"olleh"`
+
+*   Input: `"world"`
+*   Output: `"dlrow"`
+
+#### 4. Simple C++ Implementation
+
+In C++, `std::string` is your go-to for handling strings, and the standard library provides powerful tools. For reversing, `std::reverse` from the `<algorithm>` header is super handy!
+
+```cpp
+#include <iostream>  // For input/output operations (like std::cout)
+#include <string>    // For using std::string
+#include <algorithm> // For std::reverse
+
+// Function to reverse a string
+std::string reverseString(std::string s) { 
+    // std::reverse works on iterators (like s.begin() and s.end())
+    // It reverses the sequence in-place.
+    // We pass 's' by value, so we're reversing a *copy* of the original string.
+    std::reverse(s.begin(), s.end());
+    return s; // Return the reversed string
+}
+
+int main() {
+    std::string original1 = "hello";
+    std::string reversed1 = reverseString(original1);
+
+    std::cout << "Original: " << original1 << std::endl; // Output: Original: hello
+    std::cout << "Reversed: " << reversed1 << std::endl; // Output: Reversed: olleh
+
+    std::string original2 = "Programming";
+    std::string reversed2 = reverseString(original2);
+
+    std::cout << "Original: " << original2 << std::endl; // Output: Original: Programming
+    std::cout << "Reversed: " << reversed2 << std::endl; // Output: Reversed: gnimmargorP
+
+    return 0;
+}
+```
+
+**Quick Note:** While `std::reverse` is concise, it's good to also understand *how* you'd manually reverse a string (e.g., by swapping characters from the ends inwards, or building a new string by iterating backward). This problem is often used to practice those fundamental looping and character-access skills!
+
+---
+
+---
