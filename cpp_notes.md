@@ -18717,3 +18717,143 @@ Both are vastly superior to naive string matching, offering efficient solutions 
 Keep coding and exploring! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-02-09 07:05:27
+
+Okay, let's dive into Backtracking basics!
+
+---
+
+## Backtracking Basics 👣
+
+Backtracking is a powerful problem-solving technique, especially useful for exploring all possible solutions or finding a specific solution by making a series of choices.
+
+### 💡 What it means: "Trial and Error with a Plan"
+
+Imagine you're in a maze. You take a path. If it leads to a dead end, you don't just give up; you **backtrack** to the last decision point and try a different path.
+
+That's precisely what backtracking algorithms do:
+
+1.  **Choose:** Make a choice (e.g., go left, pick an element).
+2.  **Explore:** See if that choice leads to a solution (often recursively).
+3.  **Unchoose (Backtrack):** If the choice doesn't work out, or if you want to explore *other* possibilities after finding one, undo your last choice and try a different one. This "undo" step is crucial!
+
+It's essentially a smart way to explore a **decision tree** recursively.
+
+### 🤔 Why it matters: Solving Puzzles & Finding Possibilities
+
+Backtracking shines in problems where you need to:
+*   Find **all possible solutions** (e.g., all permutations, all subsets).
+*   Find **a single solution** by exploring options (e.g., Sudoku solver, N-Queens).
+*   Explore different configurations or paths.
+
+It's the go-to technique for many combinatorial problems.
+
+### 🧩 Example Problem: Generating Subsets
+
+Let's say we have a set of numbers, `[1, 2, 3]`. We want to find all possible subsets.
+
+**Input:** `nums = [1, 2, 3]`
+
+**Expected Output:** `[], [1], [2], [3], [1, 2], [1, 3], [2, 3], [1, 2, 3]`
+
+**How Backtracking Applies:**
+For each number, we have two choices:
+1.  **Include** it in our current subset.
+2.  **Exclude** it from our current subset.
+
+We'll recursively explore both choices for each number. When we've considered all numbers, the `currentSubset` is complete, and we add it to our results.
+
+### 💻 Simple C++ Implementation: Subsets
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::sort, though not strictly needed for this problem
+
+// Recursive helper function for backtracking
+void findSubsets(
+    std::vector<int>& nums,            // The original array of numbers
+    int index,                         // Current index we are considering
+    std::vector<int>& currentSubset,   // The subset being built in the current path
+    std::vector<std::vector<int>>& allSubsets // Stores all generated subsets
+) {
+    // 1. Base Case: If we've considered all elements
+    if (index == nums.size()) {
+        allSubsets.push_back(currentSubset); // Add the completed subset to our results
+        return; // Stop this recursive path
+    }
+
+    // --- Decision Point: For nums[index], we have two choices ---
+
+    // Choice 1: INCLUDE nums[index]
+    currentSubset.push_back(nums[index]); // "Choose" - Add the element
+    findSubsets(nums, index + 1, currentSubset, allSubsets); // "Explore" - Move to the next element
+    currentSubset.pop_back();              // "Unchoose" - Remove the element to backtrack
+                                           // This allows us to try other paths without it.
+
+    // Choice 2: EXCLUDE nums[index]
+    // We simply skip adding nums[index] and move to the next element
+    findSubsets(nums, index + 1, currentSubset, allSubsets); // "Explore" - Move to the next element without adding current
+}
+
+// Main function to generate all subsets
+std::vector<std::vector<int>> generateAllSubsets(std::vector<int>& nums) {
+    std::vector<std::vector<int>> allSubsets; // This will store our final answer
+    std::vector<int> currentSubset;          // This will hold the subset we're building
+    findSubsets(nums, 0, currentSubset, allSubsets); // Start backtracking from index 0
+    return allSubsets;
+}
+
+// --- Just for testing and printing ---
+void printSubsets(const std::vector<std::vector<int>>& subsets) {
+    std::cout << "All Subsets:" << std::endl;
+    for (const auto& subset : subsets) {
+        std::cout << "[";
+        for (size_t i = 0; i < subset.size(); ++i) {
+            std::cout << subset[i];
+            if (i < subset.size() - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+    }
+}
+
+int main() {
+    std::vector<int> myNums = {1, 2, 3};
+    std::vector<std::vector<int>> result = generateAllSubsets(myNums);
+    printSubsets(result);
+
+    std::cout << "\n--- Another Example ---" << std::endl;
+    std::vector<int> emptyNums = {};
+    result = generateAllSubsets(emptyNums);
+    printSubsets(result); // Should print: All Subsets: []
+
+    return 0;
+}
+
+```
+
+**Output of the code:**
+
+```
+All Subsets:
+[]
+[3]
+[2]
+[2, 3]
+[1]
+[1, 3]
+[1, 2]
+[1, 2, 3]
+
+--- Another Example ---
+All Subsets:
+[]
+```
+
+---
