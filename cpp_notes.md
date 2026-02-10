@@ -19174,3 +19174,201 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Trie Data Structure  
+🕒 2026-02-10 14:48:00
+
+Hey there, future DSA wizard! Let's dive into a super cool data structure called a **Trie**. Think of it as a specialized tree that's perfect for handling strings.
+
+---
+
+## 🌳 Trie Data Structure (Prefix Tree)
+
+### What it Means (The Concept)
+
+Imagine you're building a super-fast dictionary or an autocomplete feature. A Trie (pronounced "try," from retrieval) is a tree-like data structure where each node represents a character.
+
+*   **Nodes:** Each node typically stores a character (though often implicitly by its position in the parent's children array/map) and a flag indicating if it marks the end of a valid word.
+*   **Paths:** The path from the root to any node forms a prefix. If that node also has the "end-of-word" flag set, then that prefix is a complete word.
+*   **Root:** The root node usually represents an empty string.
+*   **Children:** Each node can have multiple children, one for each possible next character in a word. For English lowercase letters, a node might have up to 26 children.
+
+**Think of it like this:** When you walk through a dictionary, you go from 'A' to 'Ap' to 'App' to 'Apple'. A Trie does the same, letter by letter, sharing common prefixes.
+
+---
+
+### Why it Matters (The Awesomeness)
+
+Tries are fantastic for string-related problems because of their efficiency:
+
+1.  **Fast Prefix Searches:** This is their superpower! You can quickly find all words that start with a given prefix (e.g., for autocomplete suggestions).
+2.  **Efficient Word Search/Insertion:** Searching for a word or inserting a new one takes `O(L)` time, where `L` is the length of the word. This is super efficient because it doesn't depend on the *number* of words already in the dictionary, only the word's length.
+3.  **Space Efficiency (sometimes):** By sharing common prefixes among words, Tries can sometimes save space compared to storing all words individually in a hash table, especially with many similar words.
+4.  **Lexicographical Ordering:** If you traverse a Trie using a depth-first search and always visit children in alphabetical order, you can retrieve all stored words in sorted order.
+
+---
+
+### 💡 Example Problem (Mini Dictionary)
+
+**Problem:** Design a data structure that supports adding new words and checking if a word is present.
+
+*   `addWord("apple")`
+*   `addWord("app")`
+*   `search("apple")` -> true
+*   `search("app")` -> true
+*   `search("ap")` -> false (because "ap" isn't marked as a word end)
+*   `search("application")` -> false
+
+**How a Trie solves this:**
+
+1.  When you `addWord("apple")`: You traverse from the root. If a child for 'a' doesn't exist, create it. Then for 'p', then 'p', then 'l', then 'e'. Mark the 'e' node as `isEndOfWord = true`.
+2.  When you `addWord("app")`: You traverse from the root. 'a' exists, 'p' exists, 'p' exists. Now just mark this *second 'p'* node as `isEndOfWord = true`. Notice how "ap" is shared!
+3.  When you `search("apple")`: You traverse 'a', 'p', 'p', 'l', 'e'. If you reach the 'e' node and its `isEndOfWord` flag is true, return true.
+4.  When you `search("ap")`: You traverse 'a', 'p'. You reach the first 'p' node. Its `isEndOfWord` flag is `false`, so "ap" is not a full word. Return false.
+
+---
+
+### 🛠️ Simple C++ Implementation
+
+Here's a basic implementation for lowercase English letters:
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory> // For std::unique_ptr, a good practice for memory management
+
+// Forward declaration for TrieNode
+class TrieNode;
+
+// --- TrieNode Class ---
+// Represents a single node in the Trie
+class TrieNode {
+public:
+    // Pointers to children nodes (26 for 'a' through 'z')
+    // Using std::unique_ptr for automatic memory management
+    std::vector<std::unique_ptr<TrieNode>> children; 
+    
+    // Flag to mark if this node signifies the end of a complete word
+    bool isEndOfWord;
+
+    // Constructor
+    TrieNode() : isEndOfWord(false) {
+        // Initialize children vector with 26 null unique_ptrs
+        children.resize(26); 
+    }
+
+    // Destructor (unique_ptr handles child destruction automatically!)
+    ~TrieNode() {
+        // No explicit delete needed for children due to unique_ptr
+        // If raw pointers were used:
+        // for (int i = 0; i < 26; ++i) {
+        //     delete children[i];
+        // }
+    }
+
+    // Helper to get index for a character
+    static int getCharIndex(char c) {
+        return c - 'a';
+    }
+};
+
+// --- Trie Class ---
+// The main Trie data structure
+class Trie {
+private:
+    std::unique_ptr<TrieNode> root; // The root of our Trie
+
+public:
+    // Constructor: Initializes the root node
+    Trie() : root(std::make_unique<TrieNode>()) {}
+
+    // Method to insert a word into the Trie
+    void insert(const std::string& word) {
+        TrieNode* current = root.get(); // Start from the root
+
+        for (char ch : word) {
+            int index = TrieNode::getCharIndex(ch);
+            // If the child node doesn't exist, create it
+            if (!current->children[index]) {
+                current->children[index] = std::make_unique<TrieNode>();
+            }
+            // Move to the next node
+            current = current->children[index].get();
+        }
+        // Mark the last node as the end of a word
+        current->isEndOfWord = true;
+    }
+
+    // Method to search for a word in the Trie
+    bool search(const std::string& word) const {
+        const TrieNode* current = root.get(); // Start from the root
+
+        for (char ch : word) {
+            int index = TrieNode::getCharIndex(ch);
+            // If the child node doesn't exist, the word is not in the Trie
+            if (!current->children[index]) {
+                return false;
+            }
+            // Move to the next node
+            current = current->children[index].get();
+        }
+        // After traversing, check if the last node marks the end of a word
+        return current != nullptr && current->isEndOfWord;
+    }
+
+    // (Optional) Method to check if any word starts with the given prefix
+    bool startsWith(const std::string& prefix) const {
+        const TrieNode* current = root.get(); // Start from the root
+
+        for (char ch : prefix) {
+            int index = TrieNode::getCharIndex(ch);
+            // If the child node doesn't exist, no word starts with this prefix
+            if (!current->children[index]) {
+                return false;
+            }
+            // Move to the next node
+            current = current->children[index].get();
+        }
+        // If we reached here, it means the prefix path exists
+        return true;
+    }
+};
+
+// --- Main function to test the Trie ---
+int main() {
+    Trie myDictionary;
+
+    std::cout << "--- Inserting Words ---" << std::endl;
+    myDictionary.insert("apple");
+    myDictionary.insert("app");
+    myDictionary.insert("apricot");
+    myDictionary.insert("banana");
+    myDictionary.insert("band");
+
+    std::cout << "\n--- Searching Words ---" << std::endl;
+    std::cout << "Searching for 'apple': " << (myDictionary.search("apple") ? "Found" : "Not Found") << std::endl; // Expected: Found
+    std::cout << "Searching for 'app': " << (myDictionary.search("app") ? "Found" : "Not Found") << std::endl;     // Expected: Found
+    std::cout << "Searching for 'ap': " << (myDictionary.search("ap") ? "Found" : "Not Found") << std::endl;       // Expected: Not Found (it's a prefix, but not a whole word)
+    std::cout << "Searching for 'apricot': " << (myDictionary.search("apricot") ? "Found" : "Not Found") << std::endl; // Expected: Found
+    std::cout << "Searching for 'applications': " << (myDictionary.search("applications") ? "Found" : "Not Found") << std::endl; // Expected: Not Found
+    std::cout << "Searching for 'banana': " << (myDictionary.search("banana") ? "Found" : "Not Found") << std::endl; // Expected: Found
+
+    std::cout << "\n--- Checking Prefixes (startsWith) ---" << std::endl;
+    std::cout << "Starts with 'ap': " << (myDictionary.startsWith("ap") ? "Yes" : "No") << std::endl;           // Expected: Yes
+    std::cout << "Starts with 'app': " << (myDictionary.startsWith("app") ? "Yes" : "No") << std::endl;         // Expected: Yes
+    std::cout << "Starts with 'ban': " << (myDictionary.startsWith("ban") ? "Yes" : "No") << std::endl;         // Expected: Yes
+    std::cout << "Starts with 'bandana': " << (myDictionary.startsWith("bandana") ? "Yes" : "No") << std::endl; // Expected: No (path doesn't extend that far)
+    std::cout << "Starts with 'xyz': " << (myDictionary.startsWith("xyz") ? "Yes" : "No") << std::endl;         // Expected: No
+
+    return 0;
+}
+```
+
+**Quick note on `std::unique_ptr`:** It's a smart pointer that automatically manages memory. When a `unique_ptr` goes out of scope or is reassigned, it deletes the object it owns. This makes our Trie much safer from memory leaks compared to raw pointers, especially if we didn't write a careful destructor. For simpler examples, raw `TrieNode* children[26]` and `new TrieNode()` might be shown, but `unique_ptr` is better practice!
+
+Happy coding! You've just grasped a powerful tool for string manipulation.
+
+---
