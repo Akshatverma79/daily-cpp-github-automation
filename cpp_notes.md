@@ -19372,3 +19372,134 @@ int main() {
 Happy coding! You've just grasped a powerful tool for string manipulation.
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-02-11 07:02:19
+
+Hey there, future DSA pro! 👋 Let's unlock the secrets of **Disjoint Set Union (DSU)**, a super handy data structure.
+
+---
+
+## 🚀 Disjoint Set Union (DSU) - Your Guide to Grouping!
+
+### 🎯 What is DSU? (The Concept)
+
+Imagine you have a bunch of individual items, like islands in an ocean. DSU helps you keep track of which islands are connected (form a single landmass) and which are separate.
+
+At its core, DSU manages a collection of **disjoint** (non-overlapping) sets. It provides two main operations:
+
+1.  **`find(element)`**: Tells you which *set* an element belongs to. It does this by returning a "representative" element for that set. If two elements have the same representative, they are in the same set.
+2.  **`union(element1, element2)`**: Merges the sets containing `element1` and `element2` into a single set. If they were already in the same set, nothing changes.
+
+Think of it like this:
+*   `find` is asking: "Which group does this person belong to?"
+*   `union` is saying: "These two people are now friends, so their groups should merge!"
+
+### ✨ Why Does DSU Matter? (Its Importance)
+
+DSU is incredibly powerful for problems involving **connectivity** and **grouping**. It's highly efficient, often performing operations in nearly constant time (amortized O(α(N)), where α is the inverse Ackermann function, which is practically < 5 for any realistic N).
+
+You'll find DSU useful in:
+*   **Graph problems**: Detecting cycles, finding connected components, Kruskal's algorithm for Minimum Spanning Tree (MST).
+*   **Network problems**: Tracking connected devices.
+*   **Social networks**: Figuring out friend groups.
+*   **Maze generation**: Ensuring all parts are reachable.
+
+### 🧩 Mini Example Problem: Connecting Computers
+
+Let's say you have `N` computers, initially all disconnected. You need to perform two types of operations:
+1.  `connect(A, B)`: Establish a direct connection between computer `A` and computer `B`.
+2.  `are_connected(C, D)`: Check if computer `C` and computer `D` can communicate (directly or indirectly).
+
+**How DSU Helps:**
+*   Initialize `N` sets, each containing one computer.
+*   When `connect(A, B)` is called, perform `union(A, B)`.
+*   When `are_connected(C, D)` is called, check if `find(C) == find(D)`. Simple!
+
+### 🧑‍💻 Simple C++ Implementation
+
+Here's a standard DSU implementation with two key optimizations:
+1.  **Path Compression (in `find`)**: Makes `find` faster by flattening the tree structure.
+2.  **Union by Size (in `unite`)**: Attaches the smaller tree under the root of the larger tree to keep the trees relatively flat, further speeding up operations.
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota
+
+class DSU {
+private:
+    std::vector<int> parent; // parent[i] stores the parent of element i
+    std::vector<int> sz;     // sz[i] stores the size of the set if i is the root
+
+public:
+    // Constructor: Initializes N disjoint sets
+    DSU(int n) {
+        parent.resize(n);
+        std::iota(parent.begin(), parent.end(), 0); // Each element is its own parent initially
+        sz.assign(n, 1); // Each set initially has size 1
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i) { // If 'i' is its own parent, it's the root
+            return i;
+        }
+        // Path compression: Make 'i' point directly to its root
+        return parent[i] = find(parent[i]); 
+    }
+
+    // Union operation with Union by Size
+    // Merges the sets containing 'i' and 'j'
+    // Returns true if a merge actually happened (i.e., i and j were in different sets)
+    bool unite(int i, int j) {
+        int root_i = find(i); // Find the root of i's set
+        int root_j = find(j); // Find the root of j's set
+
+        if (root_i != root_j) { // If they are in different sets, merge them
+            // Union by Size: Attach smaller tree under the root of the larger tree
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i points to the larger tree's root
+            }
+            parent[root_j] = root_i; // Make root_i the parent of root_j
+            sz[root_i] += sz[root_j]; // Update the size of the new merged set
+            return true; // A merge happened
+        }
+        return false; // They were already in the same set
+    }
+
+    // Optional: Get the size of the set containing 'i'
+    int get_set_size(int i) {
+        return sz[find(i)];
+    }
+};
+
+/*
+// Example Usage:
+#include <iostream>
+
+int main() {
+    DSU dsu(5); // 5 computers (0, 1, 2, 3, 4)
+
+    std::cout << "Are 0 and 1 connected? " << (dsu.find(0) == dsu.find(1) ? "Yes" : "No") << std::endl; // No
+
+    dsu.unite(0, 1); // Connect 0 and 1
+    dsu.unite(2, 3); // Connect 2 and 3
+    dsu.unite(1, 2); // Connect 1 and 2 (This will merge {0,1} and {2,3})
+
+    std::cout << "Are 0 and 1 connected? " << (dsu.find(0) == dsu.find(1) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are 0 and 3 connected? " << (dsu.find(0) == dsu.find(3) ? "Yes" : "No") << std::endl; // Yes (0-1-2-3)
+    std::cout << "Are 0 and 4 connected? " << (dsu.find(0) == dsu.find(4) ? "Yes" : "No") << std::endl; // No
+
+    return 0;
+}
+*/
+```
+
+---
+
+That's DSU in a nutshell! It's a fundamental data structure that makes many graph and connectivity problems surprisingly simple and fast. Keep practicing, and you'll master it in no time! 😊
+
+---
