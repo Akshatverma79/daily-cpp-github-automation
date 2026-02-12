@@ -19857,3 +19857,178 @@ int main() {
 And there you have it! Fenwick Trees are a brilliant tool for competitive programming and any scenario where you need quick prefix sums and element updates. Keep practicing, and you'll master them in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Shortest Path (Dijkstra's Algorithm)  
+🕒 2026-02-12 14:39:10
+
+Hey there, aspiring coder! Let's dive into one of the most fundamental algorithms for pathfinding: **Dijkstra's Algorithm**.
+
+---
+
+### **Dijkstra's Algorithm: Your GPS for Graphs**
+
+#### **What it means (Concept)**
+
+Imagine you have a map with cities (nodes) and roads connecting them (edges), where each road has a specific travel time or distance (edge weight).
+
+Dijkstra's Algorithm is like a super-smart GPS that finds the **shortest path from a single starting city to all other cities** on the map.
+
+**Key Idea:** It works step-by-step, always picking the *unvisited* city that currently has the shortest known distance from your starting point. Once it "visits" a city, that city's shortest distance is finalized.
+
+**Important Note:** Dijkstra's only works with **non-negative edge weights** (you can't travel back in time or have negative distance!).
+
+#### **Why it matters**
+
+This algorithm is super useful in the real world:
+
+1.  **Navigation Apps (GPS):** Finds the fastest/shortest route between two points.
+2.  **Network Routing:** How data packets find the most efficient path across the internet.
+3.  **Logistics:** Optimizing delivery routes for goods.
+4.  **Resource Allocation:** Finding the cheapest way to connect different points in a network.
+
+---
+
+#### **1 Example Problem (Small)**
+
+Let's find the shortest path from node `A` to all other nodes in this small graph.
+The numbers on the edges are the "weights" (distances/costs).
+
+```
+        (1)
+    A ----- B
+   /|      /|
+(4) |     (2)|
+   \|    /  |
+    C -- D (1)
+    (1)
+```
+
+**Nodes:** A, B, C, D
+**Edges (and weights):**
+*   A to B: 1
+*   A to C: 4
+*   B to C: 2
+*   B to D: 5
+*   C to D: 1
+
+**Start Node:** A
+
+**Expected Shortest Distances from A:**
+*   A to A: 0
+*   A to B: 1 (A -> B)
+*   A to C: 3 (A -> B -> C)
+*   A to D: 4 (A -> B -> C -> D)
+
+---
+
+#### **1 Simple C++ Implementation**
+
+We'll use an **adjacency list** to represent the graph and a **priority queue** to efficiently find the next closest node.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>      // For priority_queue
+#include <limits>     // For numeric_limits (infinity)
+
+const int INF = std::numeric_limits<int>::max(); // Represents infinity
+
+// Pair to store {distance, node} for the priority queue
+// The 'greater' template argument makes it a min-priority queue
+// (smallest distance first)
+using pii = std::pair<int, int>; 
+
+void dijkstra(int start_node, int num_nodes, const std::vector<std::vector<pii>>& adj) {
+    // Vector to store the shortest distance from start_node to each other node
+    std::vector<int> dist(num_nodes + 1, INF); // +1 if nodes are 1-indexed
+
+    // Priority queue stores {current_distance, node}
+    std::priority_queue<pii, std::vector<pii>, std::greater<pii>> pq;
+
+    // Set distance to start_node as 0 and push it to the priority queue
+    dist[start_node] = 0;
+    pq.push({0, start_node});
+
+    while (!pq.empty()) {
+        int current_dist = pq.top().first;
+        int u = pq.top().second;
+        pq.pop();
+
+        // If we found a shorter path to 'u' already, skip this one
+        if (current_dist > dist[u]) {
+            continue;
+        }
+
+        // Explore neighbors of 'u'
+        for (const auto& edge : adj[u]) {
+            int v = edge.first;     // Neighbor node
+            int weight = edge.second; // Weight of edge u -> v
+
+            // If a shorter path to 'v' is found through 'u'
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+
+    // Print the shortest distances
+    std::cout << "Shortest distances from node " << start_node << ":\n";
+    for (int i = 1; i <= num_nodes; ++i) { // Assuming 1-indexed nodes
+        if (dist[i] == INF) {
+            std::cout << "Node " << i << ": Unreachable\n";
+        } else {
+            std::cout << "Node " << i << ": " << dist[i] << "\n";
+        }
+    }
+}
+
+int main() {
+    // Let's use 1-indexed nodes for clarity (A=1, B=2, C=3, D=4)
+    int num_nodes = 4;
+    
+    // Adjacency list: adj[u] stores list of {neighbor_node, weight}
+    std::vector<std::vector<pii>> adj(num_nodes + 1); 
+
+    // Add edges for our example (undirected, so add both ways)
+    // A(1) - B(2) (weight 1)
+    adj[1].push_back({2, 1});
+    adj[2].push_back({1, 1});
+
+    // A(1) - C(3) (weight 4)
+    adj[1].push_back({3, 4});
+    adj[3].push_back({1, 4});
+
+    // B(2) - C(3) (weight 2)
+    adj[2].push_back({3, 2});
+    adj[3].push_back({2, 2});
+
+    // B(2) - D(4) (weight 5)
+    adj[2].push_back({4, 5});
+    adj[4].push_back({2, 5});
+
+    // C(3) - D(4) (weight 1)
+    adj[3].push_back({4, 1});
+    adj[4].push_back({3, 1});
+
+    int start_node = 1; // Start from Node A
+    dijkstra(start_node, num_nodes, adj);
+
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+Shortest distances from node 1:
+Node 1: 0
+Node 2: 1
+Node 3: 3
+Node 4: 4
+```
+
+This matches our manual calculation! Good job! You've just explored the basics of Dijkstra's Algorithm. Keep learning!
+
+---
