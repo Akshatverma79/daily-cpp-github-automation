@@ -21175,3 +21175,125 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-02-16 07:04:27
+
+Hey there, future DSA master! 👋 Let's break down one of the coolest string algorithms: **Longest Common Subsequence (LCS)**.
+
+---
+
+### **Topic: Longest Common Subsequence (LCS)**
+
+#### 1. What is Longest Common Subsequence (LCS)?
+
+Imagine you have two strings. An **LCS** is the *longest possible sequence* of characters that can be found in *both* strings, in the *same relative order*, but **not necessarily contiguous** (meaning characters don't have to be next to each other).
+
+*   **Subsequence:** A sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements.
+    *   Example: "ACE" is a subsequence of "ABCDE". "AEC" is *not* a subsequence.
+*   **Common:** It must appear in both input strings.
+*   **Longest:** We want the one with the most characters.
+
+#### 2. Why Does it Matter? (Why LCS is Useful)
+
+LCS is a classic problem with many real-world applications:
+
+*   **"Diff" Tools:** Think about tools like Git that show you the differences between two versions of a file. They often use LCS to identify common lines and highlight the changes.
+*   **Bioinformatics:** Comparing DNA sequences to find similarities and evolutionary relationships.
+*   **Plagiarism Detection:** Identifying how much text is copied between two documents.
+*   **Spell Checkers & Autocomplete:** Sometimes used in the underlying algorithms.
+
+#### 3. Let's Try an Example!
+
+**Problem:** Find the LCS of two strings:
+`text1 = "AGGTAB"`
+`text2 = "GXTXAYB"`
+
+**Thinking it through:**
+
+1.  Let's look for characters common to both: A, G, T, B.
+2.  Can we form a sequence?
+    *   "GTAB": 'G' is in both, then 'T' is in both (after 'G'), then 'A' (after 'T'), then 'B' (after 'A'). This maintains order!
+3.  Any other common subsequences? "GAB", "GTB", "ATB"... but "GTAB" is longer.
+
+**Result:** The LCS is `"GTAB"`, and its length is **4**.
+
+#### 4. Simple C++ Implementation (Dynamic Programming)
+
+LCS is a perfect candidate for **Dynamic Programming (DP)** because it has:
+*   **Optimal Substructure:** The LCS of two strings can be found by combining the LCS of their prefixes.
+*   **Overlapping Subproblems:** The same subproblems are solved repeatedly.
+
+The core idea is to build a `dp` table where `dp[i][j]` stores the length of the LCS of `text1[0...i-1]` and `text2[0...j-1]`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length(); // Length of the first string
+    int n = text2.length(); // Length of the second string
+
+    // Create a DP table: dp[i][j] will store the LCS length
+    // for text1[0...i-1] and text2[0...j-1]
+    // We add +1 to dimensions to handle empty string cases (0-th row/column)
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the DP table
+    // i represents the current length of prefix from text1
+    for (int i = 1; i <= m; ++i) {
+        // j represents the current length of prefix from text2
+        for (int j = 1; j <= n; ++j) {
+            // If the current characters match (remember text1/text2 are 0-indexed)
+            if (text1[i - 1] == text2[j - 1]) {
+                // We found a common character! Add 1 to the LCS of the preceding parts.
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                // If characters don't match, we have two choices:
+                // 1. Exclude text1[i-1] and find LCS of text1[0...i-2] and text2[0...j-1] (dp[i-1][j])
+                // 2. Exclude text2[j-1] and find LCS of text1[0...i-1] and text2[0...j-2] (dp[i][j-1])
+                // We take the maximum of these two options.
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the LCS length for the full strings
+    return dp[m][n];
+}
+
+int main() {
+    std::string s1 = "AGGTAB";
+    std::string s2 = "GXTXAYB";
+    std::cout << "LCS length of \"" << s1 << "\" and \"" << s2 << "\" is: "
+              << longestCommonSubsequence(s1, s2) << std::endl; // Expected: 4
+
+    std::string s3 = "ABC";
+    std::string s4 = "AC";
+    std::cout << "LCS length of \"" << s3 << "\" and \"" << s4 << "\" is: "
+              << longestCommonSubsequence(s3, s4) << std::endl; // Expected: 2
+
+    std::string s5 = "ABCD";
+    std::string s6 = "EDCA";
+    std::cout << "LCS length of \"" << s5 << "\" and \"" << s6 << "\" is: "
+              << longestCommonSubsequence(s5, s6) << std::endl; // Expected: 1 ('D' or 'A')
+
+    return 0;
+}
+```
+
+---
+
+**Quick Recap:**
+*   LCS finds the longest sequence of characters common to two strings, maintaining order but not necessarily contiguity.
+*   It's a foundational Dynamic Programming problem.
+*   The DP table helps build up solutions from smaller subproblems efficiently.
+
+Keep practicing, and you'll master these patterns in no time! Happy coding! ✨
+
+---
