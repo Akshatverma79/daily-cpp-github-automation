@@ -21605,3 +21605,154 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Trees  
+🕒 2026-02-17 14:36:17
+
+Hey there, future tree master! 🌳 Let's dive into **DP on Trees**.
+
+---
+
+## DP on Trees: Unlocking Tree Puzzles!
+
+### 🎯 What is DP on Trees?
+
+Think of **Dynamic Programming (DP)** as a clever way to solve complex problems by breaking them into smaller, overlapping subproblems and storing their solutions to avoid re-calculating.
+
+When we apply this to **trees**, our "subproblems" are typically related to **subtrees**. You essentially perform a Depth-First Search (DFS) traversal, calculating a value for each node based on the values already computed for its children (or sometimes its parent).
+
+### 💡 Why It Matters
+
+*   **Efficiently solves complex tree problems:** Many challenging problems involving trees can be broken down using DP, from finding path sums to optimizing tree structures.
+*   **Avoids redundant computations:** Just like regular DP, you store results for subtrees, so you don't re-compute the same thing multiple times.
+*   **Standard technique:** It's a fundamental pattern in competitive programming and algorithm design, essential for tackling advanced tree-related challenges.
+
+### 🧠 The Core Idea
+
+Imagine each node in a tree needs to figure out some value. It often waits for its children to calculate *their* values first. Once the children have their answers, the parent node combines those answers with its own properties to determine its own value. This typically happens during a post-order traversal (children first, then parent).
+
+### 📝 Example Problem: Sum of Subtree Values
+
+**Problem:** Given a tree where each node has an integer value, calculate the total sum of node values for *each* subtree. The result for a node `u` should be the sum of `value[u]` plus the sums of all nodes in subtrees rooted at its children.
+
+**Example Tree:**
+```
+      1 (val: 5)
+     / \
+    2   3 (val: 2)
+   / \
+  4   5 (val: 10)
+(val: 3)(val: 7)
+```
+
+**Expected Output (DP value for each node, representing its subtree sum):**
+*   Node 4: 3
+*   Node 5: 7
+*   Node 2: 3 + 7 + 10 = 20
+*   Node 3: 2
+*   Node 1: 5 + 20 + 2 = 27
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate (not strictly needed, but good to know)
+
+// Adjacency list to represent the tree
+std::vector<std::vector<int>> adj;
+// Stores the value of each node (node_values[i] is value of node i)
+std::vector<int> node_values;
+// DP array to store the sum of values for the subtree rooted at node i
+std::vector<int> dp_subtree_sum;
+
+// DFS function to calculate subtree sums
+// u: current node
+// p: parent of current node (to avoid going back up the tree)
+int dfs_calculate_subtree_sum(int u, int p) {
+    // Start with the current node's own value
+    int current_sum = node_values[u];
+
+    // Recursively call for all children
+    for (int v : adj[u]) {
+        if (v == p) {
+            continue; // Skip the parent node
+        }
+        // Add the sum of the child's subtree to current_sum
+        current_sum += dfs_calculate_subtree_sum(v, u);
+    }
+
+    // Store the calculated sum in our DP array
+    dp_subtree_sum[u] = current_sum;
+    return current_sum; // Return the sum for the current subtree
+}
+
+int main() {
+    int num_nodes = 5; // Let's use 5 nodes as per the example
+
+    // Resize vectors based on number of nodes (using 0-indexed nodes for simplicity)
+    adj.resize(num_nodes);
+    node_values.resize(num_nodes);
+    dp_subtree_sum.resize(num_nodes);
+
+    // Assign node values (adjusting to 0-indexed: node 0 is 1, node 1 is 2, etc.)
+    node_values[0] = 5; // Node 1
+    node_values[1] = 10; // Node 2
+    node_values[2] = 2; // Node 3
+    node_values[3] = 3; // Node 4
+    node_values[4] = 7; // Node 5
+
+    // Build the tree (adj[u] stores neighbors of u)
+    // Remember: for an undirected tree, add edges in both directions
+    
+    // Edge: 1 - 2 (0-indexed: 0-1)
+    adj[0].push_back(1);
+    adj[1].push_back(0);
+
+    // Edge: 1 - 3 (0-indexed: 0-2)
+    adj[0].push_back(2);
+    adj[2].push_back(0);
+
+    // Edge: 2 - 4 (0-indexed: 1-3)
+    adj[1].push_back(3);
+    adj[3].push_back(1);
+
+    // Edge: 2 - 5 (0-indexed: 1-4)
+    adj[1].push_back(4);
+    adj[4].push_back(1);
+
+    // Call DFS from the root node (Node 0, which is original Node 1)
+    // The parent of the root is usually -1 or some invalid index
+    dfs_calculate_subtree_sum(0, -1); 
+
+    // Print the results
+    std::cout << "Subtree sums (0-indexed node -> sum):" << std::endl;
+    for (int i = 0; i < num_nodes; ++i) {
+        std::cout << "Node " << i << " (original " << i+1 << "): " << dp_subtree_sum[i] << std::endl;
+    }
+
+    /* Expected Output for the example:
+       Node 3 (original 4): 3
+       Node 4 (original 5): 7
+       Node 1 (original 2): 20
+       Node 2 (original 3): 2
+       Node 0 (original 1): 27
+    */
+
+    return 0;
+}
+```
+
+### 🔑 Key Takeaways & Tips
+
+*   **DFS is your friend:** Most DP on Trees problems are solved using a Depth-First Search.
+*   **Identify your state:** What information does each node need to store/calculate for its subtree? (e.g., `dp_subtree_sum[node]`).
+*   **Leaf nodes are your base cases:** They often have the simplest DP value (e.g., just their own value if they have no children).
+*   **Combine child results:** A node's DP value is usually calculated by combining its own property with the DP values of its children.
+*   **Parent parameter:** In undirected graphs, always pass the parent node to DFS to avoid going back up the tree indefinitely.
+
+Keep practicing, and you'll find DP on Trees a powerful tool! Happy coding! ✨
+
+---
