@@ -21931,3 +21931,134 @@ Minimum total cost: 37
 And that's DP on Bitmasks in a nutshell! It's a powerful technique for specific problem constraints. Keep practicing, and you'll nail it!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-02-18 14:35:53
+
+Hey there, future coding wizard! 👋 Let's dive into the super cool world of **Bit Manipulation Basics**. It sounds fancy, but it's just about playing with the individual 0s and 1s that make up your numbers.
+
+---
+
+### 🧠 What is Bit Manipulation?
+
+Imagine every number isn't just "10" or "42", but a series of tiny light switches, either ON (1) or OFF (0). That's its **binary representation**.
+
+*   **Bit Manipulation** is the art of directly working with these individual 0s and 1s (bits) using special operators. Instead of dealing with the whole number, you're peeking at, flipping, or setting specific "light switches."
+
+*   **Example:** The number `10` in binary is `...00001010`. Bit manipulation lets you check if the second bit (from the right, starting at 0) is a `1`, or change it.
+
+---
+
+### ✨ Why Does It Matter?
+
+1.  **Super Fast!** 🚀
+    *   Computers fundamentally operate on bits. Bitwise operations are often native CPU instructions, making them incredibly quick – usually faster than arithmetic operations like multiplication or division. Great for competitive programming!
+
+2.  **Memory Efficient!** 📦
+    *   You can store multiple true/false flags in a single integer (each bit represents a flag). This saves memory, especially useful in constrained environments.
+
+3.  **Clever Solutions!** 🤔
+    *   Many tricky problems (e.g., finding unique numbers, power-of-2 checks, data compression, cryptography) have elegant and optimized solutions using bit manipulation. It's a common interview topic!
+
+---
+
+### 🛠️ Key Bitwise Operators (Quick Glance)
+
+*   `&` (AND): Both bits must be 1 for the result to be 1.
+*   `|` (OR): If *either* bit is 1, the result is 1.
+*   `^` (XOR): If bits are *different*, the result is 1.
+*   `~` (NOT): Flips all bits (0 becomes 1, 1 becomes 0).
+*   `<<` (Left Shift): Multiplies by powers of 2. `N << k` means `N * 2^k`.
+*   `>>` (Right Shift): Divides by powers of 2. `N >> k` means `N / 2^k`.
+
+---
+
+### 🌟 Example Problem: Checking a Specific Bit
+
+**Problem:** Given an integer `N` and an index `i`, determine if the `i`-th bit (0-indexed from the right) of `N` is set (i.e., is `1`) or not.
+
+**Input:**
+`N = 10`
+`i = 1`
+
+**Expected Output:**
+`true` (because 10 in binary is `...00001010`, and the 1st bit is 1)
+
+---
+
+### 🚀 Simple C++ Implementation
+
+Here's how we can solve this using bit manipulation:
+
+**Logic:**
+
+1.  We need a "mask" where only the `i`-th bit is `1`, and all other bits are `0`.
+2.  We can create this mask by taking `1` (which is `...00000001`) and left-shifting it `i` times. So, `1 << i`.
+    *   If `i = 0`, `1 << 0` = `0001`
+    *   If `i = 1`, `1 << 1` = `0010`
+    *   If `i = 2`, `1 << 2` = `0100`
+3.  Then, we perform a bitwise `AND` operation between `N` and our `mask`.
+    *   If the `i`-th bit of `N` is `1`, then `N & mask` will result in `mask` (which is non-zero).
+    *   If the `i`-th bit of `N` is `0`, then `N & mask` will result in `0`.
+
+```cpp
+#include <iostream>
+
+// Function to check if the i-th bit of a number N is set
+bool is_ith_bit_set(int n, int i) {
+    // 1. Create a mask:
+    // Left-shift '1' by 'i' positions to get a number
+    // with only the i-th bit set.
+    // Example: If i = 1, mask = 0010 (binary)
+    // If i = 2, mask = 0100 (binary)
+    int mask = (1 << i);
+
+    // 2. Perform bitwise AND:
+    // If the i-th bit of 'n' is 1, then (n & mask) will be non-zero (equal to mask).
+    // If the i-th bit of 'n' is 0, then (n & mask) will be 0.
+    return (n & mask) != 0;
+}
+
+int main() {
+    int num = 10; // Binary: ...00001010
+
+    std::cout << "Number: " << num << std::endl;
+
+    // Check 0th bit (rightmost)
+    std::cout << "Is 0th bit set? " << (is_ith_bit_set(num, 0) ? "true" : "false") << std::endl; // Expected: false
+
+    // Check 1st bit
+    std::cout << "Is 1st bit set? " << (is_ith_bit_set(num, 1) ? "true" : "false") << std::endl; // Expected: true
+
+    // Check 2nd bit
+    std::cout << "Is 2nd bit set? " << (is_ith_bit_set(num, 2) ? "true" : "false") << std::endl; // Expected: false
+
+    // Check 3rd bit
+    std::cout << "Is 3rd bit set? " << (is_ith_bit_set(num, 3) ? "true" : "false") << std::endl; // Expected: true
+
+    // Check a bit that's definitely not set in a small number
+    std::cout << "Is 7th bit set? " << (is_ith_bit_set(num, 7) ? "true" : "false") << std::endl; // Expected: false
+
+    return 0;
+}
+
+```
+
+**Output of the code:**
+
+```
+Number: 10
+Is 0th bit set? false
+Is 1st bit set? true
+Is 2nd bit set? false
+Is 3rd bit set? true
+Is 7th bit set? false
+```
+
+---
+
+And there you have it! Your first step into the awesome world of bit manipulation. Keep practicing, and soon you'll be thinking in 0s and 1s! Happy coding! 🚀
+
+---
