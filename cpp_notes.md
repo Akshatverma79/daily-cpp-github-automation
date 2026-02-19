@@ -22219,3 +22219,138 @@ int main() {
 That's a quick dive into GCD and Primes! These concepts might seem basic, but they are incredibly powerful tools in a DSA problem-solver's toolkit. Keep practicing, and you'll master them in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-02-19 14:38:28
+
+Hey there, future strategist! Let's dive into the fascinating world of Game Theory in DSA.
+
+---
+
+## Game Theory Basics
+
+Game Theory in DSA is all about analyzing strategic interactions between rational players to predict outcomes. Think of it as the ultimate mind game!
+
+### 🎲 What it Means: Winning Strategies
+
+At its core, Game Theory in competitive programming usually deals with **two-player games** where:
+
+1.  **Players take turns.**
+2.  **They have perfect information:** everyone knows all the rules and previous moves.
+3.  **No randomness:** outcomes are predictable based on choices.
+4.  **Finite game:** it eventually ends.
+
+The goal is to determine if the first player (or the second) has a **winning strategy** if both play optimally. We often classify game states as:
+
+*   **Winning Position (W-position):** The current player can make a move to force a win, assuming optimal play from both sides.
+*   **Losing Position (L-position):** Every possible move from this state leads to a W-position for the *next* player. Thus, the current player will lose.
+
+### 🚀 Why it Matters: Predict & Conquer
+
+*   **Common Problem Type:** You'll encounter many "Who wins?" or "What's the optimal score?" problems that are rooted in Game Theory.
+*   **Strategic Thinking:** It trains your brain to think several steps ahead and analyze all possible paths.
+*   **Dynamic Programming (DP) Buddy:** Game Theory problems are frequently solved using DP, where `dp[state]` stores whether that state is a W-position or L-position.
+
+### 🍬 Example Problem: The Candy Game
+
+**Problem:** You and a friend are playing a game with `N` candies. On each turn, a player can take either 1, 2, or 3 candies. The player who takes the last candy wins. If both players play optimally, who wins if there are `N` candies? (Player 1 or Player 2)
+
+**Let's Trace (small N):**
+
+*   **N = 0:** (L-position) - No candies left, current player can't move, so they lose.
+*   **N = 1:** (W-position) - Take 1 candy. Opponent faces 0 (L). You win!
+*   **N = 2:** (W-position) - Take 2 candies. Opponent faces 0 (L). You win!
+*   **N = 3:** (W-position) - Take 3 candies. Opponent faces 0 (L). You win!
+*   **N = 4:** (L-position) -
+    *   If you take 1, opponent faces 3 (W). Opponent wins.
+    *   If you take 2, opponent faces 2 (W). Opponent wins.
+    *   If you take 3, opponent faces 1 (W). Opponent wins.
+    Since all your moves lead to your opponent's W-positions, `N=4` is an L-position for you.
+*   **N = 5:** (W-position) - Take 1 candy. Opponent faces 4 (L). You win!
+
+**Pattern:** You might notice a pattern here! `N % 4 == 0` tends to be an L-position, and other `N` values are W-positions.
+
+### 💻 Simple C++ Implementation (Dynamic Programming)
+
+We can use dynamic programming to figure this out. `dp[i]` will be `true` if the current player can win when `i` candies are remaining, and `false` otherwise.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::iota if needed, not strictly for this DP
+
+// Function to determine if the current player can win from 'n' candies
+bool canWin(int n) {
+    // dp[i] will be true if the current player can win with 'i' candies, false otherwise.
+    // dp array size will be N+1 to handle up to N candies.
+    std::vector<bool> dp(n + 1);
+
+    // Base case: If 0 candies, the current player cannot make a move and loses.
+    dp[0] = false; 
+
+    // Iterate from 1 candy up to N candies
+    for (int i = 1; i <= n; ++i) {
+        // Assume current position 'i' is losing until we find a winning move
+        dp[i] = false; 
+
+        // Check if taking 1 candy leads to an opponent's losing position
+        // If dp[i-1] is false (opponent loses), then taking 1 makes current player win
+        if (i >= 1 && !dp[i - 1]) {
+            dp[i] = true;
+        }
+        
+        // Check if taking 2 candies leads to an opponent's losing position
+        if (i >= 2 && !dp[i - 2]) {
+            dp[i] = true;
+        }
+
+        // Check if taking 3 candies leads to an opponent's losing position
+        if (i >= 3 && !dp[i - 3]) {
+            dp[i] = true;
+        }
+
+        // If after checking all moves, dp[i] is still false, then it's a losing position.
+        // Otherwise, it's a winning position.
+    }
+
+    // The result for the initial N candies
+    return dp[n];
+}
+
+int main() {
+    int N;
+    std::cout << "Enter the number of candies: ";
+    std::cin >> N;
+
+    if (canWin(N)) {
+        std::cout << "Player 1 wins with optimal play!" << std::endl;
+    } else {
+        std::cout << "Player 2 wins with optimal play!" << std::endl;
+    }
+
+    // Let's test a few values to confirm our pattern
+    // for (int i = 0; i <= 10; ++i) {
+    //     std::cout << "N = " << i << ": " << (canWin(i) ? "P1 Wins" : "P2 Wins") << std::endl;
+    // }
+    // Expected:
+    // N = 0: P2 Wins
+    // N = 1: P1 Wins
+    // N = 2: P1 Wins
+    // N = 3: P1 Wins
+    // N = 4: P2 Wins
+    // N = 5: P1 Wins
+    // N = 6: P1 Wins
+    // N = 7: P1 Wins
+    // N = 8: P2 Wins
+
+    return 0;
+}
+
+```
+This DP approach is a general way to solve many impartial games. For this specific "Subtraction Game," you can indeed see that `N % 4 == 0` implies Player 2 wins, otherwise Player 1 wins!
+
+Happy strategizing!
+
+---
