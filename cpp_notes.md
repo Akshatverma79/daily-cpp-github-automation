@@ -22923,3 +22923,113 @@ int main() {
 **Quick Tip:** Always try to identify your **base case** first! It's your most important safety net against infinite loops. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-02-23 07:05:41
+
+Hey there, future coder! 👋 Let's dive into Linked Lists – a super fundamental and cool data structure.
+
+---
+
+### **Linked List Basics (C++)**
+
+Imagine a treasure hunt where each clue (piece of data) also tells you exactly where to find the *next* clue. That's pretty much a Linked List!
+
+#### 1. What does a Linked List mean?
+
+*   **Concept:** A Linked List is a collection of elements, called **Nodes**, where each Node contains:
+    1.  **Data:** The actual value you want to store (e.g., a number, a string).
+    2.  **Next Pointer:** A pointer (or reference) to the *next* Node in the sequence.
+*   **Key Idea:** Unlike arrays, elements in a Linked List are *not* stored next to each other in memory. They can be scattered anywhere, and the pointers link them together logically.
+*   **The Chain:** Think of it like a chain. Each link holds some info and also points to the next link. The very first link is special – we call it the **Head**. The last link points to `nullptr` (or `NULL`), signifying the end of the chain.
+
+#### 2. Why does it matter?
+
+Linked Lists are awesome because they offer flexibility where arrays might struggle:
+
+*   **Dynamic Size:** They can grow or shrink in size very easily at runtime, without needing to pre-allocate a fixed amount of memory or reallocate a larger block (which arrays often do).
+*   **Efficient Insertions/Deletions:** Once you know *where* to insert or delete an element, it's incredibly fast (O(1) time complexity) because you only need to change a couple of pointers. (Finding the spot itself might take O(N) time, though!)
+*   **No Memory Wasted:** You only allocate memory for the nodes you actually need.
+
+#### 3. Example Problem (Small)
+
+**Problem:** Create a simple linked list that stores three numbers: `5 -> 10 -> 15`. Then, print out all the numbers in the list.
+
+#### 4. Simple C++ Implementation
+
+Let's build that list!
+
+```cpp
+#include <iostream> // For printing output
+
+// 1. The Node Structure
+// This is the blueprint for each "link" in our chain
+struct Node {
+    int data;        // The actual value this node will hold (e.g., 5, 10, 15)
+    Node* next;      // A pointer to the next node in the list
+
+    // Constructor to make creating nodes easier
+    // When you create a Node, you give it data, and it initially points to nothing.
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// 2. Main function to build and print our linked list
+int main() {
+    // Our list starts empty. 'head' is our entry point.
+    Node* head = nullptr;
+
+    // --- Let's add elements one by one (adding to the front is simplest for this demo) ---
+
+    // Add 15
+    Node* newNode1 = new Node(15); // Create a new node with data 15
+    newNode1->next = head;         // Its 'next' pointer points to what 'head' currently points to (nullptr)
+    head = newNode1;               // Now, 'head' points to our new node (list: 15)
+
+    // Add 10
+    Node* newNode2 = new Node(10); // Create a new node with data 10
+    newNode2->next = head;         // Its 'next' pointer points to what 'head' currently points to (the '15' node)
+    head = newNode2;               // Now, 'head' points to our new node (list: 10 -> 15)
+
+    // Add 5
+    Node* newNode3 = new Node(5);  // Create a new node with data 5
+    newNode3->next = head;         // Its 'next' pointer points to what 'head' currently points to (the '10' node)
+    head = newNode3;               // Now, 'head' points to our new node (list: 5 -> 10 -> 15)
+
+    // --- Traversing and Printing the Linked List ---
+    std::cout << "Linked List elements: ";
+    Node* current = head; // Start a 'current' pointer at the beginning of the list
+
+    // Loop as long as 'current' is not pointing to nothing (nullptr)
+    while (current != nullptr) {
+        std::cout << current->data << " "; // Print the data of the current node
+        current = current->next;          // Move 'current' to the next node in the list
+    }
+    std::cout << std::endl; // New line for cleaner output
+
+    // --- IMPORTANT: Clean up memory! ---
+    // In C++, we manually manage memory allocated with 'new'.
+    // If we don't 'delete' nodes, it leads to memory leaks.
+    current = head; // Reset 'current' to the head to start deleting
+    while (current != nullptr) {
+        Node* nextNode = current->next; // Store the pointer to the next node *before* deleting current
+        delete current;                 // Delete the current node
+        current = nextNode;             // Move to the next node
+    }
+    head = nullptr; // Good practice: ensure head is null after cleanup
+
+    return 0; // Program finished successfully
+}
+```
+
+**Output of the code:**
+```
+Linked List elements: 5 10 15 
+```
+
+---
+
+And there you have it! That's the core essence of a Linked List. It's a foundational concept, and understanding it well opens doors to many other data structures and algorithms! Keep practicing!
+
+---
