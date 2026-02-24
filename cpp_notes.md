@@ -23446,3 +23446,184 @@ int main() {
 And there you have it! Stacks are simple yet incredibly powerful. Keep practicing, and you'll be stacking up your DSA knowledge in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-02-24 14:41:55
+
+Here's your clean and simple DSA learning note on Queues in C++!
+
+---
+
+## Queues: The Waiting Line of Data! ☕
+
+### What is a Queue?
+
+Imagine a waiting line at your favorite coffee shop. The first person to join the line is the first person to get their coffee, right?
+
+That's exactly how a **Queue** works in programming! It's a linear data structure that follows the **First-In, First-Out (FIFO)** principle.
+
+*   New elements are added to the **back** (or "rear") of the queue. This is called **`enqueue`**.
+*   Elements are removed from the **front** (or "head") of the queue. This is called **`dequeue`**.
+
+### Why do Queues matter?
+
+Queues are super useful for managing tasks or data in a specific, sequential order.
+
+*   **Task Scheduling:** Think of print jobs – the first document sent to the printer is the first one printed.
+*   **Operating Systems:** Managing processes, handling interruptions.
+*   **Web Servers:** Processing user requests in the order they arrive.
+*   **Graph Traversal:** The Breadth-First Search (BFS) algorithm heavily relies on queues to explore nodes layer by layer.
+
+### Core Operations
+
+*   `enqueue(item)`: Adds `item` to the back of the queue.
+*   `dequeue()`: Removes and returns the item from the front of the queue.
+*   `front()`: Returns the item at the front without removing it.
+*   `isEmpty()`: Checks if the queue has any items.
+*   `size()`: Returns the number of items in the queue.
+
+---
+
+### Example Problem: Document Processor 📄
+
+Let's say we have a simple document processing system. Documents need to be processed in the order they are submitted.
+
+**Scenario:**
+1.  Submit "Report A"
+2.  Submit "Invoice B"
+3.  Submit "Memo C"
+4.  Process documents until the queue is empty.
+
+**Expected Output:**
+Processing: Report A
+Processing: Invoice B
+Processing: Memo C
+
+---
+
+### Simple C++ Implementation (Using `std::list` underneath)
+
+We can build our own `Queue` class! A common way to implement a queue is by using a `std::list` (which is like a double-ended linked list) or `std::deque` in C++ because they provide efficient O(1) operations for adding/removing from both ends.
+
+```cpp
+#include <iostream>
+#include <list> // We'll use std::list as our underlying storage
+#include <stdexcept> // For exceptions like out_of_range
+
+template <typename T>
+class MyQueue {
+private:
+    std::list<T> data; // The list holds our queue elements
+
+public:
+    // Add an element to the back of the queue
+    void enqueue(const T& item) {
+        data.push_back(item);
+        std::cout << "Enqueued: " << item << std::endl;
+    }
+
+    // Remove an element from the front of the queue
+    void dequeue() {
+        if (isEmpty()) {
+            throw std::out_of_range("Queue is empty, cannot dequeue.");
+        }
+        T item = data.front(); // Get the front item before removing
+        data.pop_front();
+        std::cout << "Dequeued: " << item << std::endl;
+    }
+
+    // Get the element at the front without removing it
+    T front() const {
+        if (isEmpty()) {
+            throw std::out_of_range("Queue is empty, no front element.");
+        }
+        return data.front();
+    }
+
+    // Check if the queue is empty
+    bool isEmpty() const {
+        return data.empty();
+    }
+
+    // Get the number of elements in the queue
+    size_t size() const {
+        return data.size();
+    }
+};
+
+int main() {
+    MyQueue<std::string> docProcessorQueue; // Our queue for documents
+
+    std::cout << "--- Document Processing Simulation ---" << std::endl;
+
+    // 1. Submit documents
+    docProcessorQueue.enqueue("Report A");
+    docProcessorQueue.enqueue("Invoice B");
+    docProcessorQueue.enqueue("Memo C");
+
+    std::cout << "\nQueue size: " << docProcessorQueue.size() << std::endl;
+    std::cout << "Next to process: " << docProcessorQueue.front() << std::endl;
+
+    std::cout << "\n--- Processing Documents ---" << std::endl;
+    // 2. Process documents until the queue is empty
+    while (!docProcessorQueue.isEmpty()) {
+        std::cout << "Processing: " << docProcessorQueue.front() << std::endl;
+        docProcessorQueue.dequeue();
+    }
+
+    std::cout << "\nQueue is empty: " << (docProcessorQueue.isEmpty() ? "Yes" : "No") << std::endl;
+
+    // Try to dequeue from an empty queue (will throw exception)
+    try {
+        docProcessorQueue.dequeue();
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+```
+
+---
+
+### Using C++'s Standard Library Queue (`std::queue`)
+
+For most real-world applications, you won't need to implement your own queue from scratch. C++ provides a ready-to-use `std::queue` as a **container adapter** in the `<queue>` header. It uses `std::deque` by default as its underlying container, offering efficient O(1) operations.
+
+```cpp
+#include <iostream>
+#include <queue> // Don't forget this header!
+#include <string>
+
+int main() {
+    std::queue<std::string> tasks; // Create a queue of strings
+
+    // Add elements
+    tasks.push("Task 1: Initialize system");
+    tasks.push("Task 2: Load data");
+    tasks.push("Task 3: Process results");
+
+    std::cout << "Current tasks in queue: " << tasks.size() << std::endl;
+    std::cout << "Next task: " << tasks.front() << std::endl;
+
+    // Process tasks
+    while (!tasks.empty()) {
+        std::cout << "Executing: " << tasks.front() << std::endl;
+        tasks.pop(); // Remove the front element
+    }
+
+    std::cout << "All tasks completed! Queue empty: " << (tasks.empty() ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+### Key Takeaway:
+
+Queues are all about **order**! They ensure that what came in first, goes out first. They're fundamental for managing sequential processes and appear in many algorithms.
+
+---
