@@ -23260,3 +23260,189 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Stacks Implementation  
+🕒 2026-02-24 07:01:42
+
+Hey there, future DSA master! 👋 Let's dive into Stacks – a super fundamental and incredibly useful data structure.
+
+---
+
+### Stacks Implementation: A Quick Dive
+
+#### What is a Stack? 📚
+
+Imagine a pile of plates:
+*   You can only add a new plate to the **top** of the stack.
+*   You can only take a plate from the **top** of the stack.
+
+That's exactly how a Stack works in computer science! It follows the **LIFO** principle: **L**ast-**I**n, **F**irst-**O**ut. Whatever item you put in *last* is the first one you can take out.
+
+**Key Operations:**
+1.  **`push(item)`**: Adds an item to the top of the stack.
+2.  **`pop()`**: Removes the item from the top of the stack.
+3.  **`top()` / `peek()`**: Looks at the item on the top without removing it.
+4.  **`isEmpty()`**: Checks if the stack has any items.
+5.  **`size()`**: Returns the number of items in the stack.
+
+#### Why Does It Matter? 🤔
+
+Stacks are everywhere! They simplify many problems and are a building block for more complex algorithms.
+
+*   **Undo/Redo features:** Every action you take is pushed onto a stack. "Undo" pops the last action.
+*   **Browser History:** When you hit the "back" button, it pops the last page you visited from a stack.
+*   **Function Call Stack:** When a program calls functions, they are pushed onto a stack. When a function finishes, it's popped. This manages execution flow!
+*   **Expression Evaluation:** Used in compilers to evaluate arithmetic expressions (e.g., converting infix to postfix).
+*   **Backtracking Algorithms:** Essential for problems like solving mazes or Sudoku.
+
+---
+
+### Ready for some C++ Code? 💻
+
+We can implement a Stack using dynamic arrays (like `std::vector`) because they allow efficient additions and removals from one end (the "top").
+
+```cpp
+#include <iostream>
+#include <vector>    // Our underlying storage
+#include <stdexcept> // For error handling (e.g., popping from an empty stack)
+
+// Define our own simple Stack class
+class MyStack {
+private:
+    std::vector<int> data; // We'll store integers in our stack
+
+public:
+    // 1. Push: Add an item to the top
+    void push(int value) {
+        data.push_back(value); // std::vector's push_back adds to the end
+        std::cout << "Pushed: " << value << std::endl;
+    }
+
+    // 2. Pop: Remove the top item
+    void pop() {
+        if (isEmpty()) {
+            throw std::out_of_range("Cannot pop from an empty stack!");
+        }
+        int popped_value = data.back(); // Get the value before removing
+        data.pop_back(); // std::vector's pop_back removes from the end
+        std::cout << "Popped: " << popped_value << std::endl;
+    }
+
+    // 3. Top (Peek): Look at the top item without removing
+    int top() {
+        if (isEmpty()) {
+            throw std::out_of_range("Cannot get top from an empty stack!");
+        }
+        return data.back(); // std::vector's back() gives the last element
+    }
+
+    // 4. IsEmpty: Check if the stack is empty
+    bool isEmpty() const { // 'const' means this method doesn't change object's state
+        return data.empty(); // std::vector's empty() checks if it has elements
+    }
+
+    // 5. Size: Get the number of items
+    int size() const {
+        return data.size(); // std::vector's size() gives element count
+    }
+};
+
+int main() {
+    MyStack s;
+
+    // Test push
+    s.push(10);
+    s.push(20);
+    s.push(30);
+
+    // Test top
+    std::cout << "Top element is: " << s.top() << std::endl; // Should be 30
+
+    // Test size
+    std::cout << "Stack size: " << s.size() << std::endl; // Should be 3
+
+    // Test pop
+    s.pop(); // Popped: 30
+    std::cout << "Top element after pop: " << s.top() << std::endl; // Should be 20
+
+    s.pop(); // Popped: 20
+    s.pop(); // Popped: 10
+
+    // Test isEmpty
+    if (s.isEmpty()) {
+        std::cout << "Stack is now empty!" << std::endl;
+    }
+
+    // Try to pop from an empty stack (this will throw an exception)
+    try {
+        s.pop();
+    } catch (const std::out_of_range& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+```
+**Note:** C++ also provides a built-in `std::stack` container adapter in the `<stack>` header, which typically uses `std::deque` by default but can also use `std::vector` or `std::list` as its underlying container. Our custom `MyStack` above is a great way to understand how it works internally!
+
+---
+
+#### Example Problem: Reverse a String 🔄
+
+This is a classic way to demonstrate LIFO!
+
+**Problem:** Given a string, reverse it using a stack.
+**Input:** `"hello"`
+**Output:** `"olleh"`
+
+**How a Stack Helps:**
+1.  You push each character of the original string onto the stack. The 'h' goes in first, then 'e', 'l', 'l', 'o'.
+2.  Because of LIFO, when you start popping, 'o' comes out first, then 'l', then 'l', 'e', 'h'. Exactly what we need for a reversed string!
+
+```cpp
+#include <iostream>
+#include <string>
+#include <stack> // Using the built-in std::stack for convenience here
+
+std::string reverseString(const std::string& str) {
+    std::stack<char> charStack;
+    
+    // 1. Push all characters from the original string onto the stack
+    for (char c : str) {
+        charStack.push(c);
+    }
+    
+    std::string reversedStr = "";
+    
+    // 2. Pop characters from the stack to build the reversed string
+    while (!charStack.empty()) {
+        reversedStr += charStack.top(); // Get the top character
+        charStack.pop();                 // Remove it
+    }
+    
+    return reversedStr;
+}
+
+int main() {
+    std::string myString = "hello";
+    std::string reversed = reverseString(myString);
+    
+    std::cout << "Original string: " << myString << std::endl;
+    std::cout << "Reversed string: " << reversed << std::endl; // Output: olleh
+
+    std::string anotherString = "DSA is fun";
+    std::cout << "Original: " << anotherString << std::endl;
+    std::cout << "Reversed: " << reverseString(anotherString) << std::endl; // Output: nuf si ASD
+    
+    return 0;
+}
+```
+
+---
+
+And there you have it! Stacks are simple yet incredibly powerful. Keep practicing, and you'll be stacking up your DSA knowledge in no time! Happy coding! ✨
+
+---
