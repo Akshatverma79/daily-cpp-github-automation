@@ -25802,3 +25802,107 @@ Character Frequencies:
 **Key Takeaway:** Hash Maps are your go-to data structure when you need to store key-value pairs and perform lightning-fast lookups, insertions, and deletions!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Manipulation Basics  
+🕒 2026-03-04 06:50:26
+
+Hey there, future coding wizard! 👋 Let's dive into String Manipulation Basics – super common and a blast to work with!
+
+---
+
+## 📚 String Manipulation Basics (C++)
+
+### 🎯 What it means
+
+**Strings** are just sequences of characters (like letters, numbers, symbols). Think of your name, an email address, or a sentence – those are all strings!
+
+**String Manipulation** is the art of working with these character sequences. It involves things like:
+*   Finding their length.
+*   Accessing individual characters.
+*   Combining (concatenating) strings.
+*   Searching for specific parts within a string.
+*   Changing their order (like reversing).
+*   Extracting smaller parts (substrings).
+
+In C++, `std::string` is your go-to friend for handling strings easily.
+
+### 🌟 Why it matters
+
+Strings are everywhere in the real world!
+*   **User Input:** Names, addresses, passwords.
+*   **Data Processing:** Parsing log files, extracting information from web pages.
+*   **Text Editors & Search Engines:** Finding and replacing text, spell-checking.
+*   **Networking:** URLs, email protocols.
+
+Mastering string manipulation is crucial for many applications and is a frequent topic in coding interviews! It often tests your ability to iterate, use pointers (or indices), and think about edge cases.
+
+### 💡 Example Problem: Reverse a String
+
+**Problem:** Given a string, reverse it.
+
+**Input:** `"hello"`
+**Output:** `"olleh"`
+
+**Input:** `"world"`
+**Output:** `"dlrow"`
+
+### 💻 Simple C++ Implementation (Reversing a String)
+
+We'll use a classic technique called "two pointers" to swap characters from the beginning and end until they meet in the middle. This is efficient and a common pattern in DSA!
+
+```cpp
+#include <iostream> // For input/output operations (like printing)
+#include <string>   // For using std::string
+#include <algorithm> // For std::swap (or you can write your own swap)
+
+// Function to reverse a string
+std::string reverseString(std::string s) {
+    // Get the length of the string
+    int n = s.length();
+
+    // Initialize two pointers: 'left' at the beginning, 'right' at the end
+    int left = 0;
+    int right = n - 1;
+
+    // Loop until the pointers cross each other
+    while (left < right) {
+        // Swap the characters at the 'left' and 'right' positions
+        std::swap(s[left], s[right]);
+
+        // Move 'left' pointer forward and 'right' pointer backward
+        left++;
+        right--;
+    }
+
+    // Return the modified (reversed) string
+    return s;
+}
+
+int main() {
+    std::string myString1 = "hello";
+    std::string reversed1 = reverseString(myString1);
+    std::cout << "Original: " << myString1 << ", Reversed: " << reversed1 << std::endl; // Output: Original: hello, Reversed: olleh
+
+    std::string myString2 = "world";
+    std::string reversed2 = reverseString(myString2);
+    std::cout << "Original: " << myString2 << ", Reversed: " << reversed2 << std::endl; // Output: Original: world, Reversed: dlrow
+
+    std::string myString3 = "a";
+    std::string reversed3 = reverseString(myString3);
+    std::cout << "Original: " << myString3 << ", Reversed: " << reversed3 << std::endl; // Output: Original: a, Reversed: a
+
+    std::string myString4 = ""; // Empty string
+    std::string reversed4 = reverseString(myString4);
+    std::cout << "Original: '" << myString4 << "', Reversed: '" << reversed4 << "'" << std::endl; // Output: Original: '', Reversed: ''
+
+    return 0;
+}
+```
+
+---
+
+That's it for a quick intro to string manipulation! The `std::string` class in C++ offers many more handy methods (like `find()`, `substr()`, `+` for concatenation, etc.) which are definitely worth exploring next! Keep coding! ✨
+
+---
