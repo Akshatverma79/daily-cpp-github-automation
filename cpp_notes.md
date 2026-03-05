@@ -26276,3 +26276,134 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-03-05 06:54:12
+
+Hey there, aspiring coder! Let's dive into the fascinating world of **Backtracking**.
+
+---
+
+### 🚶‍♂️ Backtracking Basics
+
+Backtracking is a fancy term for a very human approach to problem-solving: **trial and error, but smart!**
+
+---
+
+#### 💡 What it Means
+
+Imagine you're trying to navigate a maze.
+1.  You take a path.
+2.  If that path leads to a dead end, you **backtrack** to the last decision point.
+3.  Then, you try a different path from there.
+
+In DSA terms, Backtracking is:
+*   A **systematic way to explore all possible configurations** to find a solution (or all solutions).
+*   It **builds solutions incrementally**.
+*   If a partial solution can't lead to a complete, valid solution, it "backs up" (undoes its last choice) and tries a different one. This "undoing" is the core of backtracking!
+*   Often implemented using **recursion**.
+
+---
+
+#### 🤔 Why It Matters
+
+Backtracking is incredibly powerful for problems where you need to:
+*   **Explore many possible combinations** or permutations.
+*   **Find all possible solutions**, not just one.
+*   **Solve constraint satisfaction problems** (where you need to find a state that satisfies certain rules).
+
+Common problems solved with Backtracking:
+*   Generating all permutations/combinations/subsets.
+*   Solving puzzles like N-Queens, Sudoku, Mazes.
+*   Finding Hamiltonian cycles, Graph Coloring.
+
+---
+
+#### 🧩 Example Problem: Permutations of a String
+
+**Problem:** Given a string, print all its possible permutations.
+**Input:** `"ABC"`
+**Output:**
+```
+ABC
+ACB
+BAC
+BCA
+CAB
+CBA
+```
+
+**How Backtracking helps:**
+1.  **Start:** Fix the first character. (e.g., 'A')
+2.  **Recurse:** Now permute the rest ("BC").
+    *   Fix 'B'. Permute "C". Result: "ABC".
+    *   **Backtrack:** Un-fix 'B'.
+    *   Fix 'C'. Permute "B". Result: "ACB".
+    *   **Backtrack:** Un-fix 'C'.
+3.  **Backtrack:** Un-fix 'A'.
+4.  **Try another:** Fix 'B' as the first character. (e.g., 'B')
+5.  **Recurse:** Now permute the rest ("AC").
+    *   ...and so on!
+
+---
+
+#### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <string>
+#include <algorithm> // For std::swap
+
+// Function to generate all permutations of a string using backtracking
+void permute(std::string& str, int current_index) {
+    // Base Case: If current_index has reached the end of the string,
+    // it means we have a complete permutation. Print it!
+    if (current_index == str.length() - 1) {
+        std::cout << str << std::endl;
+        return; // Stop and backtrack
+    }
+
+    // Recursive Step: Iterate through the remaining characters
+    for (int i = current_index; i < str.length(); ++i) {
+        // 1. Make a choice: Swap the current_index character with char at 'i'
+        // This effectively "fixes" a character at the current position.
+        std::swap(str[current_index], str[i]);
+
+        // 2. Explore: Recursively call permute for the next position
+        // This continues building the permutation.
+        permute(str, current_index + 1);
+
+        // 3. Backtrack: Undo the choice (swap back to original state)
+        // This is CRUCIAL! It allows us to explore other possibilities
+        // by restoring the string to its state before the swap,
+        // so the next iteration of the loop can make a different choice.
+        std::swap(str[current_index], str[i]);
+    }
+}
+
+int main() {
+    std::string myString = "ABC";
+    std::cout << "All permutations of \"" << myString << "\":" << std::endl;
+    permute(myString, 0); // Start permutation from index 0
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+All permutations of "ABC":
+ABC
+ACB
+BAC
+BCA
+CAB
+CBA
+```
+
+---
+
+That's the essence of Backtracking! Keep practicing, and you'll soon be solving those tricky combinatorial problems like a pro. Happy coding!
+
+---
