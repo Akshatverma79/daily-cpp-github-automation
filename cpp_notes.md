@@ -26407,3 +26407,165 @@ CBA
 That's the essence of Backtracking! Keep practicing, and you'll soon be solving those tricky combinatorial problems like a pro. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: N-Queens & Sudoku Solver  
+🕒 2026-03-05 14:35:29
+
+Hey there, fellow coder! 👋 Ever felt stuck trying to solve a puzzle, only to realize you made a wrong turn and needed to retrace your steps? That's the essence of **Backtracking**!
+
+It's a super useful technique, especially for problems like N-Queens and Sudoku Solver. Let's dive in!
+
+---
+
+### **Topic: N-Queens & Sudoku Solver (using Backtracking)**
+
+#### 1. What the concept means
+
+**Backtracking** is an algorithm design paradigm for finding solutions to computational problems, typically where you have to make a sequence of choices. It's essentially a systematic way to explore all possible paths to a solution.
+
+*   **Think of it like this:** You're exploring a maze. You pick a path, go as deep as you can. If you hit a dead end (a constraint is violated, or it's not a solution), you **backtrack** (go back to the last crossroads) and try a different path.
+*   **Key steps:**
+    1.  **Make a choice:** Try placing a piece, filling a number, etc.
+    2.  **Check validity:** Is this choice allowed by the rules?
+    3.  **Explore:** If valid, recursively try to solve the rest of the problem with this choice made.
+    4.  **Backtrack:** If the choice leads to a dead end or doesn't find a solution, undo the choice you made so you can try another one. This is crucial!
+
+#### 2. Why it matters
+
+*   **Powerful for Constraint Satisfaction:** Perfect for problems where you need to find configurations that satisfy a set of rules (like board games, puzzles, scheduling).
+*   **Finding All Solutions (or One):** Can be adapted to find just one solution or exhaustively search for all possible solutions.
+*   **Practices Recursion & State Management:** It's a fantastic way to sharpen your recursive thinking and learn how to manage the "state" (e.g., the current board configuration) of your problem.
+*   **Foundation for AI/Optimization:** Concepts are used in more complex algorithms in artificial intelligence (e.g., game trees) and optimization.
+
+#### 3. 1 Example Problem: The N-Queens Problem
+
+**The Challenge:** Place `N` non-attacking queens on an `N×N` chessboard.
+**Rules:** No two queens can share the same row, column, or diagonal.
+
+**Let's take N=4:**
+
+*   **Start:** Try placing a Queen in the first row.
+    *   `Q . . .`
+    *   `. . . .`
+    *   `. . . .`
+    *   `. . . .`
+
+*   **Move to Row 1:** Now, place a Queen in the second row, avoiding the first queen's column and diagonals.
+    *   `Q . . .`
+    *   `. . Q .`
+    *   `. . . .`
+    *   `. . . .`
+    *   (Can't place at (1,0) or (1,1) due to (0,0) queen)
+
+*   **Move to Row 2:** Try to place a Queen in the third row.
+    *   `Q . . .`
+    *   `. . Q .`
+    *   `. . . Q` (If we place it here, column 3 and diagonal are free relative to the other two Queens)
+    *   `. . . .`
+
+*   **Move to Row 3:** Try to place a Queen in the fourth row.
+    *   Oh no! At this point, we might find there's NO safe spot in the fourth row! All columns and diagonals are attacked.
+
+*   **Backtrack!** Since we couldn't place the last queen, we go back to Row 2, "undo" the last queen placement, and try a different spot for the Queen in Row 2. If no other spots work in Row 2, we backtrack to Row 1, and so on.
+
+This systematic trial-and-error (and undoing) is exactly what backtracking does!
+
+#### 4. 1 Simple C++ Implementation (N-Queens)
+
+This implementation uses boolean arrays to quickly check if a column or diagonal is occupied, making the `isSafe` check very efficient.
+
+```cpp
+#include <vector>
+#include <string>
+#include <iostream>
+
+class NQueensSolver {
+public:
+    // Main function to solve N-Queens
+    std::vector<std::vector<std::string>> solveNQueens(int n) {
+        std::vector<std::vector<std::string>> solutions; // Stores all valid board configurations
+        std::vector<std::string> currentBoard(n, std::string(n, '.')); // Represents the current board
+
+        // Boolean arrays for O(1) safety checks
+        std::vector<bool> colUsed(n, false);       // Is column 'j' occupied?
+        std::vector<bool> diag1Used(2 * n - 1, false); // Is diagonal (row + col) occupied? (Top-left to bottom-right)
+        std::vector<bool> diag2Used(2 * n - 1, false); // Is diagonal (row - col + n - 1) occupied? (Top-right to bottom-left)
+
+        // Start the backtracking from the first row (row 0)
+        backtrack(0, n, currentBoard, solutions, colUsed, diag1Used, diag2Used);
+        return solutions;
+    }
+
+private:
+    // Recursive helper function for backtracking
+    void backtrack(int row, int n,
+                   std::vector<std::string>& currentBoard,
+                   std::vector<std::vector<std::string>>& solutions,
+                   std::vector<bool>& colUsed,
+                   std::vector<bool>& diag1Used,
+                   std::vector<bool>& diag2Used) {
+
+        // Base case: If all queens are placed (we've successfully filled up to row n-1)
+        if (row == n) {
+            solutions.push_back(currentBoard); // Add the current valid board to solutions
+            return;
+        }
+
+        // Try placing a queen in each column of the current 'row'
+        for (int col = 0; col < n; ++col) {
+            // Check if it's safe to place a queen at (row, col)
+            // A position is safe if its column, top-left-to-bottom-right diagonal,
+            // and top-right-to-bottom-left diagonal are all unused.
+            // Diagonals mapping:
+            //   - For diag1 (top-left to bottom-right): (row + col) is constant
+            //   - For diag2 (top-right to bottom-left): (row - col + n - 1) is constant (add n-1 to handle negative indices)
+            if (!colUsed[col] && !diag1Used[row + col] && !diag2Used[row - col + n - 1]) {
+
+                // 1. Make the choice: Place the queen
+                currentBoard[row][col] = 'Q';
+                colUsed[col] = true;
+                diag1Used[row + col] = true;
+                diag2Used[row - col + n - 1] = true;
+
+                // 2. Recurse: Move to the next row
+                backtrack(row + 1, n, currentBoard, solutions, colUsed, diag1Used, diag2Used);
+
+                // 3. Undo the choice (Backtrack): Remove the queen to explore other possibilities
+                currentBoard[row][col] = '.';
+                colUsed[col] = false;
+                diag1Used[row + col] = false;
+                diag2Used[row - col + n - 1] = false;
+            }
+        }
+    }
+};
+
+int main() {
+    NQueensSolver solver;
+    int n = 4; // For a 4x4 board
+    std::vector<std::vector<std::string>> solutions = solver.solveNQueens(n);
+
+    std::cout << "Found " << solutions.size() << " solutions for N = " << n << " Queens:\n";
+    for (const auto& board : solutions) {
+        for (const auto& row : board) {
+            std::cout << row << std::endl;
+        }
+        std::cout << "------\n";
+    }
+
+    n = 8; // For an 8x8 board
+    solutions = solver.solveNQueens(n);
+    std::cout << "\nFound " << solutions.size() << " solutions for N = " << n << " Queens.\n";
+    // For 8x8, printing all boards would be too long, just count them.
+
+    return 0;
+}
+```
+
+---
+
+That's backtracking in a nutshell! It's super satisfying when you get the hang of it and see how it systematically cracks complex puzzles. Happy coding! 🚀
+
+---
