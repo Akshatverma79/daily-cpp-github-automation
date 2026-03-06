@@ -26703,3 +26703,191 @@ int main() {
 And that's a quick tour of Heaps and Priority Queues! They're fundamental tools for solving many optimization problems efficiently. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Trie Data Structure  
+🕒 2026-03-06 14:26:15
+
+Hey there, future coding wizard! Let's unravel the mystery of the Trie data structure. It's super cool for handling strings efficiently!
+
+---
+
+## Trie Data Structure: Your String-Searching Superpower!
+
+### 💡 What is a Trie? (The Concept)
+
+Imagine a special kind of tree, but instead of just numbers, it stores *strings* or *words*. Each node in a Trie represents a character, and moving from a parent node to a child node means adding that character to form a longer prefix.
+
+Think of it like a dictionary where words sharing common prefixes branch off from the same point. That's why it's also called a "Prefix Tree"!
+
+*   **Root:** The very top node, usually an empty string.
+*   **Nodes:** Each node typically has an array (or map) of pointers to its children, representing the next possible characters. It also has a flag to indicate if a valid word *ends* at this node.
+*   **Paths:** Following a path from the root to a node spells out a prefix or a complete word.
+
+**Example:** If you insert "apple", "apply", and "apricot":
+```
+(root)
+  |
+  a
+  |
+  p
+  | \
+  p  r
+  |  |
+  l  i
+  |  |
+  e  c
+  |  |
+  (word: apple) o
+  |  |
+  y (word: apply) t (word: apricot)
+```
+
+### 🚀 Why does it matter? (Importance)
+
+Tries are incredibly powerful for operations involving strings, especially when dealing with prefixes:
+
+1.  **Fast Prefix-Based Searches:** Checking if a word exists or if any word starts with a given prefix is super fast (often `O(L)` where `L` is the length of the string, regardless of how many words are in the Trie!).
+2.  **Autocomplete Systems:** Ever typed "goog" and Google suggests "google", "googol", "goodbye"? That's a Trie at work!
+3.  **Spell Checkers:** Easily find words with common prefixes to suggest corrections.
+4.  **Dictionary Implementations:** Efficiently store and search for words.
+5.  **IP Routing:** Used to store and search for IP address ranges.
+6.  **Lexicographical Sorting:** All words inserted into a Trie can be retrieved in alphabetical order by doing a simple DFS traversal.
+
+Compared to hash tables, Tries handle prefix searches naturally and don't suffer from hash collisions. Compared to balanced binary search trees, Tries can be faster for string operations because they compare characters step-by-step rather than whole strings.
+
+### 🎯 Example Problem: Simple Dictionary
+
+Let's say you need to build a simple dictionary that can:
+1.  **`insert(word)`:** Add a word to the dictionary.
+2.  **`search(word)`:** Check if a word exists in the dictionary.
+3.  **`startsWith(prefix)`:** Check if any word in the dictionary starts with the given prefix.
+
+This is the perfect scenario for a Trie!
+
+### 💻 Simple C++ Implementation
+
+Here's a basic C++ implementation for handling lowercase English letters.
+
+```cpp
+#include <iostream>
+#include <string>
+#include <vector> // Using vector for children array might be slightly cleaner
+
+// 1. Define a Trie Node
+struct TrieNode {
+    // Array to store pointers to child nodes (one for each letter 'a'-'z')
+    TrieNode* children[26];
+    // Flag to mark if a word ends at this node
+    bool isEndOfWord;
+
+    // Constructor to initialize a new node
+    TieNode() {
+        for (int i = 0; i < 26; ++i) {
+            children[i] = nullptr; // Initialize all children pointers to null
+        }
+        isEndOfWord = false; // By default, no word ends here
+    }
+
+    // Destructor to clean up memory (important for Tries!)
+    // This will recursively delete all child nodes
+    ~TrieNode() {
+        for (int i = 0; i < 26; ++i) {
+            delete children[i]; // Recursively delete children
+        }
+    }
+};
+
+// 2. Define the Trie Class
+class Trie {
+private:
+    TrieNode* root; // The root of our Trie
+
+    // Helper function to search for a prefix and return the node
+    // corresponding to the end of that prefix.
+    // Returns nullptr if the prefix doesn't exist.
+    TrieNode* searchPrefix(const std::string& prefix) {
+        TrieNode* current = root;
+        for (char ch : prefix) {
+            int index = ch - 'a'; // Convert char to an index (0 for 'a', 1 for 'b', etc.)
+            if (current->children[index] == nullptr) {
+                return nullptr; // Character not found, so prefix doesn't exist
+            }
+            current = current->children[index];
+        }
+        return current; // Found the node at the end of the prefix
+    }
+
+public:
+    // Constructor for the Trie
+    Trie() {
+        root = new TrieNode(); // Create the root node
+    }
+
+    // Destructor for the Trie to free memory
+    ~Trie() {
+        delete root; // The TrieNode destructor handles recursive deletion
+    }
+
+    // --- Core Trie Operations ---
+
+    // 1. Insert a word into the Trie
+    void insert(const std::string& word) {
+        TrieNode* current = root;
+        for (char ch : word) {
+            int index = ch - 'a';
+            if (current->children[index] == nullptr) {
+                // If the path for this character doesn't exist, create a new node
+                current->children[index] = new TrieNode();
+            }
+            current = current->children[index]; // Move to the next node
+        }
+        current->isEndOfWord = true; // Mark the end of the word
+    }
+
+    // 2. Search for a complete word in the Trie
+    bool search(const std::string& word) {
+        TrieNode* node = searchPrefix(word);
+        // A word exists only if its prefix path exists AND it's marked as an end-of-word
+        return node != nullptr && node->isEndOfWord;
+    }
+
+    // 3. Check if any word starts with a given prefix
+    bool startsWith(const std::string& prefix) {
+        // A prefix exists if its path exists in the Trie
+        return searchPrefix(prefix) != nullptr;
+    }
+};
+
+// --- Example Usage ---
+int main() {
+    Trie myDictionary;
+
+    // Insert some words
+    myDictionary.insert("apple");
+    myDictionary.insert("app");
+    myDictionary.insert("apricot");
+    myDictionary.insert("banana");
+
+    // Test search functionality
+    std::cout << "Searching for 'apple': " << (myDictionary.search("apple") ? "Found" : "Not Found") << std::endl; // Found
+    std::cout << "Searching for 'app': " << (myDictionary.search("app") ? "Found" : "Not Found") << std::endl;     // Found
+    std::cout << "Searching for 'ap': " << (myDictionary.search("ap") ? "Found" : "Not Found") << std::endl;       // Not Found (it's a prefix, not a full word)
+    std::cout << "Searching for 'grape': " << (myDictionary.search("grape") ? "Found" : "Not Found") << std::endl; // Not Found
+
+    // Test startsWith functionality
+    std::cout << "Starts with 'ap': " << (myDictionary.startsWith("ap") ? "Yes" : "No") << std::endl;     // Yes
+    std::cout << "Starts with 'appl': " << (myDictionary.startsWith("appl") ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Starts with 'ban': " << (myDictionary.startsWith("ban") ? "Yes" : "No") << std::endl;   // Yes
+    std::cout << "Starts with 'gra': " << (myDictionary.startsWith("gra") ? "Yes" : "No") << std::endl;   // No
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! A neat little Trie ready to tackle your string problems. Keep practicing, and you'll master it in no time!
+
+---
