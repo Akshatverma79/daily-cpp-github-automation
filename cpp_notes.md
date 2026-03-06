@@ -26569,3 +26569,137 @@ int main() {
 That's backtracking in a nutshell! It's super satisfying when you get the hang of it and see how it systematically cracks complex puzzles. Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2026-03-06 06:51:53
+
+Let's dive into Heaps and Priority Queues! They're super useful for problems where you always need to know "what's next in line based on importance?"
+
+---
+
+## Heaps and Priority Queues: Your Go-To for "Who's Next?"
+
+### 🚀 What Do They Mean?
+
+1.  **Priority Queue (PQ):**
+    *   Think of it like a special queue, but not "First-In, First-Out" (FIFO).
+    *   Instead, items come out based on their **priority**. The highest-priority item *always* comes out first.
+    *   **Analogy:** Imagine a hospital emergency room – the most critical patient is seen first, regardless of when they arrived.
+
+2.  **Heap:**
+    *   This is the **data structure** that usually *implements* a Priority Queue efficiently.
+    *   It's a special type of binary tree with two key properties:
+        *   **Completeness:** It's a complete binary tree, meaning all levels are filled from left to right, with no gaps.
+        *   **Heap Property:**
+            *   **Max-Heap:** Every parent node's value is greater than or equal to its children's values. The largest item is always at the root.
+            *   **Min-Heap:** Every parent node's value is less than or equal to its children's values. The smallest item is always at the root.
+
+    *   **In simple terms:** A Heap is like a well-organized pile where you can quickly grab the biggest (or smallest) item!
+
+### 🎯 Why Do They Matter?
+
+Heaps and Priority Queues are incredibly useful because they provide **fast (logarithmic time)** operations for:
+
+*   **Finding the min/max element:** O(1) – super quick!
+*   **Adding an element:** O(log N)
+*   **Removing the min/max element:** O(log N)
+
+**Real-world uses:**
+
+*   **Finding the K largest/smallest elements** in a collection.
+*   **Scheduling tasks** in an operating system or event simulations.
+*   **Graph algorithms** like Dijkstra's (shortest path) and Prim's (minimum spanning tree).
+*   **Median finding** in a stream of data.
+
+### 🌟 Example Problem: Finding the K Largest Elements
+
+**Problem:** Given an unsorted array of numbers, find the `k` largest elements.
+
+**Input:** `nums = {3, 2, 1, 5, 6, 4}`, `k = 2`
+**Output:** `{5, 6}` (or `{6, 5}`, order doesn't strictly matter for the set of elements)
+
+**The Idea:**
+We can use a **Min-Heap** of size `k`.
+1.  Iterate through the input array.
+2.  For each number, add it to our min-heap.
+3.  If the heap's size exceeds `k`, remove the smallest element from the heap (which will always be at the top of a min-heap).
+4.  After iterating through all numbers, the `k` elements remaining in the min-heap will be the `k` largest elements from the original array!
+
+### 🛠️ Simple C++ Implementation
+
+In C++, `std::priority_queue` is a readily available template class that implements a max-heap by default. We can customize it to be a min-heap.
+
+```cpp
+#include <iostream>    // For input/output operations
+#include <vector>      // For std::vector
+#include <queue>       // For std::priority_queue
+#include <functional>  // For std::greater (to make a min-heap)
+#include <algorithm>   // For std::sort (optional, to sort output)
+
+// Function to find K largest elements using a min-heap
+std::vector<int> findKLargestElements(const std::vector<int>& nums, int k) {
+    // Create a min-heap.
+    // std::priority_queue<Type, Container, Comparator>
+    // By default, it's a max-heap (uses std::less<Type>).
+    // To make it a min-heap, we use std::greater<int>.
+    std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
+
+    for (int num : nums) {
+        minHeap.push(num); // Add the current number to the heap
+
+        // If the heap size exceeds k, remove the smallest element.
+        // The smallest element is always at the top of a min-heap.
+        if (minHeap.size() > k) {
+            minHeap.pop();
+        }
+    }
+
+    // The minHeap now contains the K largest elements.
+    // Transfer them to a vector for the result.
+    std::vector<int> result;
+    while (!minHeap.empty()) {
+        result.push_back(minHeap.top()); // Get the top element
+        minHeap.pop();                   // Remove it
+    }
+
+    // The elements extracted from a min-heap will be in ascending order.
+    // If you need them in descending order (e.g., 6, 5), you could sort:
+    // std::sort(result.rbegin(), result.rend()); // Reverse sort
+
+    return result;
+}
+
+int main() {
+    std::vector<int> nums1 = {3, 2, 1, 5, 6, 4};
+    int k1 = 2;
+    std::vector<int> kLargest1 = findKLargestElements(nums1, k1);
+
+    std::cout << "For nums = {3, 2, 1, 5, 6, 4} and k = " << k1 << ":\n";
+    std::cout << "The " << k1 << " largest elements are: ";
+    for (int val : kLargest1) {
+        std::cout << val << " ";
+    }
+    std::cout << "\n(Expected: 5 6 or 6 5)\n\n";
+
+    std::vector<int> nums2 = {7, 10, 4, 3, 20, 15};
+    int k2 = 3;
+    std::vector<int> kLargest2 = findKLargestElements(nums2, k2);
+
+    std::cout << "For nums = {7, 10, 4, 3, 20, 15} and k = " << k2 << ":\n";
+    std::cout << "The " << k2 << " largest elements are: ";
+    for (int val : kLargest2) {
+        std::cout << val << " ";
+    }
+    std::cout << "\n(Expected: 10 15 20 in some order)\n";
+
+    return 0;
+}
+```
+
+---
+
+And that's a quick tour of Heaps and Priority Queues! They're fundamental tools for solving many optimization problems efficiently. Happy coding!
+
+---
