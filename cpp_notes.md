@@ -26891,3 +26891,144 @@ int main() {
 And there you have it! A neat little Trie ready to tackle your string problems. Keep practicing, and you'll master it in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-03-07 06:42:09
+
+Here's a friendly and concise note on Disjoint Set Union (DSU)!
+
+---
+
+## Disjoint Set Union (DSU): Connect the Dots!
+
+### What is DSU?
+
+Imagine you have a bunch of individual items. A Disjoint Set Union (DSU) data structure is like a super-smart organizer that keeps these items grouped into **disjoint** (meaning non-overlapping) sets.
+
+It has two main "superpowers":
+
+1.  **`find(i)`:** Tells you which group item `i` belongs to. It does this by returning a "representative" (or "root") of that group.
+2.  **`unite(i, j)`:** Merges the group containing item `i` with the group containing item `j` into a single, larger group.
+
+Think of it like managing groups of friends. Initially, everyone is in their own group. When two people become friends, their respective groups merge into one!
+
+### Why does it matter?
+
+DSU is incredibly efficient for problems where you need to:
+
+*   **Track connectivity:** Quickly check if two items are connected (i.e., in the same group).
+*   **Group elements:** Efficiently group related items together.
+*   **Detect cycles in graphs:** If you try to `unite` two nodes that are already in the same set, you've found a cycle!
+
+You'll often find DSU being used in graph algorithms like Kruskal's for finding the Minimum Spanning Tree (MST), and in various network or social connectivity problems.
+
+### Let's solve a tiny problem!
+
+**Problem: Counting Friend Groups**
+
+You have `N` people, initially all separate. You are then given `M` pairs of people who become friends. After all friendships are declared, how many distinct groups of friends are there?
+
+**Example:**
+`N = 5` people (let's say 0, 1, 2, 3, 4)
+
+Friendships:
+1.  `(0, 1)` -> People 0 and 1 become friends. Groups: `{0,1}, {2}, {3}, {4}`. (4 groups)
+2.  `(1, 2)` -> People 1 and 2 become friends. Since 0 and 1 are already friends, now 0, 1, and 2 are all connected. Groups: `{0,1,2}, {3}, {4}`. (3 groups)
+3.  `(3, 4)` -> People 3 and 4 become friends. Groups: `{0,1,2}, {3,4}`. (2 groups)
+
+Final distinct groups: 2
+
+### Simple C++ Implementation
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota (easy way to fill vectors)
+#include <iostream>
+#include <set>     // To count distinct roots easily
+
+class DSU {
+private:
+    std::vector<int> parent; // Stores the parent of each element
+    std::vector<int> sz;     // Stores the size of the set rooted at each element (for optimization)
+
+public:
+    // Constructor: Initialize N items, each in its own set
+    DSU(int n) {
+        parent.resize(n);
+        // std::iota fills the vector with 0, 1, 2, ... (each element is initially its own parent)
+        std::iota(parent.begin(), parent.end(), 0); 
+        sz.assign(n, 1); // Each set initially has a size of 1
+    }
+
+    // Find operation (with Path Compression)
+    // Returns the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i) { // If 'i' is its own parent, it's the root of its set
+            return i;
+        }
+        // Path compression: Make 'i' point directly to its root,
+        // reducing future lookup times for 'i' and its descendants.
+        return parent[i] = find(parent[i]); 
+    }
+
+    // Union operation (with Union by Size)
+    // Merges the sets containing 'i' and 'j'
+    void unite(int i, int j) {
+        int root_i = find(i); // Find the root of i's set
+        int root_j = find(j); // Find the root of j's set
+
+        if (root_i != root_j) { // If they are not already in the same set
+            // Union by Size optimization: Attach the smaller tree under the root of the larger tree.
+            // This helps keep the trees flatter and prevents worst-case O(N) operations.
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i is the root of the larger/equal set
+            }
+            parent[root_j] = root_i;      // Make root_i the parent of root_j
+            sz[root_i] += sz[root_j];     // Update the size of the new merged set
+        }
+    }
+
+    // Helper function to count distinct sets (useful for our example problem)
+    int countDistinctSets() {
+        std::set<int> distinctRoots; // A set stores only unique elements
+        for (int i = 0; i < parent.size(); ++i) {
+            distinctRoots.insert(find(i)); // Find the root for each element and add it to our set
+        }
+        return distinctRoots.size(); // The size of the set is the number of distinct groups
+    }
+};
+
+int main() {
+    int N = 5; // We have 5 people (indexed 0 to 4)
+    DSU dsu(N);
+
+    std::cout << "Initially, " << dsu.countDistinctSets() << " distinct groups.\n"; // Should be 5
+
+    // Apply friendships
+    dsu.unite(0, 1); // 0 and 1 become friends
+    std::cout << "After (0,1): " << dsu.countDistinctSets() << " distinct groups.\n"; // Expected: 4
+
+    dsu.unite(1, 2); // 1 and 2 become friends (also connects 0)
+    std::cout << "After (1,2): " << dsu.countDistinctSets() << " distinct groups.\n"; // Expected: 3
+
+    dsu.unite(3, 4); // 3 and 4 become friends
+    std::cout << "After (3,4): " << dsu.countDistinctSets() << " distinct groups.\n"; // Expected: 2
+
+    // Let's make everyone friends by connecting an element from one group to another
+    dsu.unite(0, 4); // 0 (from {0,1,2}) and 4 (from {3,4}) become friends
+    std::cout << "After (0,4): " << dsu.countDistinctSets() << " distinct groups.\n"; // Expected: 1
+
+    // Check if 0 and 3 are connected now
+    if (dsu.find(0) == dsu.find(3)) {
+        std::cout << "0 and 3 are connected!\n"; // This should be true now
+    } else {
+        std::cout << "0 and 3 are NOT connected.\n";
+    }
+
+    return 0;
+}
+```
+
+---
