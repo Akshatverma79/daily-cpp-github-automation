@@ -27382,3 +27382,174 @@ int main() {
 *   A great alternative to Segment Trees for this specific set of operations, often with simpler code!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Shortest Path (Dijkstra's Algorithm)  
+🕒 2026-03-08 14:11:31
+
+Hey there, future algorithm master! 👋 Let's break down Dijkstra's Algorithm, a super useful tool for finding the quickest way around.
+
+---
+
+### Dijkstra's Algorithm: Finding the Shortest Path
+
+#### 1. What does it mean? (The Concept)
+
+Imagine you're trying to find the *fastest* route from your house to *every* other location in your city. Dijkstra's Algorithm is like a super-smart GPS that does exactly that!
+
+It finds the **shortest path from a single starting node to all other reachable nodes** in a graph. It works by:
+*   Always picking the "closest" unvisited location next.
+*   Updating the estimated shortest distance to its neighbors if it finds a shorter route through itself.
+*   **Key rule:** It only works if all the "roads" (edge weights) have **positive** lengths/costs. No shortcuts that take negative time!
+
+#### 2. Why does it matter? (Importance)
+
+This algorithm is everywhere!
+*   **GPS Navigation:** Yup, Google Maps and similar services use variations of Dijkstra's to find the best routes.
+*   **Network Routing:** How data packets find the most efficient path across the internet.
+*   **Resource Allocation:** Finding the cheapest way to connect points in a network.
+*   It's a foundational algorithm for understanding many other pathfinding and graph problems.
+
+#### 3. Small Example Problem
+
+Let's find the shortest paths from Node 0 to all other nodes.
+
+**Graph:**
+*   Nodes: 0, 1, 2, 3
+*   Edges (from, to, weight):
+    *   (0, 1, 4)
+    *   (0, 2, 1)
+    *   (1, 3, 5)
+    *   (2, 1, 2)  <- Notice this one!
+    *   (2, 3, 8)
+
+**Starting from Node 0:**
+
+1.  **Initialize:** `dist = [0, inf, inf, inf]` (Node 0 is 0 distance from itself, others are infinity).
+    *   Priority Queue (PQ): `{(0, 0)}` (distance, node)
+
+2.  **Pop (0, 0):** Current node is 0.
+    *   Neighbors of 0:
+        *   To 1 (weight 4): `0 + 4 = 4`. `dist[1]` becomes 4. Push `(4, 1)` to PQ.
+        *   To 2 (weight 1): `0 + 1 = 1`. `dist[2]` becomes 1. Push `(1, 2)` to PQ.
+    *   PQ: `{(1, 2), (4, 1)}`
+
+3.  **Pop (1, 2):** Current node is 2. (It's the shortest unvisited path so far!)
+    *   Neighbors of 2:
+        *   To 1 (weight 2): `dist[2] (1) + 2 = 3`. This is *less* than current `dist[1] (4)`. So, `dist[1]` becomes 3. Push `(3, 1)` to PQ.
+        *   To 3 (weight 8): `dist[2] (1) + 8 = 9`. `dist[3]` becomes 9. Push `(9, 3)` to PQ.
+    *   PQ: `{(3, 1), (4, 1 - old path to 1), (9, 3)}`
+
+4.  **Pop (3, 1):** Current node is 1. (This is the *new, shorter* path to 1!)
+    *   Neighbors of 1:
+        *   To 3 (weight 5): `dist[1] (3) + 5 = 8`. This is *less* than current `dist[3] (9)`. So, `dist[3]` becomes 8. Push `(8, 3)` to PQ.
+    *   PQ: `{(4, 1 - old path to 1), (8, 3), (9, 3 - old path to 3)}`
+
+5.  **Pop (4, 1):** Node 1 has already been finalized with a shorter distance (3). Ignore this entry.
+    *   PQ: `{(8, 3), (9, 3 - old path to 3)}`
+
+6.  **Pop (8, 3):** Current node is 3. (Shortest path to 3 found!)
+    *   No outgoing neighbors from 3.
+    *   PQ: `{(9, 3 - old path to 3)}`
+
+7.  **Pop (9, 3):** Node 3 has already been finalized with a shorter distance (8). Ignore this entry.
+    *   PQ: `{}`
+
+**Final Shortest Distances from Node 0:**
+*   Node 0: 0
+*   Node 1: 3 (Path: 0 -> 2 -> 1)
+*   Node 2: 1 (Path: 0 -> 2)
+*   Node 3: 8 (Path: 0 -> 2 -> 1 -> 3)
+
+#### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue> // For priority_queue
+#include <limits> // For numeric_limits
+
+const int INF = std::numeric_limits<int>::max(); // Represents infinity
+
+// Function to find shortest paths using Dijkstra's Algorithm
+std::vector<int> dijkstra(int num_nodes,
+                          const std::vector<std::vector<std::pair<int, int>>>& adj,
+                          int start_node) {
+
+    // 1. Initialize distances: all to infinity, start_node to 0
+    std::vector<int> dist(num_nodes, INF);
+    dist[start_node] = 0;
+
+    // 2. Priority queue: stores {distance, node} pairs.
+    //    'greater' makes it a min-heap (smallest distance on top)
+    std::priority_queue<std::pair<int, int>,
+                        std::vector<std::pair<int, int>>,
+                        std::greater<std::pair<int, int>>> pq;
+
+    // Add the starting node to the priority queue
+    pq.push({0, start_node}); // {distance_to_node, node_id}
+
+    // 3. Process nodes until priority queue is empty
+    while (!pq.empty()) {
+        int d = pq.top().first;  // Current shortest distance found for 'u'
+        int u = pq.top().second; // The node itself
+        pq.pop();
+
+        // If we found a shorter path to 'u' already, ignore this older, longer path
+        if (d > dist[u]) {
+            continue;
+        }
+
+        // 4. Explore neighbors of 'u' (relaxation step)
+        for (const auto& edge : adj[u]) {
+            int v = edge.first;    // Neighbor node
+            int weight = edge.second; // Weight of edge (u -> v)
+
+            // If a shorter path to 'v' is found through 'u'
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight; // Update distance
+                pq.push({dist[v], v});     // Add new path to PQ
+            }
+        }
+    }
+
+    return dist; // Return the vector of shortest distances from start_node
+}
+
+int main() {
+    int num_nodes = 4; // Our example has 4 nodes (0, 1, 2, 3)
+
+    // Adjacency list representation:
+    // adj[u] contains a list of {neighbor_v, weight_u_v}
+    std::vector<std::vector<std::pair<int, int>>> adj(num_nodes);
+
+    // Add edges as per our example:
+    adj[0].push_back({1, 4});
+    adj[0].push_back({2, 1});
+    adj[1].push_back({3, 5});
+    adj[2].push_back({1, 2});
+    adj[2].push_back({3, 8});
+
+    int start_node = 0;
+    std::vector<int> shortest_distances = dijkstra(num_nodes, adj, start_node);
+
+    // Print the results
+    std::cout << "Shortest distances from Node " << start_node << ":\n";
+    for (int i = 0; i < num_nodes; ++i) {
+        if (shortest_distances[i] == INF) {
+            std::cout << "Node " << i << ": Not reachable\n";
+        } else {
+            std::cout << "Node " << i << ": " << shortest_distances[i] << "\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Dijkstra's Algorithm in a nutshell – a powerful concept that's surprisingly intuitive once you trace it through. Happy coding!
+
+---
