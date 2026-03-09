@@ -27553,3 +27553,199 @@ int main() {
 And there you have it! Dijkstra's Algorithm in a nutshell – a powerful concept that's surprisingly intuitive once you trace it through. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bellman-Ford Algorithm  
+🕒 2026-03-09 07:03:24
+
+Hey there, future DSA pro! 👋 Let's break down the Bellman-Ford Algorithm – it's a super useful one!
+
+---
+
+## 🔔 Bellman-Ford Algorithm: Your Shortest Path Buddy (Even with Negatives!)
+
+### 🌟 What is it? (The Concept)
+
+Imagine you want to find the fastest route from your home to all your friends' houses. Bellman-Ford is an algorithm that does exactly that: it finds the **shortest paths from a single starting point (source) to all other vertices** in a weighted graph.
+
+The cool part? Unlike Dijkstra's algorithm, Bellman-Ford can handle **negative edge weights**! Think of negative weights as shortcuts, discounts, or even "earning" something on a path.
+
+It works by repeatedly "relaxing" edges. Relaxing an edge means checking if we can find a shorter path to a vertex `v` by going through an adjacent vertex `u` first. It does this `V-1` times (where `V` is the number of vertices) because a shortest path in a graph with `V` vertices can have at most `V-1` edges.
+
+### 💡 Why it Matters?
+
+1.  **Negative Weights are Real:** In many real-world scenarios (like financial transactions, network routing with cost/gain, arbitrage opportunities), paths can have negative "costs." Bellman-Ford is your go-to for these situations.
+2.  **Negative Cycle Detection:** This is HUGE! If a graph contains a "negative cycle" (a loop where the sum of edge weights is negative), you could theoretically go around that cycle infinitely to get an ever-decreasing, infinitely short path. Bellman-Ford can detect these cycles, which is critical because it means no true "shortest path" exists to vertices reachable from such a cycle.
+
+### 🚶‍♀️💨 Example Problem: Finding Paths in a Small City
+
+Let's say you're in "Start City (S)" and want to find the shortest routes to "A", "B", and "C".
+
+**Graph:**
+*   S → A (weight: 1)
+*   S → C (weight: 5)
+*   A → B (weight: 2)
+*   B → C (weight: -4)  <-- *A negative edge!*
+
+**Goal:** Find the shortest distance from S to all other cities.
+
+**Let's trace it!**
+*   **Initialization:**
+    *   `dist[S] = 0`
+    *   `dist[A] = ∞`
+    *   `dist[B] = ∞`
+    *   `dist[C] = ∞`
+*   Number of vertices `V = 4` (S, A, B, C). We need `V-1 = 3` iterations.
+
+---
+
+**Iteration 1:**
+*   Relax S→A: `dist[A]` becomes `dist[S] + 1 = 0 + 1 = 1`
+*   Relax S→C: `dist[C]` becomes `dist[S] + 5 = 0 + 5 = 5`
+*   Relax A→B: `dist[B]` becomes `dist[A] + 2 = 1 + 2 = 3`
+*   Relax B→C: `dist[C]` (`5`) is greater than `dist[B] + (-4) = 3 - 4 = -1`. So, `dist[C]` becomes `-1`.
+*   **Current distances:** `[S:0, A:1, B:3, C:-1]`
+
+---
+
+**Iteration 2:**
+*   Relax S→A: `dist[A]` (1) is not > `dist[S]+1` (1). No change.
+*   Relax S→C: `dist[C]` (-1) is not > `dist[S]+5` (5). No change.
+*   Relax A→B: `dist[B]` (3) is not > `dist[A]+2` (3). No change.
+*   Relax B→C: `dist[C]` (-1) is not > `dist[B]+(-4)` (-1). No change.
+*   **Current distances:** `[S:0, A:1, B:3, C:-1]`
+
+---
+
+**Iteration 3:** (Same as Iteration 2, no changes will occur)
+*   **Final distances:** `[S:0, A:1, B:3, C:-1]`
+
+---
+
+**Negative Cycle Check (1 extra pass):**
+If we iterate through all edges *one more time* and find any edge `(u, v)` where `dist[u] + weight(u,v) < dist[v]`, it means there's a negative cycle reachable from the source. In this example, no such update will happen, so no negative cycle!
+
+**Shortest paths:**
+*   S to S: 0
+*   S to A: 1 (S → A)
+*   S to B: 3 (S → A → B)
+*   S to C: -1 (S → A → B → C)
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <limits> // For numeric_limits
+
+// Define a large value for infinity
+const long long INF = std::numeric_limits<long long>::max();
+
+// Structure to represent an edge in the graph
+struct Edge {
+    int source, destination, weight;
+};
+
+// Function to implement the Bellman-Ford algorithm
+void bellmanFord(int numVertices, const std::vector<Edge>& edges, int source) {
+    // 1. Initialize distances: source to 0, others to infinity
+    std::vector<long long> dist(numVertices, INF);
+    dist[source] = 0;
+
+    // 2. Relax all edges V-1 times
+    // A shortest path can have at most V-1 edges.
+    // Each iteration potentially finds a shorter path through one more edge.
+    for (int i = 0; i < numVertices - 1; ++i) {
+        // Flag to optimize: if no distance changes in an iteration,
+        // we can stop early (graph without negative cycles)
+        bool any_update = false; 
+        for (const Edge& edge : edges) {
+            // If the current path to source 'u' is not infinity AND
+            // a shorter path to 'v' is found through 'u'
+            if (dist[edge.source] != INF && 
+                dist[edge.source] + edge.weight < dist[edge.destination]) {
+                
+                dist[edge.destination] = dist[edge.source] + edge.weight;
+                any_update = true;
+            }
+        }
+        // Optimization: If no updates were made, paths are finalized
+        if (!any_update) {
+            // std::cout << "No updates in iteration " << i+1 << ", stopping early.\n";
+            break; 
+        }
+    }
+
+    // 3. Check for negative cycles
+    // One more pass. If we can still relax an edge, there's a negative cycle.
+    for (const Edge& edge : edges) {
+        if (dist[edge.source] != INF && 
+            dist[edge.source] + edge.weight < dist[edge.destination]) {
+            std::cout << "Graph contains a negative cycle!\n";
+            return; // Exit as shortest paths are undefined
+        }
+    }
+
+    // 4. Print the shortest distances
+    std::cout << "Shortest distances from source " << source << ":\n";
+    for (int i = 0; i < numVertices; ++i) {
+        std::cout << "  To vertex " << i << ": ";
+        if (dist[i] == INF) {
+            std::cout << "Infinity\n";
+        } else {
+            std::cout << dist[i] << "\n";
+        }
+    }
+}
+
+int main() {
+    // Our example graph: S(0), A(1), B(2), C(3)
+    int numVertices = 4;
+    std::vector<Edge> edges = {
+        {0, 1, 1},  // S -> A (weight 1)
+        {0, 3, 5},  // S -> C (weight 5)
+        {1, 2, 2},  // A -> B (weight 2)
+        {2, 3, -4}  // B -> C (weight -4)
+    };
+    int sourceVertex = 0; // S is our source
+
+    std::cout << "--- Example 1: No negative cycle ---\n";
+    bellmanFord(numVertices, edges, sourceVertex);
+    std::cout << "\n";
+
+    // --- Example 2: With a negative cycle ---
+    // Let's add an edge from C to B with weight -1
+    // This creates a negative cycle: B -> C (-4) -> B (-1), total -5
+    std::vector<Edge> edgesWithNegativeCycle = {
+        {0, 1, 1},  // S -> A (weight 1)
+        {0, 3, 5},  // S -> C (weight 5)
+        {1, 2, 2},  // A -> B (weight 2)
+        {2, 3, -4}, // B -> C (weight -4)
+        {3, 2, -1}  // C -> B (weight -1) -- introduces a negative cycle!
+    };
+    std::cout << "--- Example 2: With a negative cycle (B <-> C) ---\n";
+    bellmanFord(numVertices, edgesWithNegativeCycle, sourceVertex);
+
+    // Note: The INF value might need to be adjusted for extremely large graphs
+    // or very negative weights to avoid overflow issues, e.g., using LLONG_MAX / 2.
+    // For competitive programming, make sure to consider these edge cases.
+
+    return 0;
+}
+```
+
+---
+
+### Key Takeaways:
+
+*   **Handles Negative Weights:** The biggest advantage over Dijkstra.
+*   **Detects Negative Cycles:** A crucial feature for graph integrity.
+*   **Time Complexity:** O(V * E), where V is the number of vertices and E is the number of edges. This is slower than Dijkstra's (which is O(E log V) or O(E + V log V) with a priority queue), but the ability to handle negative weights makes it valuable.
+*   **How it works:** Repeatedly relaxes all edges V-1 times, then checks for negative cycles in a final pass.
+
+That's Bellman-Ford in a nutshell! Keep practicing, and you'll master these algorithms in no time! 💪
+
+---
