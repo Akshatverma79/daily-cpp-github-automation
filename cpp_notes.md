@@ -27749,3 +27749,213 @@ int main() {
 That's Bellman-Ford in a nutshell! Keep practicing, and you'll master these algorithms in no time! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2026-03-09 14:38:10
+
+Let's dive into the Floyd-Warshall Algorithm! It's a classic for a specific kind of pathfinding in graphs.
+
+---
+
+### 🗺️ Floyd-Warshall Algorithm
+
+**Concept: What it means**
+
+Imagine you have a map with many cities and roads between them. You want to find the *shortest path* not just from one city to every other city, but from *every city to every other city*! This is called the **All-Pairs Shortest Path (APSP)** problem.
+
+The Floyd-Warshall algorithm is a dynamic programming approach to solve APSP. Its core idea is surprisingly simple:
+
+"For every pair of cities `(i, j)`, what if we try to go through an *intermediate city `k`*? Is `i -> k -> j` shorter than the current best path `i -> j`?"
+
+It systematically checks all possible intermediate cities, updating the shortest path lengths as it goes. It can handle graphs with **negative edge weights** (unlike Dijkstra's), but it cannot handle **negative cycles** (a path that goes back to itself and gets infinitely shorter).
+
+**Why it matters**
+
+1.  **All-Pairs Solution:** It directly gives you the shortest path between *every single pair* of nodes, which is exactly what some problems require.
+2.  **Simplicity:** The algorithm itself is quite elegant and relatively easy to implement with just three nested loops.
+3.  **Negative Weights:** It's one of the few algorithms that can handle negative edge weights gracefully (as long as there are no negative cycles).
+4.  **Applications:** Useful in network routing, analyzing reachability in graphs, finding transitive closures, and even detecting negative cycles.
+
+---
+
+**Example Problem (Small)**
+
+Let's find the all-pairs shortest paths in a small directed graph.
+
+**Graph:**
+*   Nodes: 0, 1, 2
+*   Edges:
+    *   0 -> 1 (weight 3)
+    *   0 -> 2 (weight 8)
+    *   1 -> 2 (weight -4)
+    *   2 -> 0 (weight 1)
+
+**Initial Distance Matrix (INF = infinity, 0 on diagonals):**
+
+```
+      0   1   2
+    +---+---+---+
+  0 | 0 | 3 | 8 |
+    +---+---+---+
+  1 |INF| 0 |-4 |
+    +---+---+---+
+  2 | 1 |INF| 0 |
+    +---+---+---+
+```
+
+**Let's trace a couple of steps (simplified):**
+
+1.  **Consider `k = 0` (using node 0 as an intermediate):**
+    *   Can we go from `1` to `2` via `0`? Path `1 -> 0 -> 2`? No, `dist[1][0]` is `INF`.
+    *   Can we go from `2` to `1` via `0`? Path `2 -> 0 -> 1`? Yes! `dist[2][0] + dist[0][1] = 1 + 3 = 4`.
+        Since `4 < INF` (current `dist[2][1]`), we update `dist[2][1]` to `4`.
+    (Many other checks happen, but no other shorter paths are found through 0 in this step).
+
+    *After k=0:*
+    ```
+          0   1   2
+        +---+---+---+
+      0 | 0 | 3 | 8 |
+        +---+---+---+
+      1 |INF| 0 |-4 |
+        +---+---+---+
+      2 | 1 | 4 | 0 | (Updated from INF)
+        +---+---+---+
+    ```
+
+2.  **Consider `k = 1` (using node 1 as an intermediate):**
+    *   Can we go from `0` to `2` via `1`? Path `0 -> 1 -> 2`? Yes! `dist[0][1] + dist[1][2] = 3 + (-4) = -1`.
+        Since `-1 < 8` (current `dist[0][2]`), we update `dist[0][2]` to `-1`.
+    *   Can we go from `2` to `0` via `1`? Path `2 -> 1 -> 0`? Yes! `dist[2][1] + dist[1][0] = 4 + INF`. This isn't shorter.
+    *   ... many others ...
+
+    *After k=1:*
+    ```
+          0   1   2
+        +---+---+---+
+      0 | 0 | 3 |-1 | (Updated from 8)
+        +---+---+---+
+      1 |INF| 0 |-4 |
+        +---+---+---+
+      2 | 1 | 4 | 0 |
+        +---+---+---+
+    ```
+
+3.  **Consider `k = 2` (using node 2 as an intermediate):**
+    *   Can we go from `1` to `0` via `2`? Path `1 -> 2 -> 0`? Yes! `dist[1][2] + dist[2][0] = -4 + 1 = -3`.
+        Since `-3 < INF` (current `dist[1][0]`), we update `dist[1][0]` to `-3`.
+    *   ... and so on ...
+
+**Final Shortest Path Matrix:**
+
+```
+      0   1   2
+    +---+---+---+
+  0 | 0 | 3 |-1 |  (e.g., 0->1->2 has path 3 + (-4) = -1)
+    +---+---+---+
+  1 |-3 | 0 |-4 |  (e.g., 1->2->0 has path -4 + 1 = -3)
+    +---+---+---+
+  2 | 1 | 4 | 0 |
+    +---+---+---+
+```
+This matrix now holds the shortest path between every pair of nodes!
+
+---
+
+**Simple C++ Implementation**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+// Define a large value for infinity.
+// Be careful with large sums that might overflow int, use long long if needed for weights.
+const int INF = 1e9; // A common choice for infinity in competitive programming
+
+void floydWarshall(int N, std::vector<std::vector<int>>& dist) {
+    // The core of the Floyd-Warshall algorithm:
+    // Iterate through all possible intermediate nodes 'k'
+    for (int k = 0; k < N; ++k) {
+        // Iterate through all possible source nodes 'i'
+        for (int i = 0; i < N; ++i) {
+            // Iterate through all possible destination nodes 'j'
+            for (int j = 0; j < N; ++j) {
+                // If path from i to k and k to j exists (not infinity)
+                // And going i -> k -> j is shorter than current i -> j
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+
+    // --- Optional: Negative Cycle Detection ---
+    // After the algorithm, if dist[i][i] < 0 for any i,
+    // it means there's a negative cycle reachable from i and back to i.
+    for (int i = 0; i < N; ++i) {
+        if (dist[i][i] < 0) {
+            std::cout << "Warning: Negative cycle detected involving node " << i << std::endl;
+            // In some problems, you might need to set reachable paths to -INF
+            // if a negative cycle means paths can be arbitrarily small.
+        }
+    }
+}
+
+void printDistances(int N, const std::vector<std::vector<int>>& dist) {
+    std::cout << "Shortest path distances between all pairs:" << std::endl;
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF ";
+            } else {
+                std::cout << dist[i][j] << "   ";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main() {
+    int N = 3; // Number of nodes
+
+    // Initialize the distance matrix
+    // dist[i][j] will store the shortest distance from node i to node j
+    std::vector<std::vector<int>> dist(N, std::vector<int>(N, INF));
+
+    // Initialize distances:
+    // 1. Distance from a node to itself is 0
+    // 2. Direct edge weights are filled in
+    for (int i = 0; i < N; ++i) {
+        dist[i][i] = 0;
+    }
+
+    // Add edges from our example:
+    dist[0][1] = 3;
+    dist[0][2] = 8;
+    dist[1][2] = -4;
+    dist[2][0] = 1;
+
+    std::cout << "Initial Distance Matrix:" << std::endl;
+    printDistances(N, dist);
+    std::cout << std::endl;
+
+    // Run the Floyd-Warshall algorithm
+    floydWarshall(N, dist);
+
+    std::cout << "\nFinal Shortest Path Distance Matrix:" << std::endl;
+    printDistances(N, dist);
+
+    return 0;
+}
+```
+
+**Complexity:**
+*   **Time:** `O(N^3)` because of the three nested loops, where `N` is the number of nodes.
+*   **Space:** `O(N^2)` to store the distance matrix.
+
+Floyd-Warshall is a powerful and elegant algorithm, perfect for when you need to know *all* the shortest paths!
+
+---
