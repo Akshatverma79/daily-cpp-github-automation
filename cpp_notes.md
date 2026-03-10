@@ -28147,3 +28147,208 @@ int main() {
 Both Prim's and Kruskal's are "greedy" algorithms – they make the best local choice at each step hoping it leads to the best global solution. And for MSTs, this greedy strategy *works*! They differ in how they define that "best local choice" and how they keep track of connections.
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-03-10 14:35:49
+
+Let's untangle some dependencies!
+
+---
+
+## Topological Sort (Kahn's Algorithm)
+
+### 1. What's the Concept?
+
+Imagine you have a list of tasks, and some tasks *must* be completed before others. Topological Sort helps you find a valid order to do them!
+
+*   **Definition:** It's a linear ordering of vertices in a **Directed Acyclic Graph (DAG)** such that for every directed edge `u -> v`, vertex `u` comes before `v` in the ordering.
+*   **Key Idea:** It's all about dependencies. If `A` depends on `B`, then `B` must appear before `A` in the sorted list.
+*   **Crucial:** It *only* works on DAGs (no cycles allowed!). If there's a cycle, you can't have a linear order.
+
+### 2. Why Does It Matter?
+
+Topological Sort is super useful for:
+
+*   **Scheduling:** Planning project tasks, course prerequisites (e.g., "Calc 1" before "Calc 2").
+*   **Build Systems:** Determining the correct compilation order for files in a project.
+*   **Dependency Resolution:** Package managers figuring out which software to install first.
+*   **Event Sequencing:** Any scenario where events have a strict "must happen before" relationship.
+
+### 3. How Kahn's Algorithm Works (Step-by-Step)
+
+Kahn's algorithm is one of the popular ways to do topological sort. It's intuitive because it starts with items that have no prerequisites.
+
+1.  **Calculate In-Degrees:** For every node, count how many incoming edges it has. This is its "in-degree." Nodes with an in-degree of 0 have no prerequisites.
+2.  **Initialize Queue:** Add all nodes with an in-degree of 0 to a queue. These are our starting points.
+3.  **Process Nodes:** While the queue is not empty:
+    *   Dequeue a node `u`. Add `u` to your result list (this is the sorted order).
+    *   For each neighbor `v` of `u` (meaning there's an edge `u -> v`):
+        *   Decrement `v`'s in-degree by 1. (Because `u` is now "done", one of `v`'s prerequisites is met).
+        *   If `v`'s in-degree becomes 0, enqueue `v`. (It now has no remaining prerequisites).
+4.  **Cycle Check:** After the loop, if the number of nodes in your result list is less than the total number of nodes in the graph, it means there was a cycle, and a topological sort isn't possible!
+
+### 4. Example Problem
+
+Let's say we have courses:
+*   A -> B (A must be taken before B)
+*   A -> C (A must be taken before C)
+*   B -> D (B must be taken before D)
+*   C -> D (C must be taken before D)
+
+**Graph:**
+```
+  A
+ / \
+v   v
+B   C
+ \ /
+  v
+  D
+```
+
+**Step 1: Calculate In-Degrees**
+*   A: 0
+*   B: 1 (from A)
+*   C: 1 (from A)
+*   D: 2 (from B, from C)
+
+**Step 2: Initialize Queue**
+*   Queue: `[A]` (A has in-degree 0)
+
+**Step 3: Process Nodes**
+
+*   **Dequeue A.** Result: `[A]`
+    *   Neighbors of A: B, C.
+    *   Decrement in-degree of B (now 0). Enqueue B.
+    *   Decrement in-degree of C (now 0). Enqueue C.
+    *   Queue: `[B, C]`
+
+*   **Dequeue B.** Result: `[A, B]`
+    *   Neighbors of B: D.
+    *   Decrement in-degree of D (now 1).
+    *   Queue: `[C]`
+
+*   **Dequeue C.** Result: `[A, B, C]`
+    *   Neighbors of C: D.
+    *   Decrement in-degree of D (now 0). Enqueue D.
+    *   Queue: `[D]`
+
+*   **Dequeue D.** Result: `[A, B, C, D]`
+    *   Neighbors of D: None.
+    *   Queue: `[]` (Empty)
+
+**Step 4: Cycle Check**
+*   Result size (4) == Total nodes (4). No cycle!
+
+**Final Topological Order:** `A, B, C, D` (or `A, C, B, D` - valid alternatives exist!)
+
+### 5. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <map> // Using map for easy node names (A, B, C, D) to int mapping
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSort(int numNodes, 
+                                std::vector<std::vector<int>>& adj, 
+                                std::vector<int>& inDegree) {
+    
+    std::vector<int> result;
+    std::queue<int> q;
+
+    // 1. Initialize queue with all nodes having in-degree 0
+    for (int i = 0; i < numNodes; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 2. Process nodes
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u); // Add to result
+
+        // For each neighbor 'v' of 'u'
+        for (int v : adj[u]) {
+            inDegree[v]--; // Decrement in-degree of 'v'
+            if (inDegree[v] == 0) {
+                q.push(v); // If 'v's in-degree becomes 0, enqueue it
+            }
+        }
+    }
+
+    // 3. Cycle check
+    if (result.size() != numNodes) {
+        std::cout << "Error: Graph contains a cycle, topological sort not possible!\n";
+        return {}; // Return empty vector indicating failure
+    }
+    
+    return result;
+}
+
+int main() {
+    // Example from above: A -> B, A -> C, B -> D, C -> D
+    // We'll map: A=0, B=1, C=2, D=3
+    int numNodes = 4;
+    std::vector<std::vector<int>> adj(numNodes); // Adjacency list
+    std::vector<int> inDegree(numNodes, 0);       // In-degree for each node
+
+    // Build the graph (edges) and update in-degrees
+    // A -> B (0 -> 1)
+    adj[0].push_back(1);
+    inDegree[1]++;
+    
+    // A -> C (0 -> 2)
+    adj[0].push_back(2);
+    inDegree[2]++;
+
+    // B -> D (1 -> 3)
+    adj[1].push_back(3);
+    inDegree[3]++;
+
+    // C -> D (2 -> 3)
+    adj[2].push_back(3);
+    inDegree[3]++;
+
+    std::cout << "Original In-degrees: [A:" << inDegree[0] << ", B:" << inDegree[1] 
+              << ", C:" << inDegree[2] << ", D:" << inDegree[3] << "]\n";
+
+
+    std::vector<int> sortedOrder = topologicalSort(numNodes, adj, inDegree);
+
+    if (!sortedOrder.empty()) {
+        std::cout << "Topological Order: ";
+        for (int node : sortedOrder) {
+            // Convert back to original names for clarity
+            char nodeChar = 'A' + node; 
+            std::cout << nodeChar << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    // Another example: Graph with a cycle (to demonstrate cycle detection)
+    std::cout << "\n--- Testing a graph with a cycle ---\n";
+    int numNodesCycle = 3;
+    std::vector<std::vector<int>> adjCycle(numNodesCycle);
+    std::vector<int> inDegreeCycle(numNodesCycle, 0);
+
+    // 0 -> 1, 1 -> 2, 2 -> 0 (a cycle!)
+    adjCycle[0].push_back(1); inDegreeCycle[1]++;
+    adjCycle[1].push_back(2); inDegreeCycle[2]++;
+    adjCycle[2].push_back(0); inDegreeCycle[0]++; // This creates the cycle
+
+    std::vector<int> sortedCycle = topologicalSort(numNodesCycle, adjCycle, inDegreeCycle);
+    if (sortedCycle.empty()) {
+        std::cout << "As expected, couldn't sort due to cycle.\n";
+    }
+
+    return 0;
+}
+```
+
+---
