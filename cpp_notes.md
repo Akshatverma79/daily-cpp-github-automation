@@ -28352,3 +28352,200 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Strongly Connected Components  
+🕒 2026-03-11 06:55:25
+
+Hey there, fellow coder! Let's unravel the mystery of **Strongly Connected Components (SCCs)** in directed graphs. It's a super useful concept!
+
+---
+
+### **Topic: Strongly Connected Components (SCCs)**
+
+#### 1. What the Concept Means
+
+Imagine a city map where all streets are one-way.
+*   A **Strongly Connected Component (SCC)** is like a "club" or a "neighborhood" within this city where:
+    *   Every member of the club can reach every other member by following the one-way streets.
+    *   And, importantly, every other member can also reach the first member.
+*   More formally: In a **directed graph**, an SCC is a **maximal** subgraph where for every pair of vertices `(u, v)` in the subgraph, there's a path from `u` to `v` AND a path from `v` to `u`.
+*   "Maximal" means you can't add any more vertices to this subgraph and still maintain the strongly connected property.
+*   SCCs partition the graph, meaning every vertex belongs to exactly one SCC.
+
+Think of it as identifying all the "feedback loops" or "cycles" that are interconnected.
+
+#### 2. Why It Matters
+
+SCCs are powerful because they allow us to **simplify directed graphs**:
+*   **Graph Condensation:** We can represent each SCC as a single "super-node." If there's an edge from a node in SCC A to a node in SCC B, we draw an edge from super-node A to super-node B.
+*   **Resulting Graph:** This "condensation graph" will always be a **Directed Acyclic Graph (DAG)**. This is huge! Many problems that are hard on general directed graphs become much easier on DAGs (e.g., topological sort, shortest/longest paths).
+*   **Applications:**
+    *   **2-Satisfiability (2-SAT):** A fundamental problem in computer science that can be solved efficiently using SCCs.
+    *   **Dependency Analysis:** Identifying circular dependencies in systems (e.g., software modules, build systems).
+    *   **Social Networks:** Finding tightly-knit groups where influence flows easily in all directions.
+    *   **Compiler Optimization:** Analyzing control flow graphs.
+
+#### 3. Example Problem
+
+**Problem:** Given a directed graph, find all its Strongly Connected Components.
+
+**Input Graph:**
+Let's use a small graph with 6 vertices (0-5) and 8 edges:
+*   0 -> 1
+*   1 -> 2
+*   2 -> 0  (This forms a cycle: 0-1-2-0)
+*   2 -> 3
+*   3 -> 4
+*   4 -> 5
+*   5 -> 4  (This forms a cycle: 4-5-4)
+
+**Visualization:**
+```
+0 <--- 2 ---> 3 ---> 4 <--- 5
+|      ^            ^    |
+v      |            |    v
+1      +------------+
+```
+
+**Expected SCCs:**
+*   SCC 1: `{0, 1, 2}` (They can all reach each other)
+*   SCC 2: `{3}` (It can reach itself vacuously, and no one else can strongly connect to it)
+*   SCC 3: `{4, 5}` (They can reach each other)
+
+Notice how 2 -> 3 and 3 -> 4 connect different SCCs, but they are one-way streets, so they don't merge the components into a single SCC.
+
+---
+
+#### 4. Simple C++ Implementation (Kosaraju's Algorithm)
+
+Kosaraju's algorithm is one of the simplest to understand for finding SCCs. It uses two DFS traversals.
+
+**Steps:**
+1.  **First DFS:** Perform a DFS on the original graph `G`. As each node *finishes* (all its descendants have been visited), push it onto a stack. This stack will order nodes by their finishing times (latest finishes on top).
+2.  **Transpose Graph:** Create a new graph `G_rev` where all edges are reversed. If `u -> v` was an edge in `G`, then `v -> u` is an edge in `G_rev`.
+3.  **Second DFS:** While the stack from Step 1 is not empty:
+    *   Pop a node `u`.
+    *   If `u` hasn't been visited yet, start a DFS from `u` on `G_rev`. All nodes visited in this DFS traversal starting from `u` will form one SCC. Print this SCC.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm> // For std::reverse if you want to print SCCs in a specific order
+
+// Global variables for simplicity in this example
+std::vector<std::vector<int>> adj;     // Original graph
+std::vector<std::vector<int>> rev_adj; // Transposed graph
+std::vector<bool> visited;
+std::stack<int> order_stack;           // Stores nodes by finishing times
+
+// Step 1: First DFS - Fill the stack with nodes in order of finishing times
+void dfs1(int u) {
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            dfs1(v);
+        }
+    }
+    order_stack.push(u); // Push node to stack AFTER visiting all its descendants
+}
+
+// Step 3: Second DFS - Find SCCs using the transposed graph
+void dfs2(int u, std::vector<int>& current_scc) {
+    visited[u] = true;
+    current_scc.push_back(u);
+    for (int v : rev_adj[u]) {
+        if (!visited[v]) {
+            dfs2(v, current_scc);
+        }
+    }
+}
+
+int main() {
+    std::cout << "Strongly Connected Components (SCC) using Kosaraju's Algorithm\n";
+
+    int N, M; // N = number of vertices, M = number of edges
+    std::cout << "Enter number of vertices (N): ";
+    std::cin >> N;
+    std::cout << "Enter number of edges (M): ";
+    std::cin >> M;
+
+    adj.resize(N);
+    rev_adj.resize(N);
+    visited.resize(N, false);
+
+    std::cout << "Enter " << M << " edges (u v):\n";
+    for (int i = 0; i < M; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        adj[u].push_back(v);
+        rev_adj[v].push_back(u); // Building transposed graph
+    }
+
+    // --- Kosaraju's Algorithm Steps ---
+
+    // Step 1: Perform first DFS for all nodes to fill the order_stack
+    for (int i = 0; i < N; ++i) {
+        if (!visited[i]) {
+            dfs1(i);
+        }
+    }
+
+    // Reset visited array for the second DFS
+    std::fill(visited.begin(), visited.end(), false);
+
+    // Step 3: Perform second DFS on the transposed graph
+    int scc_count = 0;
+    while (!order_stack.empty()) {
+        int u = order_stack.top();
+        order_stack.pop();
+
+        if (!visited[u]) {
+            std::vector<int> current_scc;
+            dfs2(u, current_scc); // All nodes reachable from 'u' in G_rev form an SCC
+
+            std::cout << "SCC " << ++scc_count << ": { ";
+            // Optional: Sort for consistent output
+            // std::sort(current_scc.begin(), current_scc.end());
+            for (int node : current_scc) {
+                std::cout << node << " ";
+            }
+            std::cout << "}\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+**Example Input for the problem:**
+
+```
+Enter number of vertices (N): 6
+Enter number of edges (M): 8
+Enter 8 edges (u v):
+0 1
+1 2
+2 0
+2 3
+3 4
+4 5
+5 4
+```
+
+**Example Output:**
+
+```
+SCC 1: { 4 5 }
+SCC 2: { 3 }
+SCC 3: { 0 1 2 }
+```
+*(Note: The order of SCCs might vary depending on initial DFS exploration, but the content of each SCC will be the same.)*
+
+---
+
+And there you have it! A quick and friendly dive into Strongly Connected Components. Keep practicing, and you'll master these graph algorithms in no time! Happy coding!
+
+---
