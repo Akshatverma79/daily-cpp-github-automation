@@ -29039,3 +29039,153 @@ While the O(N^2) solution is great for understanding, there's a more advanced an
 That's it! You've got a solid grasp of LIS and a working C++ solution. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Matrix Chain Multiplication  
+🕒 2026-03-13 06:55:33
+
+Hey there, future coding rockstar! Let's demystify Matrix Chain Multiplication (MCM) together. It's a classic example of Dynamic Programming that's super neat.
+
+---
+
+## 🧐 What is Matrix Chain Multiplication (MCM)?
+
+Imagine you have a bunch of matrices you need to multiply: `A * B * C * D`.
+Matrix multiplication is **associative**, meaning `(A * B) * C` gives the same result as `A * (B * C)`.
+
+However, the *number of scalar multiplications* (the basic arithmetic operations) required can be wildly different depending on how you parenthesize them!
+
+**MCM is all about finding the optimal way to parenthesize a sequence of matrices to minimize the total number of scalar multiplications needed.** We're not actually *doing* the matrix multiplication; we're just finding the cheapest *order* to do it in.
+
+## 🤔 Why Does It Matter?
+
+1.  **Optimization:** In real-world applications like graphics, scientific computing, or database query optimization, you might deal with huge matrices. Minimizing computations saves significant time and resources.
+2.  **Dynamic Programming Skill:** It's a fantastic problem to learn and practice Dynamic Programming (DP). It teaches you how to break a big problem into smaller, overlapping subproblems and build up a solution.
+3.  **Interview Favorite:** It often pops up in technical interviews to check your DP chops!
+
+## 💡 Let's Do an Example!
+
+Suppose we have three matrices:
+*   **A** is `10x100`
+*   **B** is `100x5`
+*   **C** is `5x50`
+
+We want to compute `A * B * C`.
+
+The dimensions can be represented by an array `p = {10, 100, 5, 50}`.
+*   A: `p[0] x p[1]`
+*   B: `p[1] x p[2]`
+*   C: `p[2] x p[3]`
+
+Let's look at the two possible parenthesizations:
+
+**1. `(A * B) * C`**
+    *   **Step 1: `A * B`**
+        *   Dimensions: `(10x100) * (100x5)`
+        *   Resulting matrix: `10x5`
+        *   Scalar multiplications: `10 * 100 * 5 = 5000`
+    *   **Step 2: `(A * B) * C`**
+        *   Dimensions: `(10x5) * (5x50)`
+        *   Resulting matrix: `10x50`
+        *   Scalar multiplications: `10 * 5 * 50 = 2500`
+    *   **Total Cost: `5000 + 2500 = 7500`**
+
+**2. `A * (B * C)`**
+    *   **Step 1: `B * C`**
+        *   Dimensions: `(100x5) * (5x50)`
+        *   Resulting matrix: `100x50`
+        *   Scalar multiplications: `100 * 5 * 50 = 25000`
+    *   **Step 2: `A * (B * C)`**
+        *   Dimensions: `(10x100) * (100x50)`
+        *   Resulting matrix: `10x50`
+        *   Scalar multiplications: `10 * 100 * 50 = 50000`
+    *   **Total Cost: `25000 + 50000 = 75000`**
+
+Clearly, `(A * B) * C` (cost 7500) is much, much better than `A * (B * C)` (cost 75000)!
+MCM aims to find this minimum cost for any sequence of matrices.
+
+## 💻 C++ Time! (Simple Implementation)
+
+We'll use a 2D array `dp[i][j]` to store the minimum scalar multiplications needed to multiply the chain of matrices from `i` to `j`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <climits> // For INT_MAX
+#include <algorithm> // For std::min
+
+// Function to find the minimum number of scalar multiplications
+// dimensions: An array 'p' where p[i-1] x p[i] represents the dimensions
+//             of the i-th matrix.
+// n: The number of matrices (not the size of 'dimensions' array)
+int matrixChainMultiplication(const std::vector<int>& dimensions) {
+    int n = dimensions.size() - 1; // Number of matrices is one less than dimensions array size
+
+    // dp[i][j] will store the minimum number of scalar multiplications
+    // needed to multiply matrices from i to j (inclusive).
+    // Matrix Mi has dimensions dimensions[i-1] x dimensions[i]
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(n + 1, 0));
+
+    // Base Case: Cost is 0 for multiplying a single matrix (chain length 1)
+    // dp[i][i] = 0; // Already initialized to 0
+
+    // L is the chain length (from 2 to n)
+    for (int L = 2; L <= n; L++) {
+        // i is the starting matrix index
+        for (int i = 1; i <= n - L + 1; i++) {
+            // j is the ending matrix index for the current chain length L
+            int j = i + L - 1;
+            dp[i][j] = INT_MAX; // Initialize with a very large value
+
+            // Try every possible split point 'k' (from i to j-1)
+            // A split at 'k' means we multiply (M_i...M_k) with (M_{k+1}...M_j)
+            for (int k = i; k <= j - 1; k++) {
+                // cost = cost of (M_i...M_k) + cost of (M_{k+1}...M_j) + cost of multiplying the two results
+                int cost = dp[i][k] + dp[k + 1][j] + dimensions[i - 1] * dimensions[k] * dimensions[j];
+                dp[i][j] = std::min(dp[i][j], cost);
+            }
+        }
+    }
+
+    // The minimum cost for the entire chain of n matrices (from 1 to n)
+    return dp[1][n];
+}
+
+int main() {
+    // Example from above: A(10x100), B(100x5), C(5x50)
+    // The 'dimensions' array represents p = {10, 100, 5, 50}
+    // Number of matrices is 3. Size of 'dimensions' array is 3+1 = 4.
+    std::vector<int> p = {10, 100, 5, 50};
+    int min_ops = matrixChainMultiplication(p);
+    std::cout << "Minimum scalar multiplications for A(10x100) * B(100x5) * C(5x50): " << min_ops << std::endl;
+    // Expected output: 7500
+
+    // Another example: W(40x20), X(20x30), Y(30x10), Z(10x30)
+    std::vector<int> p2 = {40, 20, 30, 10, 30};
+    int min_ops2 = matrixChainMultiplication(p2);
+    std::cout << "Minimum scalar multiplications for W(40x20) * X(20x30) * Y(30x10) * Z(10x30): " << min_ops2 << std::endl;
+    // Expected output: 26000 ((W(X*Y))*Z) or (W*(X(Y*Z))) -- there might be multiple optimal parenthesizations, but the cost is unique.
+
+    return 0;
+}
+```
+
+### How the `dimensions[i-1] * dimensions[k] * dimensions[j]` part works:
+
+When we split the chain `M_i ... M_j` at `k`, we effectively have:
+1.  A sub-chain `M_i ... M_k` which results in a matrix of dimensions `dimensions[i-1]` x `dimensions[k]`.
+2.  A sub-chain `M_{k+1} ... M_j` which results in a matrix of dimensions `dimensions[k]` x `dimensions[j]`.
+
+To multiply these two resulting matrices, the cost is `(rows of first) * (cols of first / rows of second) * (cols of second)`.
+This translates to `dimensions[i-1] * dimensions[k] * dimensions[j]`.
+
+### Complexity:
+*   **Time Complexity:** `O(n^3)` because of the three nested loops (`L`, `i`, `k`).
+*   **Space Complexity:** `O(n^2)` for the `dp` table.
+
+---
+
+That's MCM in a nutshell! It's a fantastic problem that truly showcases the power of Dynamic Programming. Keep practicing, and you'll master it in no time!
+
+---
