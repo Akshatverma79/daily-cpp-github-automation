@@ -29354,3 +29354,162 @@ Enter 5 edges (u v, 0-indexed):
 Keep practicing, and you'll master DP on Trees in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Bitmasks  
+🕒 2026-03-14 06:49:53
+
+Hey there, future DSA master! 👋 Let's unlock a cool technique: **DP on Bitmasks**.
+
+---
+
+### What is DP on Bitmasks?
+
+Imagine you have a small number of items (say, up to 20-22) and you need to make decisions about *subsets* of these items, or how to *assign* them, or find optimal paths *visiting specific items*. This is where DP on Bitmasks shines!
+
+It's simply **Dynamic Programming** where one of your DP states is represented by a **Bitmask**.
+
+*   **Bitmask:** A fancy way to use an integer to represent a *set* of items. Each bit in the integer corresponds to an item.
+    *   If the `i`-th bit is `1`, it means item `i` is *included* in the set.
+    *   If the `i`-th bit is `0`, it means item `i` is *excluded*.
+
+---
+
+### Why Does It Matter?
+
+1.  **Efficient Subset Representation:** Instead of storing `std::set<int>` or `std::vector<bool>`, a single integer (the bitmask) concisely represents a subset. This is super fast for lookups and manipulations.
+2.  **Avoids Brute Force:** When `N` is small (say, `N <= 20`), the number of possible subsets is `2^N`. While `2^20` is still a million, DP helps us avoid recalculating subproblems across these states, turning exponential brute force into something manageable.
+3.  **Solves Tricky Problems:** It's the go-to technique for problems like the Traveling Salesperson Problem (TSP), minimum cost assignment, set cover, and problems involving permutations or selecting disjoint sets when `N` is small.
+
+---
+
+### Quick Bitmask Operations (Refresher)
+
+Let `mask` be your current bitmask:
+
+*   **`1 << i`**: A mask where only the `i`-th bit is set. (e.g., `1 << 0` is `1`, `1 << 1` is `2`, `1 << 2` is `4`).
+*   **`mask & (1 << i)`**: Check if the `i`-th item is in the set. Returns non-zero if `i`-th bit is set, `0` otherwise.
+*   **`mask | (1 << i)`**: Add the `i`-th item to the set.
+*   **`mask ^ (1 << i)`**: Toggle the `i`-th item's presence in the set.
+*   **`__builtin_popcount(mask)`**: (GCC/Clang specific) Counts the number of set bits (i.e., number of items in the set). Super useful!
+
+---
+
+### Example Problem: Minimum Cost Assignment
+
+**Problem:** You have `N` workers and `N` tasks. There's a `N x N` matrix `cost[i][j]` representing the cost of worker `i` completing task `j`. Your goal is to assign each worker to a unique task such that the total cost is minimized.
+
+**Constraints:** `N <= 20` (perfect for bitmask DP!)
+
+**Let's think DP:**
+We need to keep track of which workers we've assigned and which tasks have been taken.
+
+*   **`dp[worker_idx][mask]`**: This will store the minimum cost to assign workers from `worker_idx` up to `N-1`, given that tasks represented by `mask` have already been assigned by previous workers (workers `0` to `worker_idx-1`).
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int N_MAX = 20; // Maximum number of workers/tasks
+const int INF = 1e9;  // A large value to represent infinity
+
+int N; // Actual number of workers/tasks for the current test case
+int cost[N_MAX][N_MAX]; // cost[worker_idx][task_idx]
+int memo[N_MAX][1 << N_MAX]; // DP table: memo[worker_idx][mask]
+
+// Function to solve the minimum cost assignment
+// worker_idx: The current worker we are trying to assign a task to
+// assigned_tasks_mask: A bitmask representing tasks that have already been taken by previous workers
+int solve(int worker_idx, int assigned_tasks_mask) {
+    // Base Case: If all workers have been assigned, total cost is 0.
+    if (worker_idx == N) {
+        return 0;
+    }
+
+    // Check if this subproblem has already been solved
+    if (memo[worker_idx][assigned_tasks_mask] != -1) {
+        return memo[worker_idx][assigned_tasks_mask];
+    }
+
+    // Initialize minimum cost for the current state to infinity
+    int min_total_cost = INF;
+
+    // Iterate through all possible tasks for the current worker
+    for (int task_idx = 0; task_idx < N; ++task_idx) {
+        // Check if this task has NOT been assigned yet (i.e., its bit is not set in the mask)
+        if (!(assigned_tasks_mask & (1 << task_idx))) {
+            // Calculate the cost if we assign task_idx to worker_idx
+            // Current worker's cost + minimum cost for the remaining workers
+            int current_assignment_cost = cost[worker_idx][task_idx] +
+                                          solve(worker_idx + 1, assigned_tasks_mask | (1 << task_idx));
+            
+            // Update the minimum total cost for this state
+            min_total_cost = std::min(min_total_cost, current_assignment_cost);
+        }
+    }
+
+    // Store the result in the memoization table before returning
+    return memo[worker_idx][assigned_tasks_mask] = min_total_cost;
+}
+
+int main() {
+    // Example Usage:
+    N = 3; // Let's say we have 3 workers and 3 tasks
+
+    // Define costs (Worker i, Task j)
+    cost[0][0] = 10; cost[0][1] = 5;  cost[0][2] = 1;
+    cost[1][0] = 1;  cost[1][1] = 2;  cost[1][2] = 10;
+    cost[2][0] = 5;  cost[2][1] = 8;  cost[2][2] = 1;
+
+    // Initialize memoization table with -1 (indicating not calculated)
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < (1 << N); ++j) {
+            memo[i][j] = -1;
+        }
+    }
+
+    // Start the DP: Worker 0, with an empty set of assigned tasks (mask = 0)
+    int result = solve(0, 0);
+
+    std::cout << "Minimum cost to assign all tasks: " << result << std::endl;
+    // Expected Output:
+    // Worker 0 -> Task 1 (cost 5)
+    // Worker 1 -> Task 0 (cost 1)
+    // Worker 2 -> Task 2 (cost 1)
+    // Total = 5 + 1 + 1 = 7
+
+    // Try a different N:
+    // N = 2;
+    // cost[0][0] = 1; cost[0][1] = 10;
+    // cost[1][0] = 10; cost[1][1] = 1;
+    // for (int i = 0; i < N; ++i) {
+    //     for (int j = 0; j < (1 << N); ++j) {
+    //         memo[i][j] = -1;
+    //     }
+    // }
+    // result = solve(0, 0);
+    // std::cout << "Minimum cost for N=2: " << result << std::endl; // Expected: 2 (0->0, 1->1 or 0->1, 1->0)
+
+    return 0;
+}
+```
+
+---
+
+**Complexity:**
+*   **Time:** `N * 2^N * N`. (Number of states `N * 2^N`, and for each state, we iterate `N` times for tasks).
+*   **Space:** `N * 2^N` (for the `memo` table).
+
+This is perfectly fine for `N` up to around 20-22!
+
+---
+
+That's it! DP on Bitmasks is a powerful tool for a specific class of problems. Practice a bit with bitwise operations and then try to apply this pattern to a few problems, and you'll get the hang of it quickly! Happy coding! ✨
+
+---
