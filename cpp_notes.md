@@ -30056,3 +30056,92 @@ The sum of all elements in the array is: 150
 And there you have it! Arrays are simple yet incredibly powerful. Get comfortable with them, as they'll be your companions on many DSA adventures to come! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Time and Space Complexity  
+🕒 2026-03-17 07:05:17
+
+Let's get efficient! Here's a quick look at Time and Space Complexity.
+
+---
+
+### Time and Space Complexity: Your Code's Efficiency Report!
+
+#### What is it?
+
+Think of Time and Space Complexity as a way to **grade how efficient your code is.** It tells you how well your program scales as the input data gets larger.
+
+1.  **Time Complexity:**
+    *   **What:** How fast your code runs, or more precisely, how many operations it performs as the input size grows.
+    *   **Example:** Does it take twice as long if the input doubles? Or does it barely change?
+
+2.  **Space Complexity:**
+    *   **What:** How much extra memory your code uses as the input size grows.
+    *   **Example:** Does it need more storage if you give it more data? Or does it always use the same small amount?
+
+We often use **"Big O" notation** (like `O(N)`, `O(1)`, `O(log N)`) to describe this. It focuses on the *worst-case scenario* and ignores constant factors, giving us a clear picture of how an algorithm performs as input size approaches infinity.
+
+#### Why does it matter?
+
+It's about writing **good code**, not just code that works!
+
+*   **Performance:** An efficient algorithm can handle massive amounts of data in seconds, while an inefficient one might take hours, crash, or be completely unusable.
+*   **Resource Management:** Efficient code uses less memory, which is crucial for mobile devices, embedded systems, or large-scale applications where every byte counts.
+*   **Choosing the Best Solution:** Often, there are multiple ways to solve a problem. Understanding complexity helps you pick the most optimal one for your needs.
+*   **Scalability:** You want your code to work well not just for small test cases, but also when it's handling real-world, large datasets.
+
+---
+
+#### Example Problem: Finding a Number in a List
+
+**Problem:** Given a list of integers and a target integer, determine if the target is present in the list.
+
+**Let's say `N` is the number of elements in our list.**
+
+---
+
+#### Simple C++ Implementation
+
+```cpp
+#include <vector> // Don't forget to include vector!
+#include <iostream> // For demonstration output
+
+// Function to find a target number in a vector
+bool findNumber(const std::vector<int>& nums, int target) {
+    // Loop through each number in the vector
+    // This loop runs N times in the worst case (if target is last or not found)
+    for (int num : nums) {
+        if (num == target) {
+            return true; // Found the number, we can stop immediately!
+        }
+    }
+    return false; // If the loop finishes, the number was not found
+}
+
+int main() {
+    std::vector<int> myNumbers = {10, 20, 30, 40, 50};
+
+    // Test cases
+    std::cout << "Is 30 in the list? " << (findNumber(myNumbers, 30) ? "Yes" : "No") << std::endl;
+    std::cout << "Is 60 in the list? " << (findNumber(myNumbers, 60) ? "Yes" : "No") << std::endl;
+    std::cout << "Is 10 in the list? " << (findNumber(myNumbers, 10) ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+#### Complexity Analysis for `findNumber`:
+
+1.  **Time Complexity: O(N) (Linear Time)**
+    *   **Why?** In the worst-case scenario (e.g., the target number is the very last element in the `nums` vector, or it's not in the vector at all), our `for` loop has to check *every single element*. If the list has `N` elements, we perform roughly `N` comparisons.
+    *   If you double the size of the list, the time taken could roughly double.
+
+2.  **Space Complexity: O(1) (Constant Space)**
+    *   **Why?** The amount of extra memory used by this function doesn't depend on the size of the input vector `nums`. We only use a few variables (`num`, `target`) to store values, and their memory usage remains constant regardless of whether `nums` has 10 elements or 10 million. We're not creating new data structures that grow with `N`.
+
+---
+
+Understanding Time and Space Complexity is a fundamental skill that helps you build efficient, scalable, and robust software. Keep practicing!
+
+---
