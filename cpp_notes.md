@@ -30349,3 +30349,115 @@ And `120` is returned to `main`! Cool, right?
 You've just taken your first step into a larger world of problem-solving techniques! You got this! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Problems  
+🕒 2026-03-18 14:53:23
+
+Alright, let's unravel Recursion!
+
+---
+
+## Recursion: Calling Yourself! 🗣️
+
+Ever had a function call itself? That's the essence of recursion! It's a powerful way to solve problems by breaking them down into smaller, identical sub-problems.
+
+---
+
+### 💡 What is Recursion?
+
+Recursion is a programming technique where a function calls itself, either directly or indirectly, to solve a problem.
+
+Think of it like this:
+*   **The Big Problem:** You have a task.
+*   **The Small Problem:** You can solve a small part of that task if you assume a similar, slightly smaller version of the task has already been solved.
+*   **The Simplest Problem (Base Case):** Eventually, you hit a task so simple it doesn't need to call itself – you just know the answer directly. This is crucial for stopping the recursion!
+
+**Two Key Parts:**
+1.  **Base Case:** The condition that stops the recursion. Without it, your function would call itself endlessly (leading to a "stack overflow").
+2.  **Recursive Step:** The part where the function calls itself with a modified (usually smaller or simpler) input, moving towards the base case.
+
+---
+
+### 🤔 Why Does it Matter?
+
+1.  **Elegance & Readability:** For certain problems (like those involving trees, graphs, or mathematical sequences), recursion offers a very clean, intuitive, and often shorter solution than iteration.
+2.  **Problem Solving Paradigm:** It teaches you to think about problems in terms of their self-similar structure, which is a valuable skill in computer science.
+3.  **Fundamental to DSA:** Many core data structures (Trees, Graphs) and algorithms (Divide and Conquer, Backtracking, Depth-First Search) are most naturally implemented using recursion.
+
+---
+
+### 🎯 Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a non-negative integer `n`.
+The factorial of `n` (denoted as `n!`) is the product of all positive integers less than or equal to `n`.
+Example: `5! = 5 * 4 * 3 * 2 * 1 = 120`
+
+**How does recursion solve this?**
+*   We know `n! = n * (n-1)!`
+*   And we know a simple case: `0! = 1` (this is our **base case**!)
+
+So, `factorial(n)` can be defined as:
+*   If `n` is `0`, return `1`. (Base Case)
+*   Otherwise, return `n * factorial(n - 1)`. (Recursive Step)
+
+---
+
+### 💻 C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate the factorial of a non-negative integer using recursion
+int factorial(int n) {
+    // 1. Base Case: The condition to stop the recursion.
+    // Factorial of 0 is 1.
+    if (n == 0) {
+        return 1;
+    } 
+    // Handle negative numbers (optional, but good practice for robustness)
+    else if (n < 0) {
+        // Or throw an exception, depending on desired behavior
+        std::cerr << "Factorial is not defined for negative numbers." << std::endl;
+        return -1; // Indicate an error
+    }
+    // 2. Recursive Step: Call the function itself with a smaller input.
+    // n! = n * (n-1)!
+    else {
+        return n * factorial(n - 1);
+    }
+}
+
+int main() {
+    int number1 = 5;
+    int number2 = 0;
+    int number3 = 3;
+    int number4 = -2;
+
+    std::cout << "Factorial of " << number1 << " is: " << factorial(number1) << std::endl; // Expected: 120
+    std::cout << "Factorial of " << number2 << " is: " << factorial(number2) << std::endl; // Expected: 1
+    std::cout << "Factorial of " << number3 << " is: " << factorial(number3) << std::endl; // Expected: 6
+    std::cout << "Factorial of " << number4 << " is: " << factorial(number4) << std::endl; // Expected: Error message & -1
+
+    return 0;
+}
+```
+
+---
+
+**Explanation of the C++ Code:**
+
+1.  **`int factorial(int n)`:** Our recursive function. It takes an integer `n`.
+2.  **`if (n == 0)`:** This is the **base case**. If `n` is 0, we immediately return `1` without any further function calls. This is vital to prevent infinite recursion.
+3.  **`else if (n < 0)`:** An optional check to handle invalid inputs gracefully, as factorials are usually defined for non-negative integers.
+4.  **`else { return n * factorial(n - 1); }`:** This is the **recursive step**.
+    *   It multiplies `n` by the result of `factorial(n - 1)`.
+    *   Notice how `factorial` is called again, but with `n - 1`, moving closer to our base case (`n == 0`).
+    *   The results of these smaller calls "unwind" back up the call stack, finally providing the answer to the original call.
+
+---
+
+Recursion can feel a bit like magic at first, but once you grasp the base case and recursive step, it unlocks an elegant way to solve many interesting problems! Keep practicing!
+
+---
