@@ -30617,3 +30617,160 @@ List memory cleared.
 And there you have it! The absolute basics of Linked Lists. You've now seen how they work, why they're useful, and implemented a core operation yourself. Keep up the great work! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-03-19 14:38:01
+
+Hey there, aspiring DSA wizard! 👋 Let's dive into the world of **Doubly Linked Lists**.
+
+---
+
+## Doubly Linked List: The Two-Way Street!
+
+### What it Means (The Concept)
+
+Imagine a regular Linked List where each node knows who comes *next*. A **Doubly Linked List (DLL)** is like that, but with a super cool upgrade!
+
+*   Each node doesn't just point to the `next` node...
+*   It *also* points to the `previous` node!
+
+Think of it like a train where each car has a coupling not just to the car in front, but also to the car behind it. This means you can go both ways!
+
+**Key Components of a DLL Node:**
+
+*   **`data`**: The actual value stored in the node.
+*   **`next`**: A pointer to the next node in the sequence.
+*   **`prev`**: A pointer to the previous node in the sequence.
+
+The first node's `prev` pointer is `nullptr` (or `NULL`), and the last node's `next` pointer is `nullptr`.
+
+### Why it Matters (The Superpower!)
+
+DLLs are awesome because they offer advantages over their "singly" linked cousins:
+
+1.  **Two-Way Traversal:** You can easily move forward *and* backward through the list. No more needing to restart from the beginning if you want to find the previous element!
+2.  **Efficient Deletion (from a given node):** If you have a pointer to a specific node, you can delete it in `O(1)` time because you can easily access its previous and next nodes. In a Singly Linked List, you'd need a pointer to the *previous* node to delete the current one, which often means traversing from the `head`.
+3.  **Use Cases:**
+    *   **Browser History:** "Back" and "Forward" buttons are perfect examples!
+    *   **Music Player:** "Previous Song" and "Next Song" features.
+    *   **Undo/Redo Functionality:** Stepping through changes.
+    *   **LRU Cache Implementation:** Where elements need to be quickly moved or removed from the middle.
+
+### Example Problem (Small & Sweet!)
+
+**Problem:** "Given a Doubly Linked List, print its elements from head to tail, then print them again from tail to head."
+
+This simple problem perfectly showcases the DLL's ability to traverse in both directions.
+
+**Input:** A Doubly Linked List: `10 <-> 20 <-> 30`
+
+**Output:**
+```
+Forward Traversal: 10 20 30
+Backward Traversal: 30 20 10
+```
+
+### Simple C++ Implementation
+
+Let's build a basic DLL with `insertAtEnd` and the forward/backward printing functions.
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node Structure
+struct Node {
+    int data;
+    Node* next; // Pointer to the next node
+    Node* prev; // Pointer to the previous node
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// --- Basic Doubly Linked List Operations ---
+
+// Function to insert a new node at the end of the list
+void insertAtEnd(Node*& head, Node*& tail, int data) {
+    Node* newNode = new Node(data); // Create a new node
+
+    if (head == nullptr) { // If the list is empty
+        head = newNode;    // New node becomes both head and tail
+        tail = newNode;
+    } else { // If the list is not empty
+        tail->next = newNode; // Link current tail's next to new node
+        newNode->prev = tail; // Link new node's prev to current tail
+        tail = newNode;       // New node becomes the new tail
+    }
+    std::cout << "Inserted " << data << std::endl;
+}
+
+// Function to print the list from head to tail (forward)
+void printForward(Node* head) {
+    Node* current = head;
+    std::cout << "Forward Traversal: ";
+    while (current != nullptr) {
+        std::cout << current->data << " ";
+        current = current->next;
+    }
+    std::cout << std::endl;
+}
+
+// Function to print the list from tail to head (backward)
+void printBackward(Node* tail) {
+    Node* current = tail; // Start from the tail!
+    std::cout << "Backward Traversal: ";
+    while (current != nullptr) {
+        std::cout << current->data << " ";
+        current = current->prev; // Move to the previous node
+    }
+    std::cout << std::endl;
+}
+
+// --- Main function to demonstrate ---
+int main() {
+    Node* head = nullptr; // Initialize head and tail pointers
+    Node* tail = nullptr;
+
+    // Build our Doubly Linked List
+    insertAtEnd(head, tail, 10);
+    insertAtEnd(head, tail, 20);
+    insertAtEnd(head, tail, 30);
+    insertAtEnd(head, tail, 40);
+
+    // Solve the example problem: Print forward and backward
+    printForward(head);
+    printBackward(tail);
+
+    // --- Cleanup: Freeing memory ---
+    // In a real application, you'd want to free allocated memory
+    // to prevent memory leaks. A simple way is to traverse and delete.
+    Node* current = head;
+    while (current != nullptr) {
+        Node* nextNode = current->next;
+        delete current;
+        current = nextNode;
+    }
+    head = nullptr; // Set head to nullptr after deleting all nodes
+    tail = nullptr; // Set tail to nullptr
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Inserted 10
+Inserted 20
+Inserted 30
+Inserted 40
+Forward Traversal: 10 20 30 40 
+Backward Traversal: 40 30 20 10 
+```
+
+---
+
+There you have it! Doubly Linked Lists are a fantastic tool when you need to navigate your data in both directions. Keep practicing, and you'll master them in no time! 💪
+
+---
