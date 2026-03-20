@@ -30936,3 +30936,178 @@ int main() {
 That's it for Stacks! You've grasped the core concept, its importance, walked through an example, and seen it implemented in C++. Great job! Keep pushing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-03-20 14:33:19
+
+Hey there, future coding wizard! Let's dive into Queues – a super common and intuitive data structure.
+
+---
+
+## Queues: First In, First Out (FIFO)!
+
+Imagine a line at a coffee shop. The person who arrived first is the first person to get their coffee, right? That's exactly how a Queue works!
+
+### 1. What is a Queue? (The Concept)
+
+A Queue is a linear data structure that follows the **First In, First Out (FIFO)** principle.
+*   **Think:** A waiting line, a playlist for songs, tasks for a printer.
+*   **Operations:**
+    *   **Enqueue (or Push):** Adding an element to the *rear* (back) of the queue.
+    *   **Dequeue (or Pop):** Removing an element from the *front* of the queue.
+    *   **Front (or Peek):** Looking at the element at the *front* without removing it.
+    *   **isEmpty:** Checking if the queue has any elements.
+
+### 2. Why Do Queues Matter? (The "So What?")
+
+Queues are everywhere in computing because they ensure order and fair processing:
+
+*   **Operating Systems:** Managing tasks for the CPU, handling print jobs.
+*   **Networking:** Buffering data packets as they arrive.
+*   **Graph Algorithms:** Breadth-First Search (BFS) uses a queue to explore nodes level by level.
+*   **Simulations:** Modeling real-world waiting lines.
+*   **Anywhere where things need to be processed in the exact order they arrived.**
+
+### 3. Example Problem: Print Server Simulation
+
+Let's say we have a tiny print server. Documents arrive and get added to a queue. The printer always processes the oldest document first.
+
+**Problem:**
+1.  Add "DocA", "DocB", "DocC" to the print queue.
+2.  Print the first two documents.
+3.  See which document is next in line to be printed.
+
+### 4. Simple C++ Implementation
+
+We can implement a Queue manually using other C++ containers like `std::list` or `std::deque` internally because they allow efficient additions and removals from both ends. Or, even simpler, C++ provides `std::queue` in its Standard Template Library (STL)!
+
+Let's show a **custom Queue class** built using `std::deque` internally to illustrate the operations, and then a quick look at `std::queue`.
+
+```cpp
+#include <iostream>
+#include <deque>    // std::deque is great for queue backend (efficient front/back operations)
+#include <string>   // For our document names
+#include <stdexcept> // For exceptions like trying to dequeue from an empty queue
+
+// --- Custom Queue Implementation ---
+template <typename T>
+class MyQueue {
+private:
+    std::deque<T> data; // Using std::deque as the underlying container
+                        // It supports fast push_back (enqueue) and pop_front (dequeue)
+
+public:
+    // Add an element to the rear
+    void enqueue(T item) {
+        data.push_back(item);
+        std::cout << "Enqueued: " << item << std::endl;
+    }
+
+    // Remove an element from the front
+    void dequeue() {
+        if (isEmpty()) {
+            throw std::runtime_error("Queue is empty, cannot dequeue.");
+        }
+        T item = data.front(); // Get the item before removing
+        data.pop_front();
+        std::cout << "Dequeued: " << item << std::endl;
+    }
+
+    // Get the element at the front without removing it
+    T front() const {
+        if (isEmpty()) {
+            throw std::runtime_error("Queue is empty, no front element.");
+        }
+        return data.front();
+    }
+
+    // Check if the queue is empty
+    bool isEmpty() const {
+        return data.empty();
+    }
+
+    // Get the number of elements in the queue
+    size_t size() const {
+        return data.size();
+    }
+};
+
+int main() {
+    std::cout << "--- Custom Queue Example (Print Server) ---" << std::endl;
+    MyQueue<std::string> printQueue;
+
+    // 1. Add "DocA", "DocB", "DocC"
+    printQueue.enqueue("DocA");
+    printQueue.enqueue("DocB");
+    printQueue.enqueue("DocC");
+    std::cout << "Current queue size: " << printQueue.size() << std::endl;
+    if (!printQueue.isEmpty()) {
+        std::cout << "Next to print: " << printQueue.front() << std::endl;
+    }
+
+    std::cout << "\n--- Processing Documents ---" << std::endl;
+    // 2. Print the first two documents
+    try {
+        printQueue.dequeue(); // Prints DocA
+        printQueue.dequeue(); // Prints DocB
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    
+    // 3. See which document is next in line
+    std::cout << "\n--- After Processing ---" << std::endl;
+    if (!printQueue.isEmpty()) {
+        std::cout << "Next document to print: " << printQueue.front() << std::endl;
+    } else {
+        std::cout << "Print queue is empty." << std::endl;
+    }
+    std::cout << "Remaining queue size: " << printQueue.size() << std::endl;
+
+    // --- Brief look at std::queue ---
+    std::cout << "\n--- Using STL std::queue (Even Simpler!) ---" << std::endl;
+    std::queue<int> std_q; // std::queue is an adapter for other containers (deque by default)
+    std_q.push(10);        // Enqueue
+    std_q.push(20);
+    std::cout << "STL Queue front: " << std_q.front() << std::endl; // Peek front
+    std_q.pop();                                                 // Dequeue
+    std::cout << "STL Queue front after pop: " << std_q.front() << std::endl;
+    std::cout << "STL Queue is empty? " << (std_q.empty() ? "Yes" : "No") << std::endl;
+    std_q.pop();
+    std::cout << "STL Queue is empty? " << (std_q.empty() ? "Yes" : "No") << std::endl;
+
+
+    return 0;
+}
+```
+
+**Output of the custom queue part:**
+```
+--- Custom Queue Example (Print Server) ---
+Enqueued: DocA
+Enqueued: DocB
+Enqueued: DocC
+Current queue size: 3
+Next to print: DocA
+
+--- Processing Documents ---
+Dequeued: DocA
+Dequeued: DocB
+
+--- After Processing ---
+Next document to print: DocC
+Remaining queue size: 1
+
+--- Using STL std::queue (Even Simpler!) ---
+STL Queue front: 10
+STL Queue front after pop: 20
+STL Queue is empty? No
+STL Queue is empty? Yes
+```
+
+---
+
+That's it for Queues! They're fundamental for keeping things orderly and processing them in the sequence they arrived. Keep practicing, and you'll master them in no time!
+
+---
