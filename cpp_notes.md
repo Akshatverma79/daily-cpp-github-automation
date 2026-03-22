@@ -31408,3 +31408,180 @@ int main() {
 And there you have it! Tree traversals are a core concept. Master these three recursive patterns, and you're well on your way to tackling more complex tree problems! Keep coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Binary Search Tree  
+🕒 2026-03-22 06:53:54
+
+Hey there, future coder! 👋 Let's unlock the magic of Binary Search Trees (BSTs) together.
+
+---
+
+## Binary Search Tree (BST): Your Sorted Data Sidekick!
+
+### 1. What is a Binary Search Tree (BST)?
+
+Imagine a special kind of family tree, but with a strict ordering rule!
+
+*   **Tree Structure:** It's a `Binary Tree`, meaning each node can have at most two children: a `left` child and a `right` child.
+*   **The Golden Rule:** For every single node in the tree:
+    *   All values in its **left subtree** are **smaller** than the node's own value.
+    *   All values in its **right subtree** are **larger** than the node's own value.
+*   **No Duplicates (usually):** Often, BSTs are designed to hold unique values. If duplicates are allowed, they are typically placed in either the left or right subtree consistently.
+
+**Think of it like this:**
+
+```
+          (Root)
+            50
+           /  \
+          30   70
+         / \   / \
+        20 40 60 80
+```
+Notice how `20 < 30`, `40 > 30`, `60 < 70`, `80 > 70`, and all left children of `50` are `< 50`, and all right children are `> 50`. Neat, right?
+
+### 2. Why does it matter?
+
+BSTs are super powerful because they combine the best of both worlds: ordered data (like a sorted array) with dynamic structure (like a linked list).
+
+*   **Lightning-Fast Search, Insert, Delete:**
+    *   In a well-balanced BST, finding, adding, or removing an element takes **O(log N)** time on average (where N is the number of elements).
+    *   Compare this to an unsorted array or linked list, where these operations can take O(N) time. Or a sorted array, where search is O(log N) but insert/delete is O(N) because you might have to shift many elements.
+*   **Efficient for Dynamic Data:** If your data changes frequently (lots of inserts and deletes), a BST is a fantastic choice because it keeps itself sorted and allows quick modifications.
+*   **Use Cases:**
+    *   Databases (for indexing records)
+    *   Symbol tables in compilers (storing variable names and their properties)
+    *   Implementing sets and maps in data structures
+
+**A quick note on "well-balanced":** If a BST gets lopsided (like a linked list), its performance can degrade to O(N). That's why advanced versions like AVL Trees and Red-Black Trees exist – they self-balance to maintain that sweet O(log N) performance!
+
+### 3. Let's Solve a Tiny Problem!
+
+**Problem:** Find the number `60` in our example BST:
+
+```
+            50
+           /  \
+          30   70
+         / \   / \
+        20 40 60 80
+```
+
+**How a BST helps:**
+
+1.  **Start at the Root (50):** Is `60` equal to `50`? No. Is `60 < 50`? No. Is `60 > 50`? Yes! So, we know `60` *must* be in the **right subtree**. We just eliminated the entire left side!
+2.  **Move to the Right Child (70):** Is `60` equal to `70`? No. Is `60 < 70`? Yes! So, we know `60` *must* be in the **left subtree** of `70`. We just eliminated the right side of `70`!
+3.  **Move to the Left Child (60):** Is `60` equal to `60`? Yes! **Found it!**
+
+See how quickly we narrowed down the search? We didn't have to check every single node!
+
+### 4. Simple C++ Implementation
+
+Here's how you'd set up the basic structure and implement `insert` and `search` functions for a BST.
+
+```cpp
+#include <iostream>
+
+// 1. Node Structure
+struct Node {
+    int data;         // The value stored in this node
+    Node* left;       // Pointer to the left child (smaller values)
+    Node* right;      // Pointer to the right child (larger values)
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+// 2. Insert Function
+// Inserts a new value into the BST. Returns the new root of the subtree.
+Node* insert(Node* root, int val) {
+    // If the tree (or subtree) is empty, create a new node and make it the root.
+    if (root == nullptr) {
+        return new Node(val);
+    }
+
+    // If the value is smaller, go left.
+    if (val < root->data) {
+        root->left = insert(root->left, val); // Recursively insert in the left subtree
+    }
+    // If the value is larger, go right.
+    else if (val > root->data) {
+        root->right = insert(root->right, val); // Recursively insert in the right subtree
+    }
+    // If val == root->data, it's a duplicate. For simplicity, we'll ignore it.
+    // In real applications, you might handle duplicates differently (e.g., store a count).
+
+    return root; // Return the (potentially updated) root of this subtree
+}
+
+// 3. Search Function
+// Checks if a value exists in the BST.
+bool search(Node* root, int val) {
+    // If the tree (or subtree) is empty, the value isn't here.
+    if (root == nullptr) {
+        return false;
+    }
+
+    // If the current node's data matches the value, we found it!
+    if (root->data == val) {
+        return true;
+    }
+
+    // If the value is smaller, search in the left subtree.
+    if (val < root->data) {
+        return search(root->left, val);
+    }
+    // If the value is larger, search in the right subtree.
+    else {
+        return search(root->right, val);
+    }
+}
+
+// Optional: A helper function to print the tree in-order (sorted order)
+void inorderTraversal(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+    inorderTraversal(root->left);
+    std::cout << root->data << " ";
+    inorderTraversal(root->right);
+}
+
+// Main function to demonstrate
+int main() {
+    Node* root = nullptr; // Start with an empty tree
+
+    // Insert elements
+    root = insert(root, 50);
+    root = insert(root, 30);
+    root = insert(root, 70);
+    root = insert(root, 20);
+    root = insert(root, 40);
+    root = insert(root, 60);
+    root = insert(root, 80);
+    root = insert(root, 30); // Trying to insert duplicate (will be ignored)
+
+    std::cout << "BST elements in sorted order: ";
+    inorderTraversal(root);
+    std::cout << std::endl; // Expected: 20 30 40 50 60 70 80
+
+    // Search for elements
+    std::cout << "Searching for 60: " << (search(root, 60) ? "Found!" : "Not Found!") << std::endl; // Expected: Found!
+    std::cout << "Searching for 99: " << (search(root, 99) ? "Found!" : "Not Found!") << std::endl; // Expected: Not Found!
+    std::cout << "Searching for 20: " << (search(root, 20) ? "Found!" : "Not Found!") << std::endl; // Expected: Found!
+
+    // IMPORTANT: In a real application, you'd also need a function to properly
+    // deallocate all nodes to prevent memory leaks (e.g., a destructor or a post-order traversal to delete).
+    // For this simple example, we're omitting it for brevity.
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! The core concepts and a simple implementation of a Binary Search Tree. BSTs are fundamental, so understanding them well is a huge step in your DSA journey. Keep practicing!
+
+---
