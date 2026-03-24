@@ -31984,3 +31984,176 @@ int main() {
 And that's your gentle intro to Dynamic Programming! The key takeaway: **solve once, store, and reuse.** Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-03-24 07:05:24
+
+Hey there, future algorithm master! Let's dive into a classic problem that's super useful and a great way to understand Dynamic Programming: **Knapsack Problems**.
+
+---
+
+### 🎒 Knapsack Problems: Packing Smart!
+
+#### What is the concept?
+
+Imagine you have a backpack (your "knapsack") with a **limited weight capacity**. You're presented with a bunch of items, each having its own **weight** and a specific **value**. Your mission? To pick items to put into your knapsack such that:
+
+1.  The **total weight** of the selected items does not exceed your knapsack's capacity.
+2.  The **total value** of the selected items is maximized.
+
+It's all about making the best choices under a constraint!
+
+There are a few types, but the most common (and what we'll focus on) is the **0/1 Knapsack Problem**: For each item, you can either take it *entirely* (1) or leave it *entirely* (0). You can't take fractions of an item.
+
+#### Why does it matter?
+
+Knapsack problems are a fantastic example of **Dynamic Programming (DP)**. Learning it helps you:
+
+*   **Solve real-world optimization challenges:** Resource allocation (e.g., how to assign engineers to projects), budget planning, portfolio optimization, cargo loading, selecting which features to include in a product given development costs and benefits.
+*   **Develop problem-solving intuition:** It teaches you to break down a big problem into smaller, overlapping subproblems and build up a solution. It's a fundamental pattern in algorithm design.
+
+#### Small Example Problem: Treasure Hunter!
+
+You're a treasure hunter with a knapsack that can hold a maximum of **5 kg**. You've found a few precious items:
+
+*   **Item 1 (Rock):** Weight = 2 kg, Value = $3
+*   **Item 2 (Gem):** Weight = 3 kg, Value = $4
+*   **Item 3 (Gold):** Weight = 4 kg, Value = $5
+
+**What's the maximum total value of treasures you can carry?**
+
+---
+
+#### The "Aha!" Moment (Dynamic Programming Idea)
+
+For each item, and for each possible weight capacity from 0 up to your knapsack's max capacity, you have two choices:
+
+1.  **Don't include the current item:** The maximum value you can get remains whatever you could achieve with previous items for the current capacity.
+2.  **Include the current item:** If its weight allows, you take its value plus the maximum value you could get from *previous items* for the *remaining capacity* (`current_capacity - item_weight`).
+
+You always pick the `max` of these two choices!
+
+Let `dp[w]` be the maximum value we can achieve with a knapsack of capacity `w`.
+
+**Let's trace for our example (Capacity = 5kg):**
+
+Initialize `dp` array of size `capacity + 1` (i.e., `dp[0]` to `dp[5]`) to all zeros.
+`dp = [0, 0, 0, 0, 0, 0]`
+
+---
+
+**1. Process Item 1 (Rock: 2kg, $3)**
+
+We iterate `w` from `capacity` down to `item_weight`. This ensures we don't reuse the same item.
+
+*   `w = 5`: `dp[5] = max(dp[5] (0), 3 + dp[5-2] (dp[3] is 0)) = 3`
+*   `w = 4`: `dp[4] = max(dp[4] (0), 3 + dp[4-2] (dp[2] is 0)) = 3`
+*   `w = 3`: `dp[3] = max(dp[3] (0), 3 + dp[3-2] (dp[1] is 0)) = 3`
+*   `w = 2`: `dp[2] = max(dp[2] (0), 3 + dp[2-2] (dp[0] is 0)) = 3`
+
+`dp` after Item 1: `[0, 0, 3, 3, 3, 3]`
+
+---
+
+**2. Process Item 2 (Gem: 3kg, $4)**
+
+*   `w = 5`: `dp[5] = max(dp[5] (3), 4 + dp[5-3] (dp[2] is 3)) = max(3, 4+3) = 7`
+*   `w = 4`: `dp[4] = max(dp[4] (3), 4 + dp[4-3] (dp[1] is 0)) = max(3, 4+0) = 4`
+*   `w = 3`: `dp[3] = max(dp[3] (3), 4 + dp[3-3] (dp[0] is 0)) = max(3, 4+0) = 4`
+
+`dp` after Item 2: `[0, 0, 3, 4, 4, 7]`
+
+---
+
+**3. Process Item 3 (Gold: 4kg, $5)**
+
+*   `w = 5`: `dp[5] = max(dp[5] (7), 5 + dp[5-4] (dp[1] is 0)) = max(7, 5+0) = 7`
+*   `w = 4`: `dp[4] = max(dp[4] (4), 5 + dp[4-4] (dp[0] is 0)) = max(4, 5+0) = 5`
+
+`dp` after Item 3: `[0, 0, 3, 4, 5, 7]`
+
+---
+
+The final answer is `dp[capacity]`, which is `dp[5] = 7`.
+You would take the Rock (2kg, $3) and the Gem (3kg, $4) for a total weight of 5kg and total value of $7.
+
+---
+
+#### Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For dynamic arrays (dp table, weights, values)
+#include <algorithm> // For std::max
+
+// Function to solve the 0/1 Knapsack problem
+int knapsack01(int capacity, const std::vector<int>& weights, const std::vector<int>& values) {
+    int numItems = weights.size();
+
+    // dp[w] will store the maximum value for a knapsack of capacity 'w'
+    // Initialize with 0s, meaning no items chosen, so no value.
+    std::vector<int> dp(capacity + 1, 0);
+
+    // Iterate through each item
+    for (int i = 0; i < numItems; ++i) {
+        int currentWeight = weights[i];
+        int currentValue = values[i];
+
+        // Iterate through knapsack capacities from max capacity down to the item's weight.
+        // We go downwards to ensure each item is considered only once for a given capacity (0/1 property).
+        // If we went upwards, dp[w - currentWeight] might already include the current item.
+        for (int w = capacity; w >= currentWeight; --w) {
+            // Option 1: Don't include the current item.
+            //           Value remains dp[w] (value without the current item).
+            // Option 2: Include the current item.
+            //           Value is currentValue + dp[w - currentWeight] (value of current item
+            //           plus max value from previous items for the remaining capacity).
+            dp[w] = std::max(dp[w], currentValue + dp[w - currentWeight]);
+        }
+    }
+
+    // The maximum value for the given capacity is in dp[capacity]
+    return dp[capacity];
+}
+
+int main() {
+    // Our example problem
+    int knapsackCapacity = 5;
+    std::vector<int> itemWeights = {2, 3, 4}; // Weights for Rock, Gem, Gold
+    std::vector<int> itemValues = {3, 4, 5};  // Values for Rock, Gem, Gold
+
+    int maxValue = knapsack01(knapsackCapacity, itemWeights, itemValues);
+
+    std::cout << "For a knapsack capacity of " << knapsackCapacity << "kg:" << std::endl;
+    std::cout << "Items: " << std::endl;
+    std::cout << "  Rock: 2kg, $3" << std::endl;
+    std::cout << "  Gem: 3kg, $4" << std::endl;
+    std::cout << "  Gold: 4kg, $5" << std::endl;
+    std::cout << "Maximum value you can carry: $" << maxValue << std::endl; // Expected: $7
+
+    // Another quick test case
+    std::cout << "\n--- Another Example ---" << std::endl;
+    int cap2 = 10;
+    std::vector<int> weights2 = {6, 4, 3, 5};
+    std::vector<int> values2 = {12, 8, 6, 10};
+    // Expected: (Item 1: 6kg, $12) + (Item 3: 3kg, $6) = 9kg, $18. Or (Item 2: 4kg, $8) + (Item 4: 5kg, $10) = 9kg, $18
+    // If you take Item 1 (6kg, $12), you have 4kg left. Best for 4kg is Item 2 (4kg, $8). Total $20.
+    // Result: Take 6kg, $12 + 4kg, $8. Total 10kg, $20
+    std::cout << "Max value for capacity " << cap2 << "kg: $" 
+              << knapsack01(cap2, weights2, values2) << std::endl; // Expected: $20 (items 1 & 2)
+
+    return 0;
+}
+```
+
+---
+
+### Key Takeaway
+
+Knapsack problems are a beautiful demonstration of how **Dynamic Programming** can solve optimization problems by systematically building up solutions from smaller subproblems. The core idea is always choosing the *best option* (take or don't take an item) at each step to reach a global maximum.
+
+Keep practicing these DP patterns, and you'll be a pro in no time! Happy coding!
+
+---
