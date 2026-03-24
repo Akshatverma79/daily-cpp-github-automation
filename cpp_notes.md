@@ -32157,3 +32157,135 @@ Knapsack problems are a beautiful demonstration of how **Dynamic Programming** c
 Keep practicing these DP patterns, and you'll be a pro in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Greedy Algorithms  
+🕒 2026-03-24 14:47:05
+
+Hello Future DSA Master! 👋
+
+Let's dive into **Greedy Algorithms** – a super intuitive way to solve problems!
+
+---
+
+## 🌳 Greedy Algorithms: Your Quick Guide
+
+### 1. What's the Concept?
+
+Imagine you're trying to solve a big problem, but you only care about making the *absolute best choice* right at this moment, hoping that it will eventually lead you to the best overall solution. That's essentially what a Greedy Algorithm does!
+
+*   **Core Idea:** Make a locally optimal choice at each step with the hope of finding a globally optimal solution.
+*   **Think of it like:** Picking the biggest slice of pizza first, hoping it satisfies you the most quickly. You don't look ahead; you just grab what seems best *now*.
+*   **Important Note:** This strategy doesn't *always* work! For some problems, making the best local choice can lead you down a path where you miss the true optimal global solution later.
+
+### 2. Why Does It Matter?
+
+*   **Simplicity:** When a greedy approach works, it's often the easiest to understand and implement.
+*   **Efficiency:** Greedy algorithms tend to be very efficient (fast!) because they usually don't explore many options or backtrack.
+*   **Common:** Many real-world problems and interview questions can be solved using a greedy strategy (e.g., scheduling, shortest path algorithms like Dijkstra's, minimum spanning trees like Prim's or Kruskal's).
+
+### 3. Example Problem: The "Delicious Chocolate Bars" Dilemma
+
+You have a backpack with a maximum weight capacity `W`. You're at a chocolate shop with several unique chocolate bars. Each bar has a certain `weight` and a `deliciousness` rating. You can take **fractions** of bars if you want (e.g., half a bar).
+
+**Your Goal:** Maximize the total deliciousness of the chocolate bars in your backpack without exceeding its weight capacity.
+
+**How would you be "greedy" here?** 🤔
+
+You'd probably want to pick the chocolate that gives you the *most deliciousness for each gram* of weight. That's your best local choice!
+
+---
+
+### 4. Simple C++ Implementation: Solving the Chocolate Bar Dilemma
+
+Let's implement our greedy strategy for the chocolate bars!
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For dynamic arrays
+#include <algorithm> // For std::sort
+
+// 1. Define a struct to represent our Chocolate Bar
+struct ChocolateBar {
+    int weight;
+    int deliciousness;
+    double ratio; // Deliciousness per unit weight
+
+    // Constructor to easily create bars and calculate their ratio
+    ChocolateBar(int w, int d) : weight(w), deliciousness(d) {
+        ratio = static_cast<double>(d) / w; // Calculate ratio (double for precision)
+    }
+};
+
+// 2. Custom comparison function for sorting
+// We want to sort bars by their 'ratio' in descending order (highest ratio first)
+bool compareBars(const ChocolateBar& a, const ChocolateBar& b) {
+    return a.ratio > b.ratio; // 'a' comes before 'b' if its ratio is higher
+}
+
+// 3. The Greedy Algorithm function
+double getMaxDeliciousness(int capacity, std::vector<ChocolateBar>& bars) {
+    // Greedy Step 1: Sort the bars based on their deliciousness-to-weight ratio
+    // The most efficient chocolate (most delicious per gram) comes first!
+    std::sort(bars.begin(), bars.end(), compareBars);
+
+    double totalDeliciousness = 0.0;
+    int currentCapacity = capacity; // Remaining capacity in our backpack
+
+    // Greedy Step 2: Iterate through the sorted bars and fill the backpack
+    for (const auto& bar : bars) {
+        if (currentCapacity <= 0) {
+            // Backpack is full, can't take any more!
+            break;
+        }
+
+        if (bar.weight <= currentCapacity) {
+            // We can take the whole bar!
+            totalDeliciousness += bar.deliciousness;
+            currentCapacity -= bar.weight;
+        } else {
+            // We can only take a fraction of this bar
+            // Calculate how much weight we can still fit
+            // And add the corresponding deliciousness
+            totalDeliciousness += bar.ratio * currentCapacity;
+            currentCapacity = 0; // Backpack is now completely full
+        }
+    }
+    return totalDeliciousness;
+}
+
+// 4. Main function to test our algorithm
+int main() {
+    std::vector<ChocolateBar> bars;
+    bars.emplace_back(10, 60);  // Bar 1: Weight 10, Deliciousness 60 (Ratio 6.0)
+    bars.emplace_back(20, 100); // Bar 2: Weight 20, Deliciousness 100 (Ratio 5.0)
+    bars.emplace_back(30, 120); // Bar 3: Weight 30, Deliciousness 120 (Ratio 4.0)
+
+    int backpackCapacity = 50; // Our backpack can hold 50 units of weight
+
+    double maxDel = getMaxDeliciousness(backpackCapacity, bars);
+
+    std::cout << "Max deliciousness we can get: " << maxDel << std::endl;
+    // Expected Output:
+    // Sorts: {10,60, ratio 6}, {20,100, ratio 5}, {30,120, ratio 4}
+    // 1. Take Bar 1 (10, 60): totalDel=60, capacity=40.
+    // 2. Take Bar 2 (20, 100): totalDel=160, capacity=20.
+    // 3. Take fraction of Bar 3 (30, 120). Ratio 4.0. Need 20 weight. totalDel += 4.0 * 20 = 80.
+    //    totalDel = 160 + 80 = 240. Capacity=0.
+    // Result: 240.0
+
+    return 0;
+}
+
+```
+
+---
+
+### ✨ Key Takeaway
+
+Greedy algorithms are fantastic for problems where the "best local choice" *consistently* leads to the "best global solution." However, it's crucial to realize they aren't a universal solution. Always question if a greedy choice might prevent a better overall outcome later!
+
+Happy Coding! 🚀
+
+---
