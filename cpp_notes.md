@@ -32670,3 +32670,117 @@ int main() {
 And there you have it! The basics of Binary Search. Keep practicing, and you'll master this powerful technique in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Binary Search on Answer  
+🕒 2026-03-26 14:53:26
+
+Here's a quick dive into "Binary Search on Answer"!
+
+---
+
+### Binary Search on Answer (BSA)
+
+**What's the concept?**
+
+Normally, when we think of Binary Search, we're looking for an element in a sorted array. Binary Search on Answer (BSA) is a clever twist: **we binary search on the *value of the answer itself***.
+
+It applies to problems where:
+1.  We're looking for a minimum possible value `X` (or maximum `X`).
+2.  If we can achieve `X`, we can definitely achieve any value *greater* than `X` (or if we can achieve `X`, we can achieve any value *less* than `X` for max problems). This is the **monotonic property**.
+3.  We have a way to *check* if a given `X` is a feasible (possible) answer.
+
+Think of it like this: Instead of searching for an item, you're guessing a number. If your guess `mid` is possible, you try for an even *better* answer (smaller if minimizing, larger if maximizing). If `mid` is not possible, you know you need a *worse* answer (larger if minimizing, smaller if maximizing).
+
+**Why it matters?**
+
+*   **Solves optimization problems:** Many problems ask "find the minimum X such that property P holds" or "maximum X such that property P holds." BSA transforms this into "can property P hold for a given X?" – which is often much easier to solve (the `check` function).
+*   **Efficiency:** If your `check` function takes `O(T)` time, and your answer space is `N`, the overall time complexity is `O(T * log N)`. This is very efficient for large `N`.
+*   **Intuitive when understood:** Once you grasp the "check function" idea, many complex problems become approachable.
+
+---
+
+**Example Problem: Minimize the Maximum Load**
+
+You are given `N` items with positive `weights` (e.g., `[10, 20, 30, 40]`) and `K` containers (e.g., `K=2`). You need to pack all items into **at most `K` containers**. Each container can hold any items. What is the **minimum possible value for the maximum total weight in any single container**?
+
+*   **Goal:** Find the minimum `max_weight_per_container`.
+*   **Monotonic Property:** If we *can* pack all items into `K` containers with a maximum load of `X`, we can definitely pack them with a maximum load of `X+1` (just use the same packing!). Conversely, if we *cannot* pack them with `X`, we certainly cannot with `X-1`.
+*   **Search Space for the Answer:**
+    *   `low`: The minimum possible maximum load is at least the heaviest single item (`max(weights)`).
+    *   `high`: The maximum possible maximum load is the sum of all weights (if all items are in one container).
+
+---
+
+**C++ Implementation**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric>   // For std::accumulate
+#include <algorithm> // For std::max_element
+
+// 1. The 'check' function: Can we pack all items into 'K' containers
+//    if no single container can exceed 'maxCapacity'?
+bool canPack(long long maxCapacity, const std::vector<int>& weights, int K) {
+    int containersNeeded = 1;
+    long long currentContainerWeight = 0;
+
+    for (int weight : weights) {
+        // If a single item is heavier than maxCapacity, it's impossible.
+        if (weight > maxCapacity) {
+            return false;
+        }
+
+        if (currentContainerWeight + weight <= maxCapacity) {
+            currentContainerWeight += weight;
+        } else {
+            // Current container is full, move to the next
+            containersNeeded++;
+            currentContainerWeight = weight; // Start new container with this item
+        }
+    }
+    return containersNeeded <= K;
+}
+
+int main() {
+    std::vector<int> weights = {10, 20, 30, 40, 50, 60};
+    int K = 3; // Number of containers
+
+    // Determine the search space for our answer (max_weight_per_container)
+    long long low = 0;
+    long long high = 0;
+
+    // Minimum possible max load is at least the heaviest item
+    low = *std::max_element(weights.begin(), weights.end());
+
+    // Maximum possible max load is the sum of all items (all in one container)
+    high = std::accumulate(weights.begin(), weights.end(), 0LL); // 0LL ensures long long sum
+
+    long long minMaxLoad = high; // Initialize with a worst-case possible answer
+
+    // Binary Search on the Answer
+    while (low <= high) {
+        long long mid = low + (high - low) / 2; // Prevent overflow for large low/high
+
+        if (canPack(mid, weights, K)) {
+            // If we can pack with 'mid' capacity, it's a possible answer.
+            // Try to find an even smaller (better) capacity.
+            minMaxLoad = mid;
+            high = mid - 1; 
+        } else {
+            // 'mid' capacity is too small, we need more capacity.
+            low = mid + 1;
+        }
+    }
+
+    std::cout << "Minimum possible value for the maximum total weight in any container: " << minMaxLoad << std::endl;
+    // For weights = {10, 20, 30, 40, 50, 60} and K = 3, expected output: 90
+    // (e.g., [10,20,30,30] (60), [40,50] (90), [60] (60). Max is 90)
+
+    return 0;
+}
+```
+
+---
