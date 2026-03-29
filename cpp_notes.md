@@ -33490,3 +33490,162 @@ void RabinKarpSearch(const std::string& text, const std::string& pattern, int q)
 Both are powerful tools in your DSA arsenal! Choose the right one based on your specific problem's needs. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-03-29 07:05:06
+
+Hey there, aspiring coder! Let's get a handle on **Backtracking Basics**.
+
+---
+
+### 🚶‍♂️ Backtracking Basics
+
+Imagine you're in a maze, and you need to find *all* possible exits, or maybe just *one* specific exit. Backtracking is your strategy!
+
+#### 💡 What is it? (The Concept)
+
+Backtracking is a **recursive algorithm** that tries to build a solution incrementally. It explores all potential candidates. If at any point a candidate solution fails to meet the constraints (e.g., hits a dead end in the maze), it "backs up" (undoes its last choice) and tries a different path.
+
+Think of it as:
+1.  **Make a choice.** (Go right)
+2.  **Explore consequences.** (Walk further right)
+3.  **If successful:** Great! Record solution, maybe keep exploring for others.
+4.  **If dead end/failure:** **Undo the last choice** (Backtrack! Go back to where you made the choice) and **try a different one.** (Now try going left)
+
+This "undoing" is crucial and what distinguishes backtracking from simple recursion.
+
+#### 🚀 Why does it matter?
+
+Backtracking is a powerful technique for solving problems that involve:
+*   Finding **all possible solutions** or **one optimal solution**.
+*   Making a sequence of **choices** where each choice might affect subsequent choices.
+*   Problems often involving **combinatorial search**, like permutations, combinations, subsets, constraint satisfaction (e.g., Sudoku, N-Queens).
+
+It helps explore the *search space* efficiently by pruning (cutting off) branches that clearly won't lead to a solution.
+
+---
+
+#### 🧩 Example Problem: Generating Permutations
+
+Let's find all unique permutations of a small list of numbers.
+
+**Problem:** Given `nums = [1, 2, 3]`, generate all possible permutations.
+
+**Expected Output:**
+```
+[1, 2, 3]
+[1, 3, 2]
+[2, 1, 3]
+[2, 3, 1]
+[3, 1, 2]
+[3, 2, 1]
+```
+
+**How Backtracking Helps:**
+1.  **Start:** We want to fill the first position. We can pick 1, 2, or 3.
+2.  **Choice 1:** Pick `1` for the first position. `[1, _ , _]`
+    *   Now, for the second position, we have `[2, 3]` left.
+        *   **Choice 1.1:** Pick `2`. `[1, 2, _]`
+            *   For the third, `[3]` is left. Pick `3`. `[1, 2, 3]`. **FOUND!** Add to result.
+            *   **BACKTRACK:** Undo `3`.
+        *   **BACKTRACK:** Undo `2`.
+        *   **Choice 1.2:** Pick `3`. `[1, 3, _]`
+            *   For the third, `[2]` is left. Pick `2`. `[1, 3, 2]`. **FOUND!** Add to result.
+            *   **BACKTRACK:** Undo `2`.
+        *   **BACKTRACK:** Undo `3`.
+    *   **BACKTRACK:** Undo `1`.
+3.  **Choice 2:** Pick `2` for the first position. `[2, _ , _]` (and repeat the process for the remaining `[1, 3]`)
+4.  ...and so on!
+
+---
+
+#### 💻 Simple C++ Implementation: Permutations
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::swap
+
+// Helper function to print a vector
+void printVector(const std::vector<int>& arr) {
+    for (int x : arr) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+}
+
+// The core backtracking function
+void generatePermutations(std::vector<int>& nums, int start_index, std::vector<std::vector<int>>& result) {
+    // Base case: If start_index has reached the end,
+    // it means we've formed a complete permutation.
+    if (start_index == nums.size()) {
+        result.push_back(nums); // Add the current permutation to our results
+        return; // Stop this path
+    }
+
+    // Recursive step: Try placing each remaining number at the current start_index
+    for (int i = start_index; i < nums.size(); ++i) {
+        // 1. Make a choice: Swap the current number (nums[i]) to the start_index position
+        std::swap(nums[start_index], nums[i]);
+
+        // 2. Explore: Recurse for the next position
+        // Now find permutations for the subarray starting from (start_index + 1)
+        generatePermutations(nums, start_index + 1, result);
+
+        // 3. Unmake the choice (BACKTRACK!): Swap back to restore the original order
+        // This is crucial! It allows us to try other choices from the current start_index.
+        std::swap(nums[start_index], nums[i]); 
+    }
+}
+
+int main() {
+    std::vector<int> nums = {1, 2, 3};
+    std::vector<std::vector<int>> allPermutations;
+
+    std::cout << "Generating permutations for: ";
+    printVector(nums);
+    std::cout << "---" << std::endl;
+
+    generatePermutations(nums, 0, allPermutations);
+
+    std::cout << "All permutations found:" << std::endl;
+    for (const auto& perm : allPermutations) {
+        printVector(perm);
+    }
+
+    // Example with different numbers
+    std::cout << "\n---" << std::endl;
+    std::vector<int> anotherNums = {5, 6};
+    std::vector<std::vector<int>> anotherPermutations;
+    std::cout << "Generating permutations for: ";
+    printVector(anotherNums);
+    std::cout << "---" << std::endl;
+    generatePermutations(anotherNums, 0, anotherPermutations);
+    std::cout << "All permutations found:" << std::endl;
+    for (const auto& perm : anotherPermutations) {
+        printVector(perm);
+    }
+
+    return 0;
+}
+
+```
+
+**Explanation of the C++ Code:**
+*   `generatePermutations(nums, start_index, result)`: This is our recursive function.
+    *   `nums`: The array we're permuting. We pass it by reference (`&`) because we want to modify it during the process (swapping elements) and see those changes in recursive calls.
+    *   `start_index`: This marks the beginning of the subarray we are currently trying to permute. Elements before `start_index` are considered "fixed" for the current path.
+    *   `result`: A `vector<vector<int>>` to store all the valid permutations we find.
+*   **Base Case (`if (start_index == nums.size())`)**: When `start_index` reaches the size of `nums`, it means we've successfully placed all elements, forming a complete permutation. We add `nums` to our `result` and return.
+*   **Loop (`for (int i = start_index; i < nums.size(); ++i)`)**: This loop iterates through all elements from `start_index` to the end of the array. Each iteration represents a **choice** for the current `start_index` position.
+    *   `std::swap(nums[start_index], nums[i])`: This is where we **make a choice**. We swap `nums[i]` into the `start_index` position.
+    *   `generatePermutations(nums, start_index + 1, result)`: We then recursively call the function for the next `start_index + 1`, effectively exploring the consequences of our choice.
+    *   `std::swap(nums[start_index], nums[i])`: This is the **BACKTRACK step**! After the recursive call returns (meaning all permutations starting with the previous choice at `start_index` have been found), we swap the elements back to their original positions. This restores `nums` to its state *before* the current choice was made, allowing the loop to try the *next* possible choice for `nums[start_index]`.
+
+---
+
+Backtracking can feel a bit mind-bending at first due to the recursion and the undoing part, but with practice, it becomes an incredibly intuitive and powerful tool in your DSA arsenal! Good luck!
+
+---
