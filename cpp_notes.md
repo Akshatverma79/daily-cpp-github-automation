@@ -33811,3 +33811,115 @@ int main() {
 And there you have it! The core idea of backtracking for N-Queens and Sudoku. It's all about making choices, checking if they're good, and if not, undoing them to try another path. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2026-03-30 07:43:23
+
+Hey there, future DSA pro! Let's get into Heaps and Priority Queues – super handy tools in your programming belt.
+
+---
+
+### **Heaps & Priority Queues**
+
+**1. What do they mean?**
+
+*   **Heap (The Structure):** Imagine a special kind of **binary tree**. It's always "complete" (meaning it's filled level by level, left to right, without gaps). But here's the magic: it follows the **Heap Property**:
+    *   **Max-Heap:** Every parent node's value is **greater than or equal to** its children's values. The largest item is always at the top!
+    *   **Min-Heap:** Every parent node's value is **less than or equal to** its children's values. The smallest item is always at the top!
+    *   It's not fully sorted like a BST; you only know the relationship between parent and children.
+
+*   **Priority Queue (The Concept):** Think of a regular queue, but with a twist! Instead of "first-in, first-out," a Priority Queue processes items based on their **priority**. The highest (or lowest, depending on your setup) priority item always gets processed first.
+    *   **How it works:** A Priority Queue is typically *implemented* using a **Heap** because heaps are excellent at efficiently finding and extracting the highest/lowest element.
+
+**2. Why do they matter? (The "Why")**
+
+They're fantastic when you need to quickly access the **"most important" or "least important" item** from a collection, without having to fully sort everything.
+
+*   **Efficient Retrieval:** Getting the highest/lowest priority item is super fast (O(1) time complexity).
+*   **Efficient Insertion/Deletion:** Adding a new item or removing the top item is also very efficient (O(log N) time complexity).
+
+**Common uses:**
+*   **Task Scheduling:** Always run the highest priority task next.
+*   **Event Simulation:** Process events in chronological order.
+*   **Graph Algorithms:** Dijkstra's and Prim's algorithms rely on priority queues.
+*   **Finding K-th largest/smallest elements:** Efficiently find the top 5, top 10, etc.
+
+**3. Example Problem: "Urgent Task Processor"**
+
+You have a list of tasks, each with a name and a priority level (higher number = higher priority). You need to process them by their priority, always tackling the most urgent one first.
+
+**Input Tasks:**
+*   Task A (Priority: 3)
+*   Task B (Priority: 1)
+*   Task C (Priority: 5)
+*   Task D (Priority: 2)
+
+**Desired Output Order:**
+*   Task C (Priority: 5)
+*   Task A (Priority: 3)
+*   Task D (Priority: 2)
+*   Task B (Priority: 1)
+
+**4. Simple C++ Implementation (using `std::priority_queue`)**
+
+C++ provides `std::priority_queue` in its Standard Template Library (STL), which is by default a **Max-Heap**. Perfect for our "highest priority first" problem!
+
+```cpp
+#include <iostream>
+#include <queue>    // Required for std::priority_queue
+#include <string>
+#include <vector>   // Default underlying container for priority_queue
+
+// We want to store tasks with priorities.
+// std::pair<int, std::string> is perfect:
+// The first element (int priority) will be used for comparison by default.
+// Since std::priority_queue is a max-heap by default,
+// it will prioritize the pair with the largest 'int'.
+using Task = std::pair<int, std::string>; // {priority, taskName}
+
+int main() {
+    // Declare a priority queue that stores 'Task' objects.
+    // By default, it's a max-heap, so the task with the highest priority (int)
+    // will always be at the top.
+    std::priority_queue<Task> taskQueue;
+
+    // Add our tasks to the priority queue
+    taskQueue.push({3, "Task A"}); // Priority 3, Task A
+    taskQueue.push({1, "Task B"}); // Priority 1, Task B
+    taskQueue.push({5, "Task C"}); // Priority 5, Task C (Highest!)
+    taskQueue.push({2, "Task D"}); // Priority 2, Task D
+
+    std::cout << "--- Processing tasks by urgency ---\n";
+
+    // While the queue is not empty, process the most urgent task
+    while (!taskQueue.empty()) {
+        Task currentTask = taskQueue.top(); // Get the highest priority task without removing it
+        taskQueue.pop();                    // Remove the highest priority task
+
+        std::cout << "Processing: \"" << currentTask.second
+                  << "\" (Priority: " << currentTask.first << ")\n";
+    }
+
+    std::cout << "--- All tasks processed! ---\n";
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+--- Processing tasks by urgency ---
+Processing: "Task C" (Priority: 5)
+Processing: "Task A" (Priority: 3)
+Processing: "Task D" (Priority: 2)
+Processing: "Task B" (Priority: 1)
+--- All tasks processed! ---
+```
+
+---
+
+There you have it! Heaps are the robust data structure that make Priority Queues sing. Think of them as your personal assistant who always knows exactly what your most important next item is!
+
+---
