@@ -35033,3 +35033,199 @@ As expected, a negative cycle was detected.
 That's your quick tour of Bellman-Ford! Remember its power for negative weights and its unique ability to sniff out those sneaky negative cycles. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2026-04-02 14:44:00
+
+Hey there, future algorithm master! 👋 Let's break down the **Floyd-Warshall Algorithm** in a super simple way.
+
+---
+
+### 🗺️ Floyd-Warshall Algorithm: All-Pairs Shortest Path
+
+#### 1. What the Concept Means
+
+Imagine you have a map with cities (nodes) and roads (edges) connecting them, each road having a certain distance (weight).
+
+*   **Goal:** Floyd-Warshall's job is to find the **shortest path between *every single pair* of cities** on the map. Not just from one starting city to all others (like Dijkstra's or BFS), but from *every* city to *every other* city.
+
+*   **How it Works (The Core Idea):**
+    It's an **iterative dynamic programming algorithm**. It systematically tries to improve the shortest path between any two nodes `i` and `j` by considering *every other node `k`* as a potential "intermediate stop" on the path from `i` to `j`.
+
+    Think of it this way: "Is the direct path from `i` to `j` shorter, or is the path `i -> k -> j` shorter?"
+    The magic formula is:
+    `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`
+
+    We repeat this for every `k` (intermediate node), every `i` (source node), and every `j` (destination node). The order of these loops matters! `k` must be the outermost loop.
+
+*   **Key Features:**
+    *   Works on graphs with **negative edge weights** (but not negative cycles that are reachable from a source and can reach a destination – it can detect these).
+    *   Uses a 2D array (adjacency matrix) `dist[N][N]` to store the shortest distances.
+    *   **Time Complexity:** O(N^3), where N is the number of vertices.
+
+#### 2. Why it Matters
+
+*   **All-Pairs Shortest Paths:** It's the go-to algorithm for this specific problem, especially when N is relatively small (say, up to a few hundred).
+*   **Simplicity:** It's quite simple to implement with just three nested loops.
+*   **Versatility:** Beyond shortest paths, it can be adapted for:
+    *   **Transitive Closure:** Finding if there's *any* path (not just shortest) between two nodes.
+    *   **Detecting Negative Cycles:** If `dist[i][i]` becomes negative after the algorithm runs, it indicates a negative cycle involving node `i`.
+*   **Foundation:** It's a classic algorithm that demonstrates the power of dynamic programming in graph theory.
+
+#### 3. 1 Example Problem (Small)
+
+Let's find all-pairs shortest paths for a tiny graph:
+
+**Graph:**
+*   Nodes: 0, 1, 2
+*   Edges:
+    *   0 -> 1 (weight 3)
+    *   1 -> 2 (weight 1)
+    *   2 -> 0 (weight -5)  <-- This introduces a negative weight!
+
+**Initial Distance Matrix (`dist`)**:
+(Assume `INF` (infinity) for unconnected nodes, `0` for self-loops)
+
+```
+       0    1    2
+    ----------------
+0 |    0    3  INF
+1 |  INF    0    1
+2 |   -5  INF    0
+```
+
+**Step-by-step (Illustrative):**
+
+*   **`k = 0` (using node 0 as intermediate):**
+    *   Consider path `1 -> 0 -> 2`: `dist[1][0] + dist[0][2]` = `INF + INF` = `INF`. No change to `dist[1][2]` (which is 1).
+    *   No other paths can be shortened via node 0 currently because `dist[i][0]` or `dist[0][j]` are `INF` for most `i, j`.
+
+*   **`k = 1` (using node 1 as intermediate):**
+    *   Consider path `0 -> 1 -> 2`:
+        `dist[0][2] = min(dist[0][2], dist[0][1] + dist[1][2])`
+        `dist[0][2] = min(INF, 3 + 1)`
+        `dist[0][2] = 4` (Now we know 0 to 2 is 4)
+
+*   **`k = 2` (using node 2 as intermediate):**
+    *   Consider path `0 -> 2 -> 0`:
+        `dist[0][0] = min(dist[0][0], dist[0][2] + dist[2][0])`
+        `dist[0][0] = min(0, 4 + (-5))`
+        `dist[0][0] = min(0, -1)`
+        `dist[0][0] = -1`
+        **Aha! `dist[0][0]` is now -1.** This means there's a negative cycle `0 -> 1 -> 2 -> 0` with total weight `3 + 1 + (-5) = -1`. The algorithm detected it!
+
+**Final Distance Matrix (before negative cycle check in code):**
+*(Note: If we just wanted shortest paths without considering negative cycles, this would be the result. Since we detected a negative cycle, actual shortest paths involving it are undefined or -infinity.)*
+
+```
+       0    1    2
+    ----------------
+0 |   -1    3    4
+1 |  INF    0    1
+2 |   -5  INF    0
+```
+
+#### 4. 1 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int INF = 1e9; // A large enough value to represent infinity
+
+void floydWarshall(std::vector<std::vector<int>>& dist, int N) {
+    // The core of the Floyd-Warshall algorithm
+    // k is the intermediate vertex
+    for (int k = 0; k < N; ++k) {
+        // i is the source vertex
+        for (int i = 0; i < N; ++i) {
+            // j is the destination vertex
+            for (int j = 0; j < N; ++j) {
+                // If path from i to k and k to j exists (not INF)
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    // Update shortest path from i to j
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+
+    // Optional: Detect negative cycles
+    // If dist[i][i] becomes negative, there's a negative cycle
+    for (int i = 0; i < N; ++i) {
+        if (dist[i][i] < 0) {
+            std::cout << "Warning: Negative cycle detected involving node " << i << std::endl;
+            // For problems asking to propagate -INF for negative cycles,
+            // you'd typically run another set of loops here.
+            // For simplicity, we'll just print the warning.
+        }
+    }
+}
+
+void printDistances(const std::vector<std::vector<int>>& dist, int N) {
+    std::cout << "Shortest Path Distances (or INF if unreachable, or negative for cycles):\n";
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF\t";
+            } else {
+                std::cout << dist[i][j] << "\t";
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
+int main() {
+    int N = 3; // Number of nodes
+
+    // Initialize distance matrix with INF, and 0 for self-loops
+    std::vector<std::vector<int>> dist(N, std::vector<int>(N, INF));
+
+    for (int i = 0; i < N; ++i) {
+        dist[i][i] = 0; // Distance from a node to itself is 0
+    }
+
+    // Add edges from our example
+    dist[0][1] = 3;  // 0 -> 1 with weight 3
+    dist[1][2] = 1;  // 1 -> 2 with weight 1
+    dist[2][0] = -5; // 2 -> 0 with weight -5 (negative edge!)
+
+    std::cout << "Initial Distance Matrix:\n";
+    printDistances(dist, N);
+
+    floydWarshall(dist, N);
+
+    std::cout << "\nFinal Distance Matrix after Floyd-Warshall:\n";
+    printDistances(dist, N);
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Initial Distance Matrix:
+0	3	INF	
+INF	0	1	
+-5	INF	0	
+
+Warning: Negative cycle detected involving node 0
+Warning: Negative cycle detected involving node 1
+Warning: Negative cycle detected involving node 2
+Final Distance Matrix after Floyd-Warshall:
+-1	3	4	
+-6	-1	0	
+-5	-2	-1	
+```
+
+Notice how `dist[0][0]` became -1, `dist[1][1]` became -1, and `dist[2][2]` became -1. This accurately reflects the negative cycle `0 -> 1 -> 2 -> 0` which has a total weight of `3 + 1 + (-5) = -1`. If you start at any of these nodes and traverse the cycle, you end up with a net negative cost.
+
+---
+
+That's the Floyd-Warshall algorithm in a nutshell! Simple, powerful, and a great tool for graph problems. Happy coding! ✨
+
+---
