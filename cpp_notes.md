@@ -35229,3 +35229,312 @@ Notice how `dist[0][0]` became -1, `dist[1][1]` became -1, and `dist[2][2]` beca
 That's the Floyd-Warshall algorithm in a nutshell! Simple, powerful, and a great tool for graph problems. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Minimum Spanning Tree (Prim's & Kruskal's)  
+🕒 2026-04-03 07:11:05
+
+Hey there, future coding wizard! 👋 Let's dive into one of the coolest graph algorithms: **Minimum Spanning Tree (MST)**!
+
+---
+
+### 🌳 Minimum Spanning Tree (MST)
+
+#### What is it? 🤔
+Imagine you have a bunch of cities (nodes) and roads connecting them (edges), and each road has a cost (weight). A **Spanning Tree** is a subset of these roads that connects all the cities without forming any loops (cycles). A **Minimum Spanning Tree (MST)** is a spanning tree where the *total cost* of all chosen roads is as small as possible.
+
+**Key characteristics:**
+*   Connects all vertices.
+*   No cycles.
+*   Has `V-1` edges, where `V` is the number of vertices.
+*   The sum of edge weights is minimized.
+
+#### Why does it matter? 🌐
+MST algorithms are super useful in real-world scenarios:
+*   **Network Design:** Laying out the least amount of cable/fiber to connect all offices in a building.
+*   **Pipeline Networks:** Designing efficient water or gas pipeline systems.
+*   **Clustering:** Grouping similar data points in machine learning.
+*   **Circuit Design:** Minimizing wire length on a circuit board.
+*   **Transport Networks:** Finding the most cost-effective way to connect locations.
+
+#### Small Example Problem 🚀
+Let's say we have 4 cities (A, B, C, D) and direct roads between some of them with their costs:
+
+```
+  A ---(1)--- B
+  | \         |
+ (3) (2)     (1)
+  |   \       |
+  C ---(4)--- D
+```
+
+Wait, this drawing is a bit ambiguous. Let's list the edges with their weights:
+*   (A, B, weight: 1)
+*   (A, C, weight: 3)
+*   (A, D, weight: 2)
+*   (B, C, weight: 1)
+*   (C, D, weight: 4)
+
+**Goal:** Find an MST that connects A, B, C, D with the minimum total cost.
+
+**Solution (Manual walk-through):**
+1.  Start picking the smallest edges without forming a cycle.
+2.  Pick (A, B, **1**) - Total cost: 1
+3.  Pick (B, C, **1**) - Total cost: 1 + 1 = 2
+4.  Pick (A, D, **2**) - Total cost: 2 + 2 = 4 (Connecting D, no cycle yet)
+    *   We now have A-B, B-C, A-D. All vertices (A,B,C,D) are connected.
+    *   Edges remaining: (A, C, 3), (C, D, 4). If we pick (A, C, 3), it forms a cycle A-B-C-A. If we pick (C, D, 4), it forms a cycle A-D-C-B-A.
+    *   Since all nodes are connected and we have V-1 = 3 edges, we stop.
+
+**MST Edges:** (A, B, 1), (B, C, 1), (A, D, 2)
+**Minimum Total Cost:** 1 + 1 + 2 = **4**
+
+Now, let's see how algorithms do this! There are two main contenders: **Prim's Algorithm** and **Kruskal's Algorithm**.
+
+---
+
+### Prim's Algorithm (The "Grower") 🪴
+
+Prim's algorithm works by "growing" an MST from an arbitrary starting vertex. It greedily adds the cheapest edge that connects a vertex in the current MST to a vertex *outside* the MST.
+
+#### How it works:
+1.  Start with any vertex and add it to your MST set.
+2.  Repeatedly find the edge with the minimum weight that connects a vertex already in your MST set to a vertex *not yet* in your MST set.
+3.  Add this edge and the new vertex to your MST set.
+4.  Repeat until all vertices are in the MST set.
+
+#### C++ Implementation (using Priority Queue)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>    // For priority_queue
+#include <utility>  // For pair
+
+const int INF = 1e9; // A large value to represent infinity
+
+// Edge representation: {weight, connected_vertex}
+using Edge = std::pair<int, int>;
+// Adjacency list: vector of edges for each vertex
+using Graph = std::vector<std::vector<Edge>>;
+
+int primMST(const Graph& graph, int start_node) {
+    int V = graph.size();
+    std::vector<bool> inMST(V, false); // Keeps track of vertices included in MST
+    std::vector<int> min_cost(V, INF); // Stores minimum cost to connect to MST
+    
+    // Priority queue stores {cost, vertex_id}
+    // We use std::greater for a min-priority queue (smallest cost at top)
+    std::priority_queue<Edge, std::vector<Edge>, std::greater<Edge>> pq;
+
+    int total_mst_weight = 0;
+
+    // Start with the initial node
+    min_cost[start_node] = 0;
+    pq.push({0, start_node}); // {cost, vertex}
+
+    while (!pq.empty()) {
+        int current_cost = pq.top().first;
+        int u = pq.top().second;
+        pq.pop();
+
+        // If 'u' is already in MST or we found a cheaper path later, skip
+        if (inMST[u]) {
+            continue;
+        }
+
+        // Add 'u' to MST
+        inMST[u] = true;
+        total_mst_weight += current_cost;
+
+        // Explore neighbors of 'u'
+        for (const auto& edge : graph[u]) {
+            int v = edge.second; // Neighbor vertex
+            int weight = edge.first; // Edge weight
+
+            // If 'v' is not in MST and this edge offers a cheaper connection
+            if (!inMST[v] && weight < min_cost[v]) {
+                min_cost[v] = weight;
+                pq.push({weight, v});
+            }
+        }
+    }
+    
+    // Check if all vertices are connected (optional, but good for disconnected graphs)
+    for (int i = 0; i < V; ++i) {
+        if (!inMST[i]) {
+            // Graph is disconnected or start_node couldn't reach all
+            return -1; // Or throw an error
+        }
+    }
+
+    return total_mst_weight;
+}
+
+// Example usage for Prim's
+/*
+int main() {
+    // Our example graph: A(0), B(1), C(2), D(3)
+    // (A, B, 1), (A, C, 3), (A, D, 2), (B, C, 1), (C, D, 4)
+    int V = 4;
+    Graph graph(V);
+
+    graph[0].push_back({1, 1}); // A-B, w=1
+    graph[1].push_back({1, 0}); // B-A, w=1
+
+    graph[0].push_back({3, 2}); // A-C, w=3
+    graph[2].push_back({3, 0}); // C-A, w=3
+
+    graph[0].push_back({2, 3}); // A-D, w=2
+    graph[3].push_back({2, 0}); // D-A, w=2
+
+    graph[1].push_back({1, 2}); // B-C, w=1
+    graph[2].push_back({1, 1}); // C-B, w=1
+    
+    graph[2].push_back({4, 3}); // C-D, w=4
+    graph[3].push_back({4, 2}); // D-C, w=4
+
+    int mst_weight = primMST(graph, 0); // Start from node 0 (A)
+
+    if (mst_weight != -1) {
+        std::cout << "Prim's MST total weight: " << mst_weight << std::endl; // Expected: 4
+    } else {
+        std::cout << "Graph is disconnected." << std::endl;
+    }
+
+    return 0;
+}
+*/
+```
+
+---
+
+### Kruskal's Algorithm (The "Collector") 🧺
+
+Kruskal's algorithm works by sorting all edges by weight and then picking them one by one, as long as adding an edge doesn't form a cycle. It's often easier to conceptualize for beginners.
+
+#### How it works:
+1.  List all edges in the graph and sort them by their weights in ascending order.
+2.  Initialize an empty MST and a way to keep track of connected components (usually a **Disjoint Set Union (DSU)** data structure).
+3.  Iterate through the sorted edges:
+    *   For each edge (u, v) with weight `w`:
+    *   If `u` and `v` are not already connected (i.e., they belong to different components), add the edge to the MST and connect their components.
+    *   If `u` and `v` are already connected (in the same component), adding this edge would form a cycle, so skip it.
+4.  Stop when the MST has `V-1` edges (or all edges have been processed).
+
+#### C++ Implementation (with Disjoint Set Union)
+
+First, let's quickly define a simple Disjoint Set Union (DSU) structure:
+
+```cpp
+// --- Disjoint Set Union (DSU) helper class ---
+struct DSU {
+    std::vector<int> parent;
+    DSU(int n) {
+        parent.resize(n);
+        for (int i = 0; i < n; ++i) {
+            parent[i] = i; // Each element is its own parent initially
+        }
+    }
+
+    // Find the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i)
+            return i;
+        return parent[i] = find(parent[i]); // Path compression
+    }
+
+    // Union the sets containing 'i' and 'j'
+    void unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+        if (root_i != root_j) {
+            parent[root_i] = root_j; // Attach smaller tree under root of larger tree (simple union)
+        }
+    }
+};
+
+// --- Edge structure for Kruskal's ---
+struct KruskalEdge {
+    int u, v, w;
+    // Custom comparator for sorting edges by weight
+    bool operator<(const KruskalEdge& other) const {
+        return w < other.w;
+    }
+};
+
+int kruskalMST(int V, std::vector<KruskalEdge>& edges) {
+    std::sort(edges.begin(), edges.end()); // Sort edges by weight
+    
+    DSU dsu(V); // Initialize DSU for V vertices
+    int total_mst_weight = 0;
+    int edges_count = 0;
+
+    for (const auto& edge : edges) {
+        // If adding this edge does not form a cycle
+        if (dsu.find(edge.u) != dsu.find(edge.v)) {
+            dsu.unite(edge.u, edge.v); // Union the components
+            total_mst_weight += edge.w;
+            edges_count++;
+            if (edges_count == V - 1) { // Optimization: MST must have V-1 edges
+                break;
+            }
+        }
+    }
+
+    // Check if a spanning tree was actually formed (graph might be disconnected)
+    if (edges_count != V - 1 && V > 1) { // For V=1, edges_count would be 0
+        return -1; // Or throw an error for disconnected graph
+    }
+
+    return total_mst_weight;
+}
+
+// Example usage for Kruskal's
+int main() {
+    // Our example graph: A(0), B(1), C(2), D(3)
+    // (A, B, 1), (A, C, 3), (A, D, 2), (B, C, 1), (C, D, 4)
+    int V = 4;
+    std::vector<KruskalEdge> edges;
+
+    edges.push_back({0, 1, 1}); // A-B, w=1
+    edges.push_back({0, 2, 3}); // A-C, w=3
+    edges.push_back({0, 3, 2}); // A-D, w=2
+    edges.push_back({1, 2, 1}); // B-C, w=1
+    edges.push_back({2, 3, 4}); // C-D, w=4
+
+    std::cout << "--- Prim's Algorithm ---" << std::endl;
+    // For Prim's, we need an adjacency list representation
+    Graph graph(V);
+    graph[0].push_back({1, 1}); graph[1].push_back({1, 0});
+    graph[0].push_back({3, 2}); graph[2].push_back({3, 0});
+    graph[0].push_back({2, 3}); graph[3].push_back({2, 0});
+    graph[1].push_back({1, 2}); graph[2].push_back({1, 1});
+    graph[2].push_back({4, 3}); graph[3].push_back({4, 2});
+
+    int prim_mst_weight = primMST(graph, 0); // Start from node 0 (A)
+    if (prim_mst_weight != -1) {
+        std::cout << "Prim's MST total weight: " << prim_mst_weight << std::endl; // Expected: 4
+    } else {
+        std::cout << "Graph is disconnected for Prim's." << std::endl;
+    }
+
+    std::cout << "\n--- Kruskal's Algorithm ---" << std::endl;
+    int kruskal_mst_weight = kruskalMST(V, edges);
+    if (kruskal_mst_weight != -1) {
+        std::cout << "Kruskal's MST total weight: " << kruskal_mst_weight << std::endl; // Expected: 4
+    } else {
+        std::cout << "Graph is disconnected for Kruskal's." << std::endl;
+    }
+
+    return 0;
+}
+
+```
+
+---
+
+There you have it! Two powerful algorithms, Prim's and Kruskal's, both solving the MST problem with different approaches. Prim's grows a tree, Kruskal's connects components. Both are super efficient and widely used. Keep practicing, and you'll master them in no time! Happy coding! ✨
+
+---
