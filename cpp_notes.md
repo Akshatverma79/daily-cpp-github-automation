@@ -36315,3 +36315,125 @@ int main() {
 And there you have it! LCS in a nutshell. It's a fundamental problem that beautifully demonstrates the power of Dynamic Programming. Keep practicing, and you'll master it in no time! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Increasing Subsequence (LIS)  
+🕒 2026-04-05 14:23:20
+
+Here's a clean and simple note on the Longest Increasing Subsequence (LIS)!
+
+---
+
+## DSA Notes: Longest Increasing Subsequence (LIS)
+
+### 🧐 What is LIS?
+
+Imagine you have a list of numbers. An **Increasing Subsequence** is a sequence of numbers from that list where each number is greater than the one before it, and they appear in the same relative order as in the original list.
+
+The **Longest Increasing Subsequence (LIS)** is simply the increasing subsequence with the greatest possible length!
+
+*   **Subsequence**: Elements don't have to be next to each other in the original list, but their relative order must be preserved.
+*   **Increasing**: `element_k > element_{k-1}`.
+*   **Longest**: Maximize the number of elements in the subsequence.
+
+### 🌟 Why Does It Matter?
+
+LIS is a classic problem in dynamic programming (DP) and it's a great way to understand how DP works. It has applications in:
+*   **Bioinformatics**: Comparing DNA sequences.
+*   **Data Analysis**: Identifying trends in data.
+*   **Optimization**: Problems where you need to select items in a specific order while satisfying certain conditions.
+*   It's a foundational problem that helps you tackle more complex DP challenges.
+
+### 📝 Example Problem
+
+**Problem:** Find the length of the Longest Increasing Subsequence in the array: `nums = [3, 10, 2, 1, 20]`
+
+**Let's break it down:**
+
+1.  `[3, 10, 20]` - This is an increasing subsequence (length 3).
+2.  `[3, 10]` - Increasing (length 2).
+3.  `[2, 20]` - Increasing (length 2).
+4.  `[1, 20]` - Increasing (length 2).
+5.  `[3]` - Increasing (length 1).
+6.  `[10]` - Increasing (length 1).
+...and so on.
+
+The longest one we found is `[3, 10, 20]`, which has a length of **3**. So, the answer is 3.
+
+### 🚀 Simple C++ Implementation (O(N^2) Dynamic Programming)
+
+This is the most straightforward DP approach.
+
+```cpp
+#include <vector>
+#include <algorithm> // Required for std::max
+
+// Function to find the length of the Longest Increasing Subsequence
+int lengthOfLIS(std::vector<int>& nums) {
+    // If the array is empty, the LIS length is 0
+    if (nums.empty()) {
+        return 0;
+    }
+
+    int n = nums.size();
+    // dp[i] will store the length of the LIS ending at nums[i]
+    std::vector<int> dp(n, 1); 
+
+    // Initialize maxLength to 1, as a single element is always an LIS of length 1
+    int maxLength = 1;
+
+    // Iterate through the array starting from the second element
+    for (int i = 1; i < n; ++i) {
+        // For each element nums[i], look at all previous elements nums[j]
+        for (int j = 0; j < i; ++j) {
+            // If nums[i] is greater than nums[j], it means nums[i] can extend 
+            // the LIS that ends at nums[j]
+            if (nums[i] > nums[j]) {
+                // We update dp[i] to be the maximum of its current value 
+                // or (the LIS length ending at nums[j] + 1)
+                dp[i] = std::max(dp[i], dp[j] + 1);
+            }
+        }
+        // After checking all previous elements for nums[i], update the overall maxLength
+        maxLength = std::max(maxLength, dp[i]);
+    }
+
+    // The maximum value in the dp array is the length of the LIS
+    return maxLength;
+}
+
+/*
+// How to test it:
+#include <iostream>
+int main() {
+    std::vector<int> nums1 = {3, 10, 2, 1, 20};
+    std::cout << "LIS length for {3, 10, 2, 1, 20}: " << lengthOfLIS(nums1) << std::endl; // Expected: 3
+
+    std::vector<int> nums2 = {10, 9, 2, 5, 3, 7, 101, 18};
+    std::cout << "LIS length for {10, 9, 2, 5, 3, 7, 101, 18}: " << lengthOfLIS(nums2) << std::endl; // Expected: 4 ({2, 3, 7, 101} or {2, 5, 7, 101})
+
+    std::vector<int> nums3 = {0, 1, 0, 3, 2, 3};
+    std::cout << "LIS length for {0, 1, 0, 3, 2, 3}: " << lengthOfLIS(nums3) << std::endl; // Expected: 4 ({0, 1, 2, 3})
+    
+    return 0;
+}
+*/
+```
+
+**Explanation:**
+
+1.  **`dp` Array:** We create a `dp` array where `dp[i]` stores the length of the longest increasing subsequence that *ends* at `nums[i]`. Every element itself is an increasing subsequence of length 1, so we initialize all `dp` values to 1.
+2.  **Outer Loop (`i`):** This loop iterates through the `nums` array from the second element (`i = 1`) up to the end. For each `nums[i]`, we want to find the best possible LIS ending with it.
+3.  **Inner Loop (`j`):** For each `nums[i]`, we look at all previous elements `nums[j]` (where `j < i`).
+4.  **Condition (`nums[i] > nums[j]`):** If `nums[i]` is greater than `nums[j]`, it means `nums[i]` can extend an increasing subsequence that ends at `nums[j]`.
+5.  **Update (`dp[i] = std::max(dp[i], dp[j] + 1)`):** If `nums[i]` can extend `nums[j]`, then the length of the LIS ending at `nums[i]` could be `dp[j] + 1`. We take the maximum of its current `dp[i]` value (which defaults to 1 or any longer LIS found so far) and this new possibility.
+6.  **`maxLength`:** We keep track of the overall maximum value found in the `dp` array, which will be our final answer.
+
+**Time Complexity:** O(N^2) because of the nested loops.
+**Space Complexity:** O(N) for the `dp` array.
+
+---
+This `O(N^2)` solution is easy to grasp. There's also a more advanced `O(N log N)` solution using binary search, but the `O(N^2)` is excellent for understanding the core DP idea first! Happy coding!
+
+---
