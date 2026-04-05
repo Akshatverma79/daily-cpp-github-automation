@@ -36182,3 +36182,136 @@ Bridges: (1-3)
 And that's it! You've grasped the core of Bridges and Articulation Points. They're fundamental for understanding graph connectivity and designing robust systems. Keep exploring! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-04-05 07:08:32
+
+Hey there, future DSA pro! 👋 Let's unlock the secret of the **Longest Common Subsequence (LCS)**. It's a classic dynamic programming problem that's super useful.
+
+---
+
+## 🚀 Longest Common Subsequence (LCS)
+
+### 🧐 What does it mean?
+
+Imagine you have two strings, say "AGGTAB" and "GXTXAYB".
+A **subsequence** is a sequence that can be derived from another sequence by deleting zero or more elements without changing the order of the remaining elements.
+*   "GAB" is a subsequence of "AGGTAB".
+*   "GAY" is a subsequence of "GXTXAYB".
+
+The **Longest Common Subsequence (LCS)** is the longest possible subsequence that is common to both strings. The characters must appear in the same relative order, but they don't have to be consecutive.
+
+For "AGGTAB" and "GXTXAYB", the LCS is "GTAB" (length 4).
+
+### 🌟 Why does it matter?
+
+LCS isn't just a brain-teaser; it has practical applications everywhere!
+*   **Bioinformatics:** Comparing DNA sequences to find similarities.
+*   **Diff Utilities:** When you compare two versions of a file (`git diff`), LCS helps find what's changed.
+*   **Plagiarism Detection:** Measuring the similarity between two texts.
+*   **Spell Checkers & Autocomplete:** Suggesting corrections or completions.
+*   **Version Control:** Merging code changes in systems like Git.
+
+### 🧩 Example Problem
+
+Let's find the LCS of:
+*   `text1 = "ACE"`
+*   `text2 = "ABCDE"`
+
+**Intuition:**
+We'll build up a solution using a 2D table (Dynamic Programming!). `dp[i][j]` will store the length of the LCS of `text1[0...i-1]` and `text2[0...j-1]`.
+
+1.  **If characters match:** If `text1[i-1] == text2[j-1]`, then this character contributes to the LCS. So, `dp[i][j] = 1 + dp[i-1][j-1]` (take the current matching character and add it to the LCS of the preceding parts).
+2.  **If characters don't match:** We can't include both. We have to skip one of them and take the maximum LCS from the two possibilities:
+    *   `dp[i-1][j]` (LCS without the current character from `text1`)
+    *   `dp[i][j-1]` (LCS without the current character from `text2`)
+    So, `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.
+
+**DP Table Walkthrough:**
+
+We'll use a `(m+1) x (n+1)` table, where `m` is length of `text1` and `n` is length of `text2`.
+`text1 = " ACE"` (length 3)
+`text2 = " ABCDE"` (length 5)
+
+|       |  "" | A | B | C | D | E |
+| :---- | :-: | :-: | :-: | :-: | :-: | :-: |
+| **""**| **0** | 0 | 0 | 0 | 0 | 0 |
+| **A** |  0  | 1 | 1 | 1 | 1 | 1 |
+| **C** |  0  | 1 | 1 | 2 | 2 | 2 |
+| **E** |  0  | 1 | 1 | 2 | 2 | **3** |
+
+Let's trace a few cells:
+*   `dp[1][1]` (A vs A): Match! `1 + dp[0][0] = 1 + 0 = 1`.
+*   `dp[1][2]` (A vs B): No match. `max(dp[0][2], dp[1][1]) = max(0, 1) = 1`.
+*   `dp[2][3]` (C vs C): Match! `1 + dp[1][2] = 1 + 1 = 2`. (LCS of "AC" and "ABC" is "AC")
+*   `dp[3][5]` (E vs E): Match! `1 + dp[2][4] = 1 + 2 = 3`. (LCS of "ACE" and "ABCD" is "AC", add E makes "ACE")
+
+The final answer is at `dp[m][n]`, which is `dp[3][5] = 3`. The LCS is "ACE".
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length();
+    int n = text2.length();
+
+    // Create a 2D DP table.
+    // dp[i][j] will store the length of the LCS of text1[0...i-1] and text2[0...j-1]
+    // We use (m+1) x (n+1) to handle base cases (empty strings) easily.
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the DP table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            // If the current characters match (remember 0-based indexing for strings)
+            if (text1[i - 1] == text2[j - 1]) {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                // If characters don't match, take the maximum LCS from either
+                // excluding text1's current char or excluding text2's current char
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the length of the LCS of the full strings
+    return dp[m][n];
+}
+
+int main() {
+    std::string s1 = "ACE";
+    std::string s2 = "ABCDE";
+    std::cout << "LCS of \"" << s1 << "\" and \"" << s2 << "\" is: " 
+              << longestCommonSubsequence(s1, s2) << std::endl; // Expected: 3
+
+    std::string s3 = "AGGTAB";
+    std::string s4 = "GXTXAYB";
+    std::cout << "LCS of \"" << s3 << "\" and \"" << s4 << "\" is: " 
+              << longestCommonSubsequence(s3, s4) << std::endl; // Expected: 4
+
+    std::string s5 = "ABCD";
+    std::string s6 = "AXBYCZD";
+    std::cout << "LCS of \"" << s5 << "\" and \"" << s6 << "\" is: " 
+              << longestCommonSubsequence(s5, s6) << std::endl; // Expected: 4 ("ABCD")
+              
+    return 0;
+}
+```
+
+**Complexity:**
+*   **Time Complexity:** O(m*n), where `m` and `n` are the lengths of the two strings. We fill an `m x n` table, and each cell takes constant time.
+*   **Space Complexity:** O(m*n), for storing the DP table. (Can be optimized to O(min(m, n)) if we only need the previous row/column, but the `m*n` version is easier to understand).
+
+---
+
+And there you have it! LCS in a nutshell. It's a fundamental problem that beautifully demonstrates the power of Dynamic Programming. Keep practicing, and you'll master it in no time! ✨
+
+---
