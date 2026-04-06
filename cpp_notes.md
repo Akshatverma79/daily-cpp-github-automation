@@ -36437,3 +36437,144 @@ int main() {
 This `O(N^2)` solution is easy to grasp. There's also a more advanced `O(N log N)` solution using binary search, but the `O(N^2)` is excellent for understanding the core DP idea first! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Matrix Chain Multiplication  
+🕒 2026-04-06 07:45:05
+
+Hey there, future coding rockstar! 👋 Let's break down Matrix Chain Multiplication (MCM) in a friendly, no-fuss way.
+
+---
+
+### 🌟 Matrix Chain Multiplication (MCM)
+
+#### 🚀 What's the Concept?
+
+Imagine you have a bunch of matrices (A, B, C, D...) that you need to multiply together, like `A * B * C * D`. Matrix multiplication is **associative**, meaning you can group them in different ways without changing the final result, e.g., `(A * B) * (C * D)` or `A * (B * (C * D))`.
+
+But here's the kicker: **the order of multiplication *drastically* affects the number of scalar multiplications (basic arithmetic operations) performed!** Some orders are super efficient, while others are incredibly costly.
+
+MCM is about finding the **optimal parenthesization** (grouping) of a chain of matrices such that the total number of scalar multiplications is **minimized**.
+
+#### ✨ Why Does It Matter?
+
+1.  **Performance Optimization:** In many scientific computations, graphics, or machine learning, you might perform a sequence of matrix multiplications. Choosing the right order can save *huge* amounts of computation time (we're talking orders of magnitude!).
+2.  **Classic Dynamic Programming Problem:** It's a textbook example of Dynamic Programming, helping you understand how to break down complex problems into smaller, overlapping subproblems and build up a solution.
+
+#### 💡 Small Example Problem
+
+Let's say we have three matrices:
+*   `A` is 10x100
+*   `B` is 100x5
+*   `C` is 5x50
+
+We want to compute `A * B * C`.
+
+**Rule for Matrix Multiplication Cost:** To multiply a `P x Q` matrix by a `Q x R` matrix, it costs `P * Q * R` scalar multiplications, and the result is a `P x R` matrix.
+
+Let's look at the two possible ways to parenthesize:
+
+**Option 1: `(A * B) * C`**
+1.  **Multiply (A * B):**
+    *   A (10x100) * B (100x5)
+    *   Cost: `10 * 100 * 5 = 5000`
+    *   Resulting matrix (let's call it `AB`) is 10x5.
+2.  **Multiply (AB * C):**
+    *   AB (10x5) * C (5x50)
+    *   Cost: `10 * 5 * 50 = 2500`
+    *   **Total Cost for Option 1: `5000 + 2500 = 7500`**
+
+**Option 2: `A * (B * C)`**
+1.  **Multiply (B * C):**
+    *   B (100x5) * C (5x50)
+    *   Cost: `100 * 5 * 50 = 25000`
+    *   Resulting matrix (let's call it `BC`) is 100x50.
+2.  **Multiply (A * BC):**
+    *   A (10x100) * BC (100x50)
+    *   Cost: `10 * 100 * 50 = 50000`
+    *   **Total Cost for Option 2: `25000 + 50000 = 75000`**
+
+**Conclusion:** Option 1 (7500 operations) is significantly cheaper than Option 2 (75000 operations)! MCM would pick Option 1.
+
+---
+
+#### 💻 Simple C++ Implementation (Dynamic Programming)
+
+The core idea is to break the problem into smaller parts:
+To find the minimum cost for matrices `i` to `j`, we try every possible split point `k` (`i <= k < j`). The cost for `(i..j)` would be `cost(i..k) + cost(k+1..j) + cost_of_multiplying_results`.
+
+We'll use a `dp` table where `dp[i][j]` stores the minimum scalar multiplications needed to multiply the matrices from index `i` to `j`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <limits>    // For std::numeric_limits<int>::max()
+
+// Function to find the minimum number of scalar multiplications
+// 'dims' is a vector where dims[i] is the number of columns of matrix A_i
+// and dims[i-1] is the number of rows of matrix A_i.
+// So, for 'n' matrices (A1 to An), 'dims' will have 'n+1' elements.
+// Example: {P0, P1, P2, P3} for 3 matrices A1(P0xP1), A2(P1xP2), A3(P2xP3)
+int matrixChainOrder(const std::vector<int>& dims) {
+    int n = dims.size() - 1; // Number of matrices
+
+    // dp[i][j] stores the minimum number of scalar multiplications
+    // needed to multiply the chain of matrices from i to j (inclusive).
+    // Note: We use 1-based indexing for matrices to simplify the logic.
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(n + 1, 0));
+
+    // L is the chain length. We start with length 2, as length 1 (a single matrix)
+    // has 0 cost, which is handled by initialization.
+    for (int L = 2; L <= n; ++L) {
+        // i is the starting matrix index
+        for (int i = 1; i <= n - L + 1; ++i) {
+            int j = i + L - 1; // j is the ending matrix index
+            dp[i][j] = std::numeric_limits<int>::max(); // Initialize with max value
+
+            // k is the split point: multiply (A_i ... A_k) and (A_{k+1} ... A_j)
+            for (int k = i; k <= j - 1; ++k) {
+                // Cost = cost of multiplying A_i..A_k
+                //      + cost of multiplying A_{k+1}..A_j
+                //      + cost of multiplying the two resulting matrices
+                //         (dimensions: dims[i-1] x dims[k] and dims[k] x dims[j])
+                int cost = dp[i][k] + dp[k + 1][j] + dims[i - 1] * dims[k] * dims[j];
+                dp[i][j] = std::min(dp[i][j], cost);
+            }
+        }
+    }
+
+    // The minimum cost for the entire chain (from matrix 1 to n)
+    return dp[1][n];
+}
+
+int main() {
+    // Example from above: A(10x100), B(100x5), C(5x50)
+    // Dimensions array: {P0, P1, P2, P3}
+    // A: P0 x P1 (10x100)
+    // B: P1 x P2 (100x5)
+    // C: P2 x P3 (5x50)
+    std::vector<int> dims = {10, 100, 5, 50};
+    // Expected output: 7500
+
+    int minOperations = matrixChainOrder(dims);
+    std::cout << "Minimum scalar multiplications: " << minOperations << std::endl; // Output: 7500
+
+    // Another example: 4 matrices A(40x20), B(20x30), C(30x10), D(10x30)
+    std::vector<int> dims2 = {40, 20, 30, 10, 30};
+    // Expected output: 26000
+    // (A(40x20) * (B(20x30) * C(30x10))) * D(10x30) = (40*20*30 + 20*30*10) + (40*10*30)
+    // 24000 + 6000 + 12000 = 42000 --> No, this isn't right.
+    // The correct solution for this set of dimensions {40, 20, 30, 10, 30}
+    // is often found to be 26000 via DP.
+    // The calculation details are more involved for this one.
+
+    minOperations = matrixChainOrder(dims2);
+    std::cout << "Minimum scalar multiplications for second example: " << minOperations << std::endl; // Output: 26000
+
+    return 0;
+}
+```
+
+---
