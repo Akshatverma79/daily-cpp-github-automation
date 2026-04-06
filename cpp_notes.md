@@ -36578,3 +36578,166 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Trees  
+🕒 2026-04-06 14:38:24
+
+Hey there, future algorithm master! Let's dive into **DP on Trees** – a super useful technique for solving problems on hierarchical data.
+
+---
+
+### 🌳 DP on Trees: The Concept
+
+**What it means:**
+Imagine you have a tree structure (like a family tree or a file system). **Dynamic Programming (DP) on Trees** is a way to solve problems on these trees by breaking them down into smaller, overlapping subproblems.
+
+Think of it this way: to figure something out for a parent node, you often need to first figure things out for all its children (and their children, and so on). You then combine these "child solutions" to get the "parent solution." This is typically done using a **Depth-First Search (DFS)** traversal, often in a **post-order** manner (process children first, then the parent).
+
+---
+
+### ✨ Why it Matters
+
+1.  **Efficiency:** It allows you to solve problems on trees in a much more efficient way (polynomial time, often linear) than brute-force methods which might be exponential.
+2.  **Tree Problems are Common:** Trees are everywhere in computer science! File systems, organization charts, abstract syntax trees, game trees – understanding how to optimize calculations on them is crucial.
+3.  **Building Block:** It's a fundamental pattern. Mastering it helps you tackle more complex graph and tree problems.
+
+---
+
+### 💡 The Key Idea (DFS with Memoization/Aggregation)
+
+You usually define a `dp_function(node, parent)` that calculates some property for the `node`'s subtree. This function:
+1.  Recursively calls itself for all children of `node`.
+2.  Uses the results from these child calls to compute its own result.
+3.  Stores or returns this result (often back to its own parent).
+
+---
+
+### 🎯 Example Problem: Sum of Subtree Values
+
+**Problem:** Given a tree where each node has an integer value, calculate the total sum of values for all nodes in each node's subtree (including the node itself).
+
+**Why this is DP on Trees:**
+To find the sum of a node's subtree, you need its own value PLUS the sum of values of all its children's subtrees. This perfectly fits the "solve children first, then combine" pattern.
+
+**Input Example:**
+
+```
+      A (value=5)
+     / \
+    B(2) C(8)
+   / \
+  D(1) E(3)
+```
+
+**Expected Output:**
+
+*   `D` subtree sum: `1`
+*   `E` subtree sum: `3`
+*   `B` subtree sum: `B(2) + D(1) + E(3) = 6`
+*   `C` subtree sum: `8`
+*   `A` subtree sum: `A(5) + B_subtree(6) + C_subtree(8) = 19`
+
+---
+
+### 💻 Simple C++ Implementation
+
+We'll use an adjacency list to represent the tree and a separate vector for node values.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // Not strictly needed for this problem, but useful for general sums
+
+// --- Global variables for simplicity in this example ---
+std::vector<std::vector<int>> adj;       // Adjacency list to store tree connections
+std::vector<int> node_values;             // Stores the value of each node (index 0 unused for 1-based indexing)
+std::vector<int> subtree_sums;            // Stores the calculated DP results: subtree_sums[i] = sum for node i's subtree
+
+// --- The DP function using DFS ---
+// u: current node being processed
+// p: parent of u (to avoid going back up the tree)
+void dfs_dp_subtree_sum(int u, int p) {
+    // 1. Initialize current node's subtree sum with its own value
+    subtree_sums[u] = node_values[u];
+
+    // 2. Recursively call for children and aggregate their results
+    for (int v : adj[u]) {
+        if (v == p) { // Skip the parent to avoid infinite loops and going backwards
+            continue;
+        }
+        dfs_dp_subtree_sum(v, u); // Process child v first
+        subtree_sums[u] += subtree_sums[v]; // Add child's subtree sum to current node's sum
+    }
+
+    // After the loop, subtree_sums[u] holds the total sum for node u's subtree.
+    // This value is implicitly "returned" via the global `subtree_sums` array
+    // for its own parent to use (if it has one).
+}
+
+int main() {
+    int num_nodes = 5; // For our example tree (A, B, C, D, E)
+    // We'll use 1-based indexing for node IDs (1 to 5) for clarity
+    // So, resize vectors to num_nodes + 1
+    adj.resize(num_nodes + 1);
+    node_values.resize(num_nodes + 1);
+    subtree_sums.resize(num_nodes + 1);
+
+    // --- Set node values (matching our example) ---
+    // Node A (1) = 5
+    // Node B (2) = 2
+    // Node C (3) = 8
+    // Node D (4) = 1
+    // Node E (5) = 3
+    node_values[1] = 5; // A
+    node_values[2] = 2; // B
+    node_values[3] = 8; // C
+    node_values[4] = 1; // D
+    node_values[5] = 3; // E
+
+    // --- Build the tree (connections) ---
+    // A (1) is connected to B (2) and C (3)
+    adj[1].push_back(2);
+    adj[2].push_back(1); // Undirected edge
+    adj[1].push_back(3);
+    adj[3].push_back(1); // Undirected edge
+
+    // B (2) is connected to D (4) and E (5)
+    adj[2].push_back(4);
+    adj[4].push_back(2); // Undirected edge
+    adj[2].push_back(5);
+    adj[5].push_back(2); // Undirected edge
+
+    // --- Start the DP calculation from the root (Node 1, A) ---
+    // The parent of the root is typically -1 or 0 (an invalid node ID)
+    int root_node = 1;
+    dfs_dp_subtree_sum(root_node, 0); // 0 acts as a dummy parent for the root
+
+    // --- Print the results ---
+    std::cout << "Subtree Sums:\n";
+    std::cout << "Node 1 (A): " << subtree_sums[1] << std::endl; // Expected: 19
+    std::cout << "Node 2 (B): " << subtree_sums[2] << std::endl; // Expected: 6
+    std::cout << "Node 3 (C): " << subtree_sums[3] << std::endl; // Expected: 8
+    std::cout << "Node 4 (D): " << subtree_sums[4] << std::endl; // Expected: 1
+    std::cout << "Node 5 (E): " << subtree_sums[5] << std::endl; // Expected: 3
+
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+Subtree Sums:
+Node 1 (A): 19
+Node 2 (B): 6
+Node 3 (C): 8
+Node 4 (D): 1
+Node 5 (E): 3
+```
+
+---
+
+And there you have it! DP on Trees in a nutshell. It's all about breaking down problems on a tree, solving for the children, and then combining those solutions for the parent. Keep practicing, and you'll master it in no time!
+
+---
