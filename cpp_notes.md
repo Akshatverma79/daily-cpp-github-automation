@@ -36897,3 +36897,105 @@ DP on Bitmasks can feel a bit tricky at first, but once you get the hang of repr
 Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-04-08 07:21:45
+
+Hey there, future DSA superstar! ✨ Let's dive into the fascinating world of **Bit Manipulation**.
+
+---
+
+## Bit Manipulation Basics (C++)
+
+### What it Means 🧠
+
+Imagine a number not just as "5" or "42", but as a series of tiny light switches (on/off, 1/0). That's essentially what a computer sees! Bit manipulation is about **working directly with these individual binary digits (bits)** that make up a number, rather than the number as a whole. It's like looking "under the hood" of your integer variables.
+
+For example, the number `5` is `...00000101` in binary. Bit manipulation lets us check if the last switch is on, turn the second switch off, and so on.
+
+### Why it Matters 🚀
+
+1.  **Super Efficient:** Bitwise operations are incredibly fast because CPUs are designed to handle them directly. This can lead to significant performance improvements in certain algorithms.
+2.  **Memory Saving:** You can store multiple boolean flags or small pieces of information in a single integer by using each bit to represent something.
+3.  **Clever Algorithms:** Many powerful and optimized algorithms (like those in cryptography, error detection, or data structures like bitsets) rely heavily on bit manipulation.
+4.  **Interview Favorite:** It's a common topic in competitive programming and technical interviews!
+
+### Key Bitwise Operators (A Quick Peek)
+
+*   `&` (AND): Returns 1 if *both* bits are 1.
+*   `|` (OR): Returns 1 if *at least one* bit is 1.
+*   `^` (XOR): Returns 1 if bits are *different*.
+*   `~` (NOT): Flips all bits (0 becomes 1, 1 becomes 0).
+*   `<<` (Left Shift): Shifts bits to the left, adding 0s on the right. Effectively multiplies by powers of 2.
+*   `>>` (Right Shift): Shifts bits to the right. Effectively divides by powers of 2 (integer division).
+
+---
+
+### Example Problem: Check if the $i$-th Bit is Set
+
+**Problem:** Given an integer `num` and an index `i`, determine if the $i$-th bit (0-indexed from the right) of `num` is 1.
+
+**Example:**
+If `num = 5` (binary `101`):
+*   Is the 0th bit set? Yes (the rightmost '1').
+*   Is the 1st bit set? No (the middle '0').
+*   Is the 2nd bit set? Yes (the leftmost '1').
+
+**How to Solve (The Bit Magic!):**
+
+1.  **Create a Mask:** We need a number that has *only* its $i$-th bit set to 1. We can get this by taking the number `1` (binary `001`) and left-shifting it `i` times: `(1 << i)`.
+    *   E.g., for `i=0`, `1 << 0` is `001`.
+    *   E.g., for `i=1`, `1 << 1` is `010`.
+    *   E.g., for `i=2`, `1 << 2` is `100`.
+
+2.  **Use Bitwise AND:** Now, we perform a bitwise AND (`&`) operation between `num` and our `mask`.
+    *   If the $i$-th bit of `num` is 1, then `(num & mask)` will be non-zero (specifically, it will be equal to the mask itself).
+    *   If the $i$-th bit of `num` is 0, then `(num & mask)` will be 0.
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+
+// Function to check if the i-th bit of a number is set
+bool isBitSet(int num, int i) {
+    // 1. Create a mask: (1 << i)
+    //    This creates a number with only the i-th bit as 1, all others 0.
+    //    Example: if i=2, mask will be binary 100 (decimal 4)
+
+    // 2. Perform bitwise AND: (num & mask)
+    //    If the i-th bit of 'num' is 1, the result will be non-zero.
+    //    If the i-th bit of 'num' is 0, the result will be zero.
+
+    return (num & (1 << i)) != 0;
+}
+
+int main() {
+    int myNumber = 5; // Binary representation: 101
+
+    std::cout << "Number: " << myNumber << " (Binary: 101)\n\n";
+
+    // Test cases
+    std::cout << "Is 0th bit set? " << (isBitSet(myNumber, 0) ? "Yes" : "No") << " (Expected: Yes)\n"; // 0th bit is 1
+    std::cout << "Is 1st bit set? " << (isBitSet(myNumber, 1) ? "Yes" : "No") << " (Expected: No)\n";  // 1st bit is 0
+    std::cout << "Is 2nd bit set? " << (isBitSet(myNumber, 2) ? "Yes" : "No") << " (Expected: Yes)\n"; // 2nd bit is 1
+    std::cout << "Is 3rd bit set? " << (isBitSet(myNumber, 3) ? "Yes" : "No") << " (Expected: No)\n";  // 3rd bit is 0
+
+    int anotherNumber = 10; // Binary: 1010
+    std::cout << "\nNumber: " << anotherNumber << " (Binary: 1010)\n\n";
+    std::cout << "Is 1st bit set? " << (isBitSet(anotherNumber, 1) ? "Yes" : "No") << " (Expected: Yes)\n";
+    std::cout << "Is 3rd bit set? " << (isBitSet(anotherNumber, 3) ? "Yes" : "No") << " (Expected: Yes)\n";
+
+    return 0;
+}
+```
+
+---
+
+And that's a quick intro to Bit Manipulation! It might feel a bit abstract at first, but with practice, you'll start seeing numbers in a whole new, powerful way. Keep practicing! 💪
+
+---
