@@ -37138,3 +37138,135 @@ int main() {
 And there you have it! GCD and Primes are foundational. Master these, and you'll be well-equipped for a surprising number of DSA challenges. Keep up the great work! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-04-10 14:39:46
+
+Hey there, aspiring coder! 👋 Let's dive into a super cool topic in competitive programming: **Game Theory Basics**. It's less about deep math and more about smart thinking!
+
+---
+
+### 🎲 Game Theory Basics
+
+Imagine you're playing a game where every move counts, and your opponent is just as smart (or smarter) than you. Game Theory is all about analyzing these situations to find the *best possible strategy*.
+
+#### 🧠 What the Concept Means
+
+*   It's the study of **strategic decision-making** in situations where multiple "players" interact.
+*   **Key Idea:** Each player acts rationally, trying to maximize their own outcome (e.g., win the game, get a higher score) assuming the other players are also playing optimally.
+*   In competitive programming, we often deal with **"Impartial Games"**:
+    *   The available moves depend only on the state of the game, not on whose turn it is.
+    *   Players have perfect information (they know everything about the game state).
+    *   There are no ties; one player always wins.
+    *   The game always ends in a finite number of moves.
+
+#### 💡 Why It Matters
+
+*   **Competitive Programming Goldmine:** Many problems involve two players taking turns, trying to win or achieve a certain score. Game theory helps you model these and predict outcomes.
+*   **Strategic Thinking:** It trains your mind to anticipate opponent's moves and plan several steps ahead, which is a valuable skill far beyond coding.
+*   **Problem Solving Framework:** It introduces a powerful way to think about decision problems where multiple agents interact, often leading to dynamic programming (DP) solutions.
+
+---
+
+### 🧩 Example Problem: "Stones on a Table"
+
+Let's try a classic!
+
+**Problem:** You have `N` stones on a table. Two players, Alice and Bob, take turns removing stones. Alice goes first. In each turn, a player can remove either **1 or 2 stones**. The player who takes the last stone wins. If both players play optimally, who wins?
+
+**Thinking Process:**
+
+This is a perfect candidate for **Dynamic Programming (DP)**, where we figure out if a state is a "winning" or "losing" state.
+
+Let `dp[i]` be `true` if the current player (whose turn it is) can win when there are `i` stones remaining, and `false` otherwise.
+
+*   **Base Cases:**
+    *   `dp[0] = false`: If there are 0 stones, the current player cannot make a move, so they lose. The previous player took the last stone.
+    *   `dp[1] = true`: If there is 1 stone, the current player takes 1 stone and wins.
+    *   `dp[2] = true`: If there are 2 stones, the current player takes 2 stones and wins.
+
+*   **Recursive Relation:**
+    For `i` stones, the current player can win (`dp[i] = true`) if they can make a move such that the *next* player (their opponent) is forced into a losing state.
+    *   If the current player takes 1 stone, `i-1` stones remain. If `dp[i-1]` is `false` (meaning the opponent loses from `i-1` stones), then the current player wins by taking 1.
+    *   If the current player takes 2 stones, `i-2` stones remain. If `dp[i-2]` is `false` (meaning the opponent loses from `i-2` stones), then the current player wins by taking 2.
+
+    So, `dp[i] = (!dp[i-1] || !dp[i-2])`
+    *   `!dp[i-1]` means "opponent loses if I leave `i-1` stones".
+    *   `!dp[i-2]` means "opponent loses if I leave `i-2` stones".
+    *   The `||` (OR) means "if I can achieve a win by *either* taking 1 *or* taking 2 stones, then I win from state `i`."
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string> // For Yes/No output
+
+// Function to determine the winner for N stones
+std::string findWinner(int n) {
+    // dp[i] stores whether the *current player* can win with 'i' stones remaining.
+    // We assume Alice is the "current player" when the game starts with N stones.
+    std::vector<bool> dp(n + 1);
+
+    // Base cases
+    // If 0 stones, the current player has no moves and loses.
+    dp[0] = false; 
+
+    // If 1 stone, current player takes 1 and wins.
+    if (n >= 1) {
+        dp[1] = true;
+    }
+
+    // If 2 stones, current player takes 2 and wins.
+    if (n >= 2) {
+        dp[2] = true;
+    }
+
+    // Fill the DP table for i from 3 to N
+    for (int i = 3; i <= n; ++i) {
+        // The current player can win from 'i' stones if:
+        // 1. They take 1 stone, leaving 'i-1'. If the opponent cannot win from 'i-1' (!dp[i-1]),
+        //    then the current player wins.
+        // OR
+        // 2. They take 2 stones, leaving 'i-2'. If the opponent cannot win from 'i-2' (!dp[i-2]),
+        //    then the current player wins.
+        dp[i] = (!dp[i - 1] || !dp[i - 2]);
+    }
+
+    // Alice is the first player. If dp[N] is true, Alice wins. Otherwise, Bob wins.
+    return dp[n] ? "Alice" : "Bob";
+}
+
+int main() {
+    // Test cases for the "Stones on a Table" game
+    std::cout << "--- Stones on a Table Game ---" << std::endl;
+    std::cout << "N = 1: Winner = " << findWinner(1) << std::endl; // Alice
+    std::cout << "N = 2: Winner = " << findWinner(2) << std::endl; // Alice
+    std::cout << "N = 3: Winner = " << findWinner(3) << std::endl; // Bob (Alice leaves 2 or 1, Bob takes all)
+    std::cout << "N = 4: Winner = " << findWinner(4) << std::endl; // Alice
+    std::cout << "N = 5: Winner = " << findWinner(5) << std::endl; // Alice
+    std::cout << "N = 6: Winner = " << findWinner(6) << std::endl; // Bob
+
+    int test_N = 10;
+    std::cout << "N = " << test_N << ": Winner = " << findWinner(test_N) << std::endl; // Alice
+    
+    test_N = 11;
+    std::cout << "N = " << test_N << ": Winner = " << findWinner(test_N) << std::endl; // Bob
+
+    // Observation: In this specific game, if N is a multiple of 3, Bob wins. Otherwise, Alice wins.
+    // This is because 3 is the "losing number" (if you're forced to face 3, you lose).
+    // The DP correctly captures this pattern!
+
+    return 0;
+}
+```
+
+---
+
+That's a quick intro to Game Theory basics for competitive programming! Start looking for problems where players take turns and try to win – you might be able to apply this winning/losing state DP approach! Happy coding! ✨
+
+---
