@@ -37270,3 +37270,110 @@ int main() {
 That's a quick intro to Game Theory basics for competitive programming! Start looking for problems where players take turns and try to win – you might be able to apply this winning/losing state DP approach! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Arrays Basics  
+🕒 2026-04-11 14:24:49
+
+Alright, let's dive into Arrays!
+
+---
+
+## Arrays Basics (C++)
+
+Hey there, future coding wizard! Let's get started with one of the most fundamental building blocks in programming: **Arrays**.
+
+### 1. What's an Array? 📦
+
+Imagine you have a list of items of the **same type** (like all numbers, or all names) that you want to store together in an organized way. An array is exactly that!
+
+Think of it as a row of numbered mailboxes, each holding something similar.
+
+*   **Collection:** It stores multiple items.
+*   **Same Type:** All items must be of the same data type (e.g., all `int`s, or all `char`s).
+*   **Sequential:** Items are stored one after another in memory.
+*   **Indexed:** Each item has a unique number (called an **index**) to identify its position. In C++, arrays are **zero-indexed**, meaning the first item is at index `0`, the second at `1`, and so on.
+*   **Fixed Size:** Once created, a basic C-style array's size usually can't change.
+
+**In C++:**
+To declare an array of 5 integers: `int numbers[5];`
+To access the first element: `numbers[0]`
+To access the third element: `numbers[2]`
+
+### 2. Why Do They Matter? ✨
+
+Arrays are super important for several reasons:
+
+*   **Efficiency:** They offer incredibly fast access (we call it O(1) or constant time) to any element if you know its position (index). This is like instantly grabbing a book from a shelf if you know its exact slot number!
+*   **Foundation:** Many other powerful data structures (like Stacks, Queues, Hash Tables) are often built using arrays as their core.
+*   **Organized Data:** They let you process collections of data easily, like finding the average of a list of scores or sorting a list of names.
+
+### 3. Example Problem: Summing Up! ➕
+
+Let's solve a simple problem to see arrays in action.
+
+**Problem:** You're given a list of `n` numbers. Your task is to calculate and print their total sum.
+
+**Input:** An array `[10, 20, 5, 15]`
+**Expected Output:** `50` (because 10 + 20 + 5 + 15 = 50)
+
+### 4. Simple C++ Implementation 🚀
+
+```cpp
+#include <iostream> // For input/output operations
+
+// Function to calculate the sum of array elements
+int calculateArraySum(int arr[], int size) {
+    int sum = 0; // Initialize sum to 0
+
+    // Loop through each element of the array
+    // 'i' goes from 0 up to (size - 1)
+    for (int i = 0; i < size; ++i) {
+        sum += arr[i]; // Add the current element to the sum
+                       // arr[i] accesses the element at index 'i'
+    }
+
+    return sum; // Return the final calculated sum
+}
+
+int main() {
+    // 1. Declare and initialize an integer array
+    int myNumbers[] = {10, 20, 5, 15};
+
+    // 2. Calculate the size of the array
+    // sizeof(myNumbers) gives total bytes of the array
+    // sizeof(myNumbers[0]) gives bytes of one element
+    // Dividing them gives the number of elements
+    int arraySize = sizeof(myNumbers) / sizeof(myNumbers[0]);
+
+    // 3. Call our function to get the sum
+    int totalSum = calculateArraySum(myNumbers, arraySize);
+
+    // 4. Print the result
+    std::cout << "The numbers are: ";
+    for (int i = 0; i < arraySize; ++i) {
+        std::cout << myNumbers[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "The sum of the numbers is: " << totalSum << std::endl; // Output: 50
+
+    return 0; // Indicate successful execution
+}
+```
+
+**How the code works:**
+
+1.  We define `myNumbers` as an array of integers and directly give it some values.
+2.  `arraySize` is calculated to know how many elements are in our array. This is crucial for looping!
+3.  The `calculateArraySum` function takes the array and its size.
+4.  Inside the function, a `for` loop iterates from `i = 0` up to `size - 1`.
+5.  In each iteration, `arr[i]` fetches the element at the current index `i`, and it's added to `sum`.
+6.  Finally, `sum` (which is `50` in this case) is returned and printed.
+
+---
+
+That's Arrays Basics in a nutshell! They might seem simple, but mastering them is key to understanding more complex data structures and algorithms. Keep practicing!
+
+---
