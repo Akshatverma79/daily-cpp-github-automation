@@ -37682,3 +37682,100 @@ New value *pointed to* by 'ptr_score' (*ptr_score'): 250
 That's the gist! Pointers are a cornerstone of C++ and essential for understanding how data structures work efficiently. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-04-14 15:04:48
+
+Here's a clean and simple note on Recursion Basics!
+
+---
+
+## Recursion Basics 🚀
+
+### What is Recursion? (The Concept)
+
+Imagine a function that solves a problem by calling *itself* to solve smaller, simpler versions of that very same problem. That's recursion!
+
+Think of it like this: To clean your room, you first clean the biggest mess, then tell yourself to "clean the *rest* of the room" (which is now a smaller mess). You keep doing this until there's no mess left (the simplest case).
+
+**Key Idea:** A problem is solved by breaking it down into one or more identical, but smaller, sub-problems until a very simple "base case" is reached, which can be solved directly.
+
+### Why Does It Matter?
+
+1.  **Elegance & Readability:** For certain problems (like tree traversals, some sorting algorithms, or mathematical sequences), recursion can make your code incredibly concise and easy to understand.
+2.  **Problem Solving Tool:** It's a fundamental technique in computer science and DSA, especially for problems that have a naturally recursive structure (e.g., traversing hierarchical data like filesystems or organizational charts).
+3.  **Foundation for Advanced Topics:** Understanding recursion is crucial for grasping concepts like Divide and Conquer algorithms, dynamic programming, and backtracking.
+
+### The Two Golden Rules of Recursion:
+
+Every recursive function MUST have:
+
+1.  **Base Case:** This is the *stopping condition*. It's the simplest version of the problem that can be solved directly, without further recursion. Without it, you get an infinite loop (and a stack overflow!).
+2.  **Recursive Step:** This is where the function calls itself with a *modified (usually smaller)* input, moving closer to the base case.
+
+### Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a non-negative integer `n`.
+The factorial of `n` (denoted as `n!`) is the product of all positive integers less than or equal to `n`.
+
+*   `5! = 5 * 4 * 3 * 2 * 1 = 120`
+*   `3! = 3 * 2 * 1 = 6`
+*   `0! = 1` (By definition)
+
+**How it works Recursively:**
+
+*   **Base Case:** If `n` is `0` or `1`, the factorial is `1`. This is where we stop.
+*   **Recursive Step:** Otherwise, `n! = n * (n-1)!`. We call the `factorial` function again for a smaller number (`n-1`) and multiply its result by `n`.
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+
+// Function to calculate factorial using recursion
+// We use 'long long' to handle potentially larger factorial results
+long long factorial(int n) {
+    // --- 1. Base Case ---
+    // If n is 0 or 1, the factorial is 1.
+    // This is the condition that stops the recursion.
+    if (n == 0 || n == 1) {
+        return 1;
+    }
+    // Handle negative numbers (optional, but good practice)
+    if (n < 0) {
+        // Factorial is traditionally not defined for negative numbers,
+        // or one might throw an exception. For simplicity, we'll return 0.
+        std::cerr << "Factorial is not defined for negative numbers." << std::endl;
+        return 0; 
+    }
+
+    // --- 2. Recursive Step ---
+    // For n > 1, n! = n * (n-1)!
+    // The function calls itself with a smaller input (n-1)
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int num1 = 5;
+    std::cout << "Factorial of " << num1 << " is: " << factorial(num1) << std::endl; // Output: 120
+
+    int num2 = 0;
+    std::cout << "Factorial of " << num2 << " is: " << factorial(num2) << std::endl; // Output: 1
+
+    int num3 = 7;
+    std::cout << "Factorial of " << num3 << " is: " << factorial(num3) << std::endl; // Output: 5040
+
+    int num4 = -3;
+    std::cout << "Factorial of " << num4 << " is: " << factorial(num4) << std::endl; // Output: (Error message) and 0
+
+    return 0;
+}
+```
+
+---
+
+Recursion can feel a bit mind-bending at first, but with practice, it clicks! It's a powerful and elegant tool for certain types of problems. Keep experimenting!
+
+---
