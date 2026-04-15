@@ -37865,3 +37865,131 @@ int main() {
 And there you have it! Recursion in a nutshell. Keep practicing, and it'll click!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-04-15 14:57:32
+
+Hey there, future coding wizard! 👋 Let's break down Linked Lists – they're super fundamental and not nearly as scary as they sound.
+
+---
+
+### 📝 **Linked List Basics: Your First Glimpse**
+
+#### **What is a Linked List?**
+
+Imagine a **treasure hunt** where each clue tells you where to find the *next* clue, instead of all clues being laid out in a row on a single map. That's pretty much a Linked List!
+
+*   It's a **linear** data structure, but unlike arrays, elements are **not stored at contiguous memory locations**.
+*   Instead, each element (called a **Node**) points to the next element in the sequence.
+*   Think of it like a train: each car (node) holds some data and is connected to the next car.
+
+**Key Components:**
+1.  **Node:** The basic building block. It contains:
+    *   **Data:** The actual value you want to store.
+    *   **Pointer (Next):** A reference (or memory address) to the *next* node in the list.
+2.  **Head:** A special pointer that always points to the **first node** of the list. If `head` is `nullptr`, the list is empty.
+3.  **Tail:** The last node in the list. Its `next` pointer is always `nullptr`, signifying the end.
+
+```
+[HEAD] --> [NODE 1 | next] --> [NODE 2 | next] --> [NODE 3 | next] --> [nullptr]
+             (Data)                (Data)                (Data)
+```
+
+---
+
+#### **Why Does It Matter? (Why Use It?)**
+
+Linked lists shine in scenarios where arrays might struggle:
+
+*   **Dynamic Size:** Linked lists can easily grow or shrink at runtime. You don't need to pre-allocate a fixed amount of memory like with arrays. This is awesome for handling unknown amounts of data!
+*   **Efficient Insertions/Deletions:**
+    *   Adding a new node or removing an existing one (especially at the beginning or end, or if you have a pointer to the node before the target) can be done very quickly (O(1) time complexity) because you just need to re-wire a couple of pointers.
+    *   Compare this to arrays, where inserting/deleting in the middle might require shifting *all* subsequent elements, which can be slow (O(N)).
+*   **Flexible Memory:** Elements don't need to be next to each other in memory, allowing for more flexible memory usage.
+
+---
+
+#### **Example Problem: Building a Simple List & Printing It**
+
+**Problem:** Create a singly linked list with a few integer values (e.g., 10, 20, 30) and then print all the values in the list.
+
+**Approach:**
+1.  Define a `Node` structure.
+2.  Create a `head` pointer initialized to `nullptr` (empty list).
+3.  Add nodes one by one (we'll add to the front for simplicity).
+4.  Write a function to traverse the list from `head` to `nullptr` and print each node's data.
+
+---
+
+#### **Simple C++ Implementation**
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;     // Data stored in this node
+    Node* next;   // Pointer to the next node in the list
+
+    // Constructor to easily create a new Node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// Function to add a new node to the front of the list
+// 'head' is passed by reference so we can modify the actual head pointer
+void addFront(Node*& head, int val) {
+    Node* newNode = new Node(val); // Create a new node
+    newNode->next = head;          // New node points to the current head
+    head = newNode;                // Update head to be the new node
+}
+
+// Function to print all elements in the list
+void printList(Node* head) {
+    Node* current = head; // Start from the head
+    while (current != nullptr) { // Loop until we reach the end (nullptr)
+        std::cout << current->data << " -> "; // Print current node's data
+        current = current->next;              // Move to the next node
+    }
+    std::cout << "nullptr" << std::endl; // Indicate the end of the list
+}
+
+int main() {
+    // Initialize an empty linked list
+    Node* head = nullptr; // Our list starts empty!
+
+    std::cout << "Building the list by adding to the front:" << std::endl;
+
+    // Add elements to the list (they'll be added to the front)
+    addFront(head, 10); // List: 10 -> nullptr
+    printList(head);
+
+    addFront(head, 20); // List: 20 -> 10 -> nullptr
+    printList(head);
+
+    addFront(head, 30); // List: 30 -> 20 -> 10 -> nullptr
+    printList(head);
+
+    std::cout << "\nFinal Linked List: ";
+    printList(head); // Print the final list
+
+    // --- Important: Clean up memory! ---
+    // In C++, you must manually free memory allocated with 'new'.
+    Node* current = head;
+    while (current != nullptr) {
+        Node* temp = current; // Store current node to delete it
+        current = current->next; // Move to the next node
+        delete temp; // Delete the stored node
+    }
+    head = nullptr; // Set head to nullptr after cleanup
+
+    return 0;
+}
+```
+
+---
+
+That's your first step into the world of Linked Lists! You've grasped the core idea, why they're useful, and even implemented a basic one. Next up, you'd explore adding to the end, deleting nodes, searching, and more! Keep coding! ✨
+
+---
