@@ -38256,3 +38256,201 @@ int main() {
 And that's your quick dive into Stacks! They're simple yet incredibly powerful for solving many programming challenges. Keep practicing! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-04-18 07:09:32
+
+Hey there, aspiring coder! Let's dive into Queues – a super common and useful data structure.
+
+---
+
+## 🚀 Queues: The FIFO Line
+
+### 1. What is a Queue? (The Concept)
+
+Imagine you're in line at a coffee shop.
+*   The first person to join the line is the first person to get their coffee.
+*   New people join at the *back* of the line.
+*   People leave from the *front* of the line.
+
+That's exactly what a **Queue** is in computer science! It's a linear data structure that follows the **First-In, First-Out (FIFO)** principle.
+
+*   **Enqueue:** Adding an element to the *rear* (back) of the queue.
+*   **Dequeue:** Removing an element from the *front* (head) of the queue.
+*   **Front:** Peeking at the element at the front without removing it.
+*   **IsEmpty:** Checking if the queue has any elements.
+*   **Size:** Getting the number of elements in the queue.
+
+### 2. Why Does it Matter? (Importance)
+
+Queues are everywhere! They're perfect for scenarios where you need to process things in the exact order they arrived.
+
+*   **Task Scheduling:** Operating systems use queues to manage processes waiting for the CPU.
+*   **Printer Queues:** Documents are printed in the order they were sent.
+*   **Buffering:** When streaming video, data is put into a queue to ensure smooth playback.
+*   **Breadth-First Search (BFS):** A graph traversal algorithm heavily relies on queues.
+*   **Call Centers:** Customers are typically served in the order they called in.
+
+Pretty neat, right? It's all about fairness and order!
+
+---
+
+### 3. Example Problem: Simple Printer Queue
+
+Let's say you're building a super basic system for a printer. Users send documents, and the printer should always process the *oldest* document first.
+
+**Scenario:**
+1.  User 1 sends "Doc A".
+2.  User 2 sends "Doc B".
+3.  Printer is ready: Print the next document.
+4.  User 3 sends "Doc C".
+5.  Printer is ready: Print the next document.
+
+**Expected Output:**
+*   Printer prints "Doc A".
+*   Printer prints "Doc B".
+
+This perfectly illustrates the FIFO nature of a queue!
+
+---
+
+### 4. Simple C++ Implementation (using Linked List)
+
+We can implement a queue using a linked list, which is flexible for adding/removing elements dynamically.
+
+```cpp
+#include <iostream> // For input/output operations
+
+// A simple Node structure for our linked list
+struct Node {
+    int data;     // The value stored in this node
+    Node* next;   // Pointer to the next node in the list
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// Our custom Queue class
+class MyQueue {
+private:
+    Node* frontPtr;  // Pointer to the front (head) of the queue
+    Node* rearPtr;   // Pointer to the rear (tail) of the queue
+    int currentSize; // To keep track of the number of elements
+
+public:
+    // Constructor: Initializes an empty queue
+    MyQueue() : frontPtr(nullptr), rearPtr(nullptr), currentSize(0) {}
+
+    // Destructor: Cleans up memory when the queue object is destroyed
+    ~MyQueue() {
+        while (!isEmpty()) {
+            dequeue(); // Dequeue all elements to free memory
+        }
+    }
+
+    // --- Queue Operations ---
+
+    // 1. Enqueue: Adds an element to the rear of the queue
+    void enqueue(int val) {
+        Node* newNode = new Node(val); // Create a new node
+
+        if (isEmpty()) {
+            // If the queue is empty, the new node is both front and rear
+            frontPtr = newNode;
+            rearPtr = newNode;
+        } else {
+            // Otherwise, link the current rear to the new node,
+            // then make the new node the new rear
+            rearPtr->next = newNode;
+            rearPtr = newNode;
+        }
+        currentSize++;
+        std::cout << "Enqueued: " << val << std::endl;
+    }
+
+    // 2. Dequeue: Removes an element from the front of the queue
+    void dequeue() {
+        if (isEmpty()) {
+            std::cout << "Queue is empty! Cannot dequeue." << std::endl;
+            return;
+        }
+
+        Node* temp = frontPtr; // Store the front node to delete it later
+        std::cout << "Dequeued: " << temp->data << std::endl;
+        frontPtr = frontPtr->next; // Move front pointer to the next node
+
+        if (frontPtr == nullptr) {
+            // If the queue became empty after dequeueing,
+            // then rearPtr should also be null
+            rearPtr = nullptr;
+        }
+        delete temp; // Free the memory of the removed node
+        currentSize--;
+    }
+
+    // 3. Front: Returns the element at the front without removing it
+    int front() const {
+        if (isEmpty()) {
+            std::cout << "Queue is empty! No front element." << std::endl;
+            return -1; // Or throw an exception for error handling
+        }
+        return frontPtr->data;
+    }
+
+    // 4. IsEmpty: Checks if the queue is empty
+    bool isEmpty() const {
+        return frontPtr == nullptr; // Or return currentSize == 0;
+    }
+
+    // 5. Size: Returns the number of elements in the queue
+    int size() const {
+        return currentSize;
+    }
+};
+
+// --- Main function to test our Queue ---
+int main() {
+    MyQueue printerQueue;
+
+    std::cout << "--- Printer Queue Simulation ---\n";
+
+    // 1. User 1 sends "Doc A" (value 101)
+    printerQueue.enqueue(101);
+    // 2. User 2 sends "Doc B" (value 102)
+    printerQueue.enqueue(102);
+
+    std::cout << "Current queue size: " << printerQueue.size() << std::endl;
+    std::cout << "Front document: " << printerQueue.front() << std::endl;
+
+    // 3. Printer is ready: Print the next document.
+    std::cout << "\nPrinter starts processing...\n";
+    printerQueue.dequeue(); // Prints "Doc A"
+
+    // 4. User 3 sends "Doc C" (value 103)
+    printerQueue.enqueue(103);
+
+    std::cout << "Current queue size: " << printerQueue.size() << std::endl;
+    std::cout << "Front document: " << printerQueue.front() << std::endl;
+
+    // 5. Printer is ready: Print the next document.
+    std::cout << "\nPrinter starts processing...\n";
+    printerQueue.dequeue(); // Prints "Doc B"
+
+    std::cout << "\nIs queue empty? " << (printerQueue.isEmpty() ? "Yes" : "No") << std::endl;
+
+    printerQueue.dequeue(); // Prints "Doc C"
+    printerQueue.dequeue(); // Tries to dequeue from empty queue
+
+    std::cout << "Is queue empty? " << (printerQueue.isEmpty() ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! A clean and simple look at Queues, how they work, why they're important, and a basic C++ implementation. Keep practicing, and you'll master these fundamental building blocks in no time! Happy coding!
+
+---
