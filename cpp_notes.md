@@ -38942,3 +38942,149 @@ int main() {
 And there you have it! A quick, friendly intro to Binary Search Trees. Keep practicing, and you'll master them in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graphs Basics  
+🕒 2026-04-21 07:52:10
+
+Hey there, future graph guru! Let's dive into the fascinating world of Graphs.
+
+---
+
+## 🗺️ Graphs Basics
+
+### 1. What's a Graph?
+
+Imagine a bunch of dots connected by lines. That's pretty much a graph!
+
+*   **Formal Talk:**
+    *   **Nodes (or Vertices):** The "dots." These are the individual entities in your graph (e.g., cities, people, web pages).
+    *   **Edges:** The "lines." These represent the connections or relationships between the nodes (e.g., roads between cities, friendships between people, links between web pages).
+
+*   **Think of it like:**
+    *   **Social Network:** People are nodes, friendships are edges.
+    *   **Road Map:** Cities are nodes, roads are edges.
+
+*   **Key Types to Know (super quick):**
+    *   **Undirected Graph:** Edges go both ways (e.g., if Alice is friends with Bob, Bob is friends with Alice).
+    *   **Directed Graph:** Edges have a specific direction (e.g., if you follow someone on Twitter, they don't necessarily follow you back).
+    *   **Weighted Graph:** Edges have a value (weight) associated with them (e.g., distance of a road, cost of a flight).
+    *   **Unweighted Graph:** Edges just show a connection, no value.
+
+### 2. Why Do Graphs Matter?
+
+Graphs are *everywhere* in the real world and in computer science. They are a powerful way to model relationships and solve complex problems.
+
+*   **Navigation:** Google Maps uses graphs to find the shortest route between two places.
+*   **Social Media:** Friend suggestions, trend analysis, influence networks.
+*   **Internet:** How data packets travel from your computer to a website.
+*   **Dependencies:** Project management, task scheduling (what needs to be done before what).
+*   **Recommendation Systems:** "People who bought this also bought..."
+
+Essentially, if you need to understand how things are connected and interact, graphs are your go-to data structure!
+
+### 3. Example Problem: The Neighborhood Network
+
+Let's keep it simple!
+
+**Problem:** You have a small neighborhood. We want to represent who lives next to whom. If person A lives next to person B, then person B also lives next to person A.
+
+**Input:**
+*   `N`: Number of people in the neighborhood.
+*   `M`: Number of "next-door" relationships.
+*   `M` lines, each with two numbers `u` and `v`, indicating that person `u` lives next to person `v`.
+
+**Example Scenario:**
+*   `N = 3` (People: 0, 1, 2)
+*   `M = 3`
+*   Relationships:
+    *   `0 1` (Person 0 lives next to Person 1)
+    *   `1 2` (Person 1 lives next to Person 2)
+    *   `2 0` (Person 2 lives next to Person 0)
+
+**Goal:** Create a structure that lets us easily see who lives next to whom.
+
+### 4. Simple C++ Implementation: Adjacency List
+
+The most common and often efficient way to represent a graph in code is using an **Adjacency List**.
+
+It's essentially an array (or `std::vector`) where each index `i` represents a node, and the value at `adj[i]` is a list (or `std::vector`) of all nodes that `i` is connected to.
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For using std::vector
+
+int main() {
+    // Keep things clean and simple
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_people; // N: Number of people (nodes)
+    int num_relationships; // M: Number of next-door relationships (edges)
+
+    std::cout << "Enter number of people (nodes): ";
+    std::cin >> num_people;
+    std::cout << "Enter number of next-door relationships (edges): ";
+    std::cin >> num_relationships;
+
+    // --- Adjacency List Representation ---
+    // 'adj' is a vector of vectors.
+    // adj[i] will store a list of all people person 'i' lives next to.
+    // We use num_people to size it for 0-indexed nodes (0 to num_people-1).
+    std::vector<std::vector<int>> adj(num_people);
+
+    std::cout << "\nEnter relationships (person u person v):\n";
+    for (int i = 0; i < num_relationships; ++i) {
+        int u, v; // Person u and Person v
+        std::cin >> u >> v;
+
+        // Since it's an UNDIRECTED relationship (if u lives next to v, v lives next to u)
+        // we add both connections.
+        adj[u].push_back(v); // Add v to u's neighbors
+        adj[v].push_back(u); // Add u to v's neighbors
+    }
+
+    // --- Print the Adjacency List to verify ---
+    std::cout << "\n--- Neighborhood Network (Adjacency List) ---\n";
+    for (int i = 0; i < num_people; ++i) {
+        std::cout << "Person " << i << " lives next to: ";
+        if (adj[i].empty()) {
+            std::cout << "No one.";
+        } else {
+            for (int neighbor : adj[i]) {
+                std::cout << neighbor << " ";
+            }
+        }
+        std::cout << "\n";
+    }
+
+    return 0;
+}
+```
+
+**How to run it and what to expect:**
+
+**Input:**
+```
+Enter number of people (nodes): 3
+Enter number of next-door relationships (edges): 3
+Enter relationships (person u person v):
+0 1
+1 2
+2 0
+```
+
+**Output:**
+```
+--- Neighborhood Network (Adjacency List) ---
+Person 0 lives next to: 1 2
+Person 1 lives next to: 0 2
+Person 2 lives next to: 1 0
+```
+
+---
+
+And that's your quick intro to graphs! This simple representation is the foundation for almost all graph algorithms you'll learn next, like Breadth-First Search (BFS) and Depth-First Search (DFS). Keep exploring!
+
+---
