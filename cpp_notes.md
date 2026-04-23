@@ -39324,3 +39324,125 @@ int main() {
 That's your quick intro to Dynamic Programming! Remember, it's all about solving once, storing, and reusing. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-04-23 15:28:21
+
+Hey there, future problem-solver! Let's unpack the famous **Knapsack Problem** together. It's a classic for a reason!
+
+---
+
+### What is the Knapsack Problem?
+
+Imagine you have a backpack (your "knapsack") with a **limited weight capacity**. You're presented with a bunch of items, each having a specific **weight** and a specific **value**.
+
+Your goal? To pick items that fit into your backpack **without exceeding its capacity**, while making sure the **total value of the chosen items is as high as possible**.
+
+We'll focus on the "0/1 Knapsack" where you can either take an item *completely* (1) or *not at all* (0) – no partial items!
+
+---
+
+### Why Does It Matter?
+
+This isn't just a puzzle! Knapsack problems show up everywhere:
+
+*   **Resource Allocation:** Which projects to fund with a limited budget to maximize return?
+*   **Cutting Stock:** How to cut materials (like fabric or metal) to minimize waste?
+*   **Investment Portfolios:** Which assets to buy within a budget to maximize profit/minimize risk?
+*   **Logistics:** Packing a truck with items of varying sizes and values.
+
+It's a fundamental problem for understanding **optimization** and **Dynamic Programming** – a super important technique in computer science!
+
+---
+
+### Let's Solve One! (0/1 Knapsack)
+
+**Problem:** You have a knapsack with a capacity of `W = 5 kg`. You have three items:
+
+*   **Item 1:** Weight = 2 kg, Value = $60
+*   **Item 2:** Weight = 3 kg, Value = $100
+*   **Item 3:** Weight = 1 kg, Value = $30
+
+What's the maximum value you can carry?
+
+---
+
+#### Thinking Process (The DP Approach)
+
+This is a classic Dynamic Programming (DP) problem. We'll build up our solution from smaller parts.
+
+Imagine a table `dp[i][w]` where `dp[i][w]` stores the maximum value you can get using the *first `i` items* with a knapsack capacity of `w`.
+
+For each item `i` and each capacity `w`, we have two choices:
+
+1.  **Don't take item `i`:** The maximum value is simply whatever `dp[i-1][w]` was (the value without considering item `i`).
+2.  **Take item `i`:** This is only possible if `item_weight[i] <= w`. If we take it, the value will be `item_value[i]` plus the maximum value we could get from the *remaining capacity* (`w - item_weight[i]`) using the *previous items* (`dp[i-1][w - item_weight[i]]`).
+
+We'll choose the **maximum** of these two options.
+
+---
+
+#### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+int main() {
+    // Our items: {weight, value}
+    // We'll use 1-based indexing for convenience in loops,
+    // so the 0th index is unused/dummy.
+    std::vector<int> weights = {0, 2, 3, 1}; // weights[1]=2, weights[2]=3, weights[3]=1
+    std::vector<int> values = {0, 60, 100, 30}; // values[1]=60, values[2]=100, values[3]=30
+
+    int n = weights.size() - 1; // Number of actual items (3 in this case)
+    int W = 5; // Knapsack capacity
+
+    // dp[i][w] will store the maximum value with 'i' items and 'w' capacity
+    // Initialize with 0s. The table size will be (n+1) x (W+1).
+    // dp[0][...] and dp[...][0] will naturally be 0, which is our base case.
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
+
+    // Build the DP table
+    for (int i = 1; i <= n; ++i) { // Iterate through each item (from 1 to n)
+        for (int w = 1; w <= W; ++w) { // Iterate through each possible capacity (from 1 to W)
+            
+            // Option 1: Don't take item 'i'
+            // The value is the same as what we got with 'i-1' items for capacity 'w'
+            dp[i][w] = dp[i-1][w];
+
+            // Option 2: Take item 'i' (if it fits)
+            if (weights[i] <= w) {
+                // If we take it, the value is:
+                // current item's value + max value from remaining capacity (w - weights[i])
+                // using the previous 'i-1' items.
+                dp[i][w] = std::max(dp[i][w], values[i] + dp[i-1][w - weights[i]]);
+            }
+        }
+    }
+
+    std::cout << "Knapsack Capacity: " << W << " kg" << std::endl;
+    std::cout << "Maximum value you can carry: $" << dp[n][W] << std::endl;
+    
+    // Expected output: $130 (Items 2 and 3: 3kg+1kg=4kg, $100+$30=$130)
+
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+Knapsack Capacity: 5 kg
+Maximum value you can carry: $130
+```
+
+---
+
+### Key Takeaway
+
+And there you have it! The 0/1 Knapsack problem is a fantastic way to grasp Dynamic Programming. Remember, the core idea is to break down a big problem into smaller, overlapping subproblems and build up your solution systematically. Keep practicing!
+
+---
