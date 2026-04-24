@@ -39446,3 +39446,119 @@ Maximum value you can carry: $130
 And there you have it! The 0/1 Knapsack problem is a fantastic way to grasp Dynamic Programming. Remember, the core idea is to break down a big problem into smaller, overlapping subproblems and build up your solution systematically. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Greedy Algorithms  
+🕒 2026-04-24 08:04:57
+
+Let's dive into Greedy Algorithms! It's all about making smart, immediate choices. 🚀
+
+---
+
+## Greedy Algorithms: Make the Best Choice *Now*! 🤑
+
+### What it Means (The Concept)
+
+Imagine you're faced with a series of decisions, and at each step, you simply pick whatever looks like the **absolute best option right then and there**, without worrying about future consequences or exploring other paths. That's the core idea behind a Greedy Algorithm!
+
+It works by making a **locally optimal** choice at each stage with the hope of finding a **globally optimal** solution. It doesn't backtrack or reconsider past choices; it just moves forward based on the immediate best available option.
+
+### Why it Matters
+
+Greedy algorithms are super important because:
+
+1.  **Simplicity:** They are often much simpler to design and implement compared to more complex approaches like Dynamic Programming or exhaustive search.
+2.  **Efficiency:** When a greedy approach works, it's typically very fast because it avoids exploring many possibilities. It just makes one decision and sticks with it.
+3.  **Real-World Applicability:** Many real-world optimization problems (like scheduling, network routing, or certain types of resource allocation) can be solved effectively using greedy strategies.
+
+**Big Caveat:** A greedy choice doesn't *always* lead to the best overall solution. You need to prove that the greedy choice indeed produces the global optimum for your specific problem to rely on it fully!
+
+### Example Problem: Minimum Coin Change (Standard Denominations)
+
+**Problem:** You have an amount of money (e.g., `63` cents) and a set of standard coin denominations (e.g., 25, 10, 5, 1 cents). Your goal is to find the **minimum number of coins** to make up that amount.
+
+**Greedy Strategy:**
+Always pick the largest possible coin denomination that is less than or equal to the remaining amount. Repeat until the amount becomes zero.
+
+**Let's trace `63` cents:**
+
+1.  Remaining: `63`. Largest coin <= `63` is `25`. Take one `25c` coin.
+    *   Coins: `[25]`
+    *   Remaining: `63 - 25 = 38`
+2.  Remaining: `38`. Largest coin <= `38` is `25`. Take another `25c` coin.
+    *   Coins: `[25, 25]`
+    *   Remaining: `38 - 25 = 13`
+3.  Remaining: `13`. Largest coin <= `13` is `10`. Take one `10c` coin.
+    *   Coins: `[25, 25, 10]`
+    *   Remaining: `13 - 10 = 3`
+4.  Remaining: `3`. Largest coin <= `3` is `1`. Take one `1c` coin.
+    *   Coins: `[25, 25, 10, 1]`
+    *   Remaining: `3 - 1 = 2`
+5.  Remaining: `2`. Largest coin <= `2` is `1`. Take another `1c` coin.
+    *   Coins: `[25, 25, 10, 1, 1]`
+    *   Remaining: `2 - 1 = 1`
+6.  Remaining: `1`. Largest coin <= `1` is `1`. Take another `1c` coin.
+    *   Coins: `[25, 25, 10, 1, 1, 1]`
+    *   Remaining: `1 - 1 = 0`
+
+Total coins: **6** (2 quarters, 1 dime, 3 pennies).
+
+*(Note: This greedy strategy works for standard coin systems like USD or Euro, but not necessarily for arbitrary coin systems. For arbitrary systems, you'd typically need Dynamic Programming.)*
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector to store denominations
+#include <algorithm> // Not strictly needed for this pre-sorted array, but good for general sorting
+
+// Function to find the minimum number of coins using a greedy approach
+int minCoins(int amount) {
+    // Define the available coin denominations, sorted from largest to smallest.
+    // This order is crucial for the greedy strategy.
+    std::vector<int> denominations = {25, 10, 5, 1}; 
+    int coinCount = 0; // Initialize the total count of coins used
+
+    // Iterate through each coin denomination
+    for (int coin : denominations) {
+        // While the current amount is greater than or equal to the current coin
+        while (amount >= coin) {
+            amount -= coin; // Subtract the coin's value from the amount
+            coinCount++;    // Increment the coin count
+        }
+    }
+    return coinCount; // Return the total number of coins
+}
+
+int main() {
+    int targetAmount1 = 63;
+    std::cout << "Minimum coins for " << targetAmount1 << " cents: " 
+              << minCoins(targetAmount1) << std::endl; // Expected: 6
+
+    int targetAmount2 = 12;
+    std::cout << "Minimum coins for " << targetAmount2 << " cents: " 
+              << minCoins(targetAmount2) << std::endl; // Expected: 10 + 1 + 1 = 3
+
+    int targetAmount3 = 100;
+    std::cout << "Minimum coins for " << targetAmount3 << " cents: " 
+              << minCoins(targetAmount3) << std::endl; // Expected: 4 quarters = 4
+
+    return 0;
+}
+```
+
+**Explanation of the Code:**
+
+1.  We define a `std::vector` called `denominations` holding our coin values, sorted in **descending order**. This is vital for the greedy choice (always picking the largest possible).
+2.  `coinCount` keeps track of how many coins we've used.
+3.  We loop through each `coin` in our `denominations` vector.
+4.  Inside this loop, a `while` loop repeatedly subtracts the current `coin` value from `amount` as long as `amount` is large enough. Each subtraction counts as one coin used.
+5.  Once `amount` is less than the current `coin`, we move to the next smaller denomination.
+6.  Finally, `coinCount` holds the minimum number of coins.
+
+---
+
+**Key Takeaway:** Greedy Algorithms are about making the best *immediate* choice. They're simple and often efficient, but always be sure that your local "best" choice truly contributes to the global "best" solution! Happy coding! ✨
+
+---
