@@ -39677,3 +39677,122 @@ int main() {
 And that's your quick dive into Sliding Window! This fixed-size window is just the beginning; there are also variable-size windows which are a bit more complex but follow the same core idea. Keep sliding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Two Pointer Technique  
+🕒 2026-04-25 07:18:15
+
+Alright, let's break down the Two Pointer Technique!
+
+---
+
+### DSA Learning Note: Two Pointer Technique
+
+Hey there, future coding wizard! Let's talk about a super common and handy trick called the **Two Pointer Technique**.
+
+---
+
+#### 🤝 What the Concept Means
+
+Imagine you're trying to find something or make changes in a line of items (like an array or a string). Instead of using complicated data structures or slow nested loops, you simply use *two* "pointers" (which are just variables holding indices) to navigate through your data.
+
+These pointers typically move in one of two ways:
+1.  **Opposite Directions:** One pointer starts at the beginning, the other at the end, and they move towards each other.
+2.  **Same Direction:** Both pointers start at or near the beginning, but one moves "faster" than the other (often called a "fast and slow pointer" approach).
+
+The magic happens when you use the positions of these two pointers to make decisions, compare elements, or swap values efficiently.
+
+---
+
+#### 🚀 Why It Matters
+
+It's a fantastic technique for:
+*   **Optimization:** It often reduces time complexity from a common `O(N^2)` (think nested loops) down to a much faster `O(N)` (single pass).
+*   **Space Efficiency:** It usually operates "in-place," meaning it doesn't require much extra memory (typically `O(1)` additional space).
+*   **Simplicity:** Once you get the hang of it, many problems become surprisingly straightforward to solve.
+
+---
+
+#### 💡 Example Problem: Reverse a Vector
+
+Let's say you have a list of numbers and you want to reverse their order.
+
+**Problem:** Given a `std::vector<int>`, reverse its elements.
+
+**Input:** `[1, 2, 3, 4, 5]`
+**Output:** `[5, 4, 3, 2, 1]`
+
+**How Two Pointers help:**
+We can use two pointers: `left` starting at the first element, and `right` starting at the last. We swap the elements they point to, then move `left` one step right and `right` one step left, until they meet or cross.
+
+---
+
+#### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For std::vector
+#include <algorithm> // For std::swap
+
+// Function to reverse a vector using two pointers
+void reverseVector(std::vector<int>& arr) {
+    // Pointer 1: Starts at the beginning
+    int left = 0;
+    // Pointer 2: Starts at the end
+    int right = arr.size() - 1;
+
+    // Loop until the pointers meet or cross each other
+    // If they meet (for odd-sized arrays), the middle element is already in place.
+    // If they cross (for even-sized arrays), all necessary swaps are done.
+    while (left < right) {
+        // Swap the elements at the left and right pointers
+        std::swap(arr[left], arr[right]);
+
+        // Move left pointer one step to the right
+        left++;
+        // Move right pointer one step to the left
+        right--;
+    }
+}
+
+int main() {
+    std::vector<int> myVec = {10, 20, 30, 40, 50};
+
+    std::cout << "Original vector: ";
+    for (int x : myVec) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    reverseVector(myVec); // Call the two-pointer function
+
+    std::cout << "Reversed vector: ";
+    for (int x : myVec) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // Another example
+    std::vector<int> singleElementVec = {99};
+    std::cout << "Original single element vector: ";
+    for (int x : singleElementVec) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+    reverseVector(singleElementVec);
+    std::cout << "Reversed single element vector: ";
+    for (int x : singleElementVec) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+See how clean and efficient that is? No nested loops, just a single pass! That's the power of the Two Pointer Technique. Keep practicing, and you'll spot opportunities to use it everywhere!
+
+---
