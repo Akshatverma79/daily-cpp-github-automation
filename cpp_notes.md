@@ -40798,3 +40798,164 @@ void RabinKarpSearch(const std::string& text, const std::string& pattern) {
 And there you have it! Two powerful string matching algorithms. KMP excels with its deterministic linear time by cleverly using pattern self-knowledge, while Rabin-Karp offers a probabilistic approach with excellent average-case performance using the magic of hashing. Both are super useful in different scenarios! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-04-29 15:48:59
+
+Hey there, future algorithm master! 🚀 Let's dive into Backtracking.
+
+---
+
+## Backtracking Basics 👣
+
+Backtracking is a powerful algorithmic technique for solving problems, often involving making a sequence of decisions. Think of it like exploring a maze!
+
+### 1. What is Backtracking?
+
+*   **Concept:** Backtracking is an algorithmic paradigm that tries to find solutions by **incrementally building candidates** to the solutions and **abandoning a candidate** ("backtracking") as soon as it determines that the candidate cannot possibly be extended to a valid complete solution.
+*   **Analogy:** Imagine you're in a maze. You try a path. If it leads to a dead end, you **backtrack** to the last junction and try a different path. You keep doing this until you find the exit or explore all possibilities.
+*   **Key Idea:**
+    1.  **Make a choice.**
+    2.  **Explore** (recursively) with that choice.
+    3.  **Undo the choice** (backtrack) to try other options. This "undo" step is crucial!
+
+### 2. Why is Backtracking Important?
+
+*   **Problem Solving:** It's super useful for problems where you need to explore *all possible configurations* or *find a path* by trying different options.
+*   **Common Use Cases:**
+    *   Finding all permutations or combinations of elements.
+    *   Solving puzzles like Sudoku, N-Queens.
+    *   Generating subsets.
+    *   Finding paths in a maze or on a graph.
+*   **Power:** It systematically explores the solution space, guaranteeing you'll find all solutions (if any) or the optimal one.
+
+### 3. Let's See an Example! (Subsets)
+
+**Problem:** Given a set of distinct integers, `nums`, return all possible subsets (the power set).
+
+**Example:**
+Input: `nums = [1, 2, 3]`
+
+Output:
+```
+[
+  [],
+  [1],
+  [2],
+  [3],
+  [1,2],
+  [1,3],
+  [2,3],
+  [1,2,3]
+]
+```
+
+### 4. How Backtracking Solves It (Intuition)
+
+For each number in `nums`, we have two choices:
+1.  **Include** it in the current subset.
+2.  **Exclude** it from the current subset.
+
+We'll use a recursive function that keeps track of the current `index` we're considering and the `currentSubset` we're building.
+
+*   **Base Case:** When `index` goes beyond the array size, it means we've considered all numbers. The `currentSubset` at this point is a valid subset, so we add it to our `result` list.
+*   **Recursive Step:**
+    *   **Choice 1 (Include):** Add `nums[index]` to `currentSubset`. Then recursively call the function for `index + 1`.
+    *   **Backtrack (Undo):** After the recursive call returns (meaning we've explored all subsets stemming from including `nums[index]`), we **remove `nums[index]`** from `currentSubset`. This cleans up our state for the next choice.
+    *   **Choice 2 (Exclude):** Recursively call the function for `index + 1` *without* adding `nums[index]` to `currentSubset`.
+
+### 5. C++ Code Time!
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::sort if needed, though not strictly for this distinct problem
+
+class Solution {
+public:
+    // This will store all the subsets we find
+    std::vector<std::vector<int>> allSubsets;
+
+    // Helper function for the backtracking logic
+    // nums: The original array of numbers
+    // index: The current number we are considering (to include or exclude)
+    // currentSubset: The subset we are currently building
+    void backtrack(const std::vector<int>& nums, int index, std::vector<int>& currentSubset) {
+        // Base case: If we've considered all elements
+        if (index == nums.size()) {
+            allSubsets.push_back(currentSubset); // Add the current valid subset to our results
+            return;
+        }
+
+        // --- Choice 1: Include the current number ---
+        currentSubset.push_back(nums[index]); // Make the choice: add current number
+        backtrack(nums, index + 1, currentSubset); // Explore with this choice
+        currentSubset.pop_back(); // BACKTRACK: Undo the choice to clean up for the next option
+                                  // This is crucial! It removes nums[index] so other paths can try without it.
+
+        // --- Choice 2: Exclude the current number ---
+        // We simply move to the next index without adding nums[index]
+        backtrack(nums, index + 1, currentSubset); // Explore without this choice
+    }
+
+    // Main function to initiate the subset generation
+    std::vector<std::vector<int>> subsets(std::vector<int>& nums) {
+        allSubsets.clear(); // Clear previous results if called multiple times
+        std::vector<int> currentSubset; // Start with an empty subset
+        backtrack(nums, 0, currentSubset); // Begin backtracking from index 0
+        return allSubsets;
+    }
+};
+
+// --- Test the code ---
+int main() {
+    Solution sol;
+    std::vector<int> nums = {1, 2, 3};
+    std::vector<std::vector<int>> result = sol.subsets(nums);
+
+    std::cout << "Subsets for [1, 2, 3]:" << std::endl;
+    for (const auto& subset : result) {
+        std::cout << "[";
+        for (size_t i = 0; i < subset.size(); ++i) {
+            std::cout << subset[i];
+            if (i < subset.size() - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+    }
+
+    std::cout << "\nSubsets for [0]:" << std::endl;
+    std::vector<int> nums2 = {0};
+    result = sol.subsets(nums2);
+    for (const auto& subset : result) {
+        std::cout << "[";
+        for (size_t i = 0; i < subset.size(); ++i) {
+            std::cout << subset[i];
+            if (i < subset.size() - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+    }
+    
+    return 0;
+}
+
+```
+
+### Key Takeaways for Backtracking:
+
+1.  **Recursive Structure:** Backtracking problems are almost always solved recursively.
+2.  **Base Case:** Define when a solution is found or a path is invalid.
+3.  **Choices:** Clearly identify the decisions you can make at each step.
+4.  **Explore & Undo:** For each choice:
+    *   **Make the choice.** (Add to `currentSubset`, mark `visited`, etc.)
+    *   **Recurse.** (Call `backtrack` for the next step).
+    *   **Undo the choice.** (Remove from `currentSubset`, unmark `visited`, restore original state). This is the "backtrack" part and is essential for exploring other paths!
+
+You got this! Keep practicing, and backtracking will become second nature. ✨
+
+---
