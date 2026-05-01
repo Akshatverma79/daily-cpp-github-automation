@@ -41124,3 +41124,112 @@ int main() {
 **Pretty neat, huh?** Backtracking is a fundamental technique for problems where you need to make a sequence of choices, and if a choice leads to a dead end, you can cleverly "undo" it and try another. Keep practicing, and you'll master it in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2026-05-01 08:12:35
+
+Alright, let's dive into Heaps and Priority Queues! They're super useful for managing things that need a "priority" order.
+
+---
+
+## 🎒 Heaps & Priority Queues: Your Priority Manager
+
+### 🚀 1. What's the Concept?
+
+Imagine you have a list of tasks, but some are more urgent than others. You don't just want to process them in the order they arrived; you want to handle the **most important** one first. That's exactly what a **Priority Queue** does!
+
+*   **Priority Queue (Abstract Data Type):**
+    *   It's like a special queue where each item has a "priority."
+    *   Instead of "first-in, first-out" (FIFO) like a regular queue, it's "highest-priority-out-first."
+    *   You can `add` elements, and `extract` the highest priority element.
+    *   You can also `peek` at the highest priority element without removing it.
+
+*   **Heap (Data Structure):**
+    *   A **Heap** is the most common and efficient way to *implement* a Priority Queue.
+    *   It's a specialized **tree-based data structure** that satisfies the "heap property."
+    *   **Heap Property:** For a **Max-Heap**, every parent node's value is greater than or equal to its children's values. (For a **Min-Heap**, it's the opposite: parent is less than or equal to children).
+    *   This property ensures that the highest (or lowest) priority element is always at the "root" (top) of the heap, making it super quick to access!
+    *   Heaps are typically implemented using an array or `std::vector` in a way that mimics a complete binary tree.
+
+### 🤔 2. Why Does It Matter?
+
+Heaps and Priority Queues are everywhere because they're incredibly efficient for maintaining order based on priority:
+
+*   **Efficient:** Adding an item or removing the highest priority item takes `O(log n)` time (where `n` is the number of items). Peeking at the highest priority item is `O(1)`.
+*   **Real-world Scheduling:** Think about a hospital emergency room (most critical patient first), task scheduling in an operating system (highest priority task runs next), or even AI algorithms.
+*   **Graph Algorithms:** They are fundamental to algorithms like Dijkstra's (finding shortest paths) and Prim's (finding minimum spanning trees).
+*   **Event Simulation:** Managing events that need to happen at specific times, processing the earliest event first.
+
+### 💡 3. Example Problem: "Highest Score First"
+
+Let's say you're grading assignments, and you want to always pull out the assignment with the highest score first to review.
+
+**Problem:** You receive a stream of student scores. Whenever you need to grade, you want to automatically get the student with the highest current score.
+
+**Scores received:** `85, 92, 78, 95, 88, 70`
+
+**Desired Output Order (highest first):** `95, 92, 88, 85, 78, 70`
+
+### 💻 4. Simple C++ Implementation (using `std::priority_queue`)
+
+C++ STL provides `std::priority_queue` which is a fantastic wrapper around a heap! By default, it's a **Max-Heap** (meaning it always gives you the largest element).
+
+```cpp
+#include <iostream>
+#include <queue>    // For std::priority_queue
+#include <vector>   // priority_queue uses std::vector by default for storage
+
+int main() {
+    // Declare a priority queue for integers.
+    // By default, std::priority_queue is a Max-Heap,
+    // so it will always give us the largest element.
+    std::priority_queue<int> studentScores;
+
+    std::cout << "Adding student scores to the priority queue:\n";
+
+    // Add scores
+    studentScores.push(85);
+    std::cout << "Pushed 85. Top score: " << studentScores.top() << std::endl; // 85
+
+    studentScores.push(92);
+    std::cout << "Pushed 92. Top score: " << studentScores.top() << std::endl; // 92 (because 92 > 85)
+
+    studentScores.push(78);
+    std::cout << "Pushed 78. Top score: " << studentScores.top() << std::endl; // 92 (still 92)
+
+    studentScores.push(95);
+    std::cout << "Pushed 95. Top score: " << studentScores.top() << std::endl; // 95 (new highest)
+
+    studentScores.push(88);
+    std::cout << "Pushed 88. Top score: " << studentScores.top() << std::endl; // 95
+
+    studentScores.push(70);
+    std::cout << "Pushed 70. Top score: " << studentScores.top() << std::endl; // 95
+
+    std::cout << "\n--- Processing assignments (highest score first) ---\n";
+
+    // Process all assignments by repeatedly getting the highest score
+    while (!studentScores.empty()) {
+        int highestScore = studentScores.top(); // Get the highest score
+        studentScores.pop();                     // Remove the highest score from the queue
+        std::cout << "Grading assignment with score: " << highestScore << std::endl;
+    }
+
+    std::cout << "\nAll assignments graded!\n";
+
+    // You can also create a Min-Heap if you want the smallest element first:
+    // std::priority_queue<int, std::vector<int>, std::greater<int>> minHeap;
+    // minHeap.push(5); minHeap.push(1); minHeap.push(10);
+    // std::cout << "\nMin-Heap top: " << minHeap.top() << std::endl; // Output: 1
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Heaps and Priority Queues are fantastic tools for efficient priority management in your programs. Keep exploring!
+
+---
