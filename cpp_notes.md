@@ -41428,3 +41428,175 @@ int main() {
 And there you have it! Tries are a fantastic tool for efficient string manipulation. Keep practicing, and you'll master them in no time! Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-05-02 14:37:37
+
+Hey there, future algorithm master! 👋 Let's break down Disjoint Set Union (DSU) into bite-sized pieces.
+
+---
+
+## DSU: Grouping Things Simply!
+
+Imagine you have a bunch of individual items, and you want to group them. Sometimes, these groups merge. DSU is a super efficient data structure that helps you manage these collections of **disjoint** (non-overlapping) sets.
+
+### What DSU Means (The Concept)
+
+At its heart, DSU solves two main problems very, very quickly:
+
+1.  **Find:** Given an item, which group does it belong to? (Specifically, it returns a "representative" element for that group).
+2.  **Unite (or Union):** Take two items and merge the groups they belong to.
+
+Think of it like managing social circles:
+*   `find(person)`: Who is the "leader" or main representative of this person's friend group?
+*   `unite(personA, personB)`: If person A and person B become friends, their entire friend groups merge into one larger group.
+
+### Why DSU Matters (Its Power)
+
+DSU is incredibly useful for problems involving **connectivity** and **grouping**:
+
+*   **Graph Problems:** Checking if two nodes are connected, finding connected components, Kruskal's algorithm for Minimum Spanning Tree.
+*   **Network Connectivity:** Determining if all computers in a network can communicate.
+*   **Social Networks:** Finding distinct friend groups.
+*   **Maze Generation:** Ensuring all parts of the maze are reachable.
+
+It's efficient! With clever optimizations (path compression and union by size/rank), operations are almost constant time (amortized $O(\alpha(N))$, where $\alpha$ is the inverse Ackermann function, which grows *extremely* slowly – practically constant for any realistic $N$).
+
+### How it Works (Under the Hood)
+
+We represent each set as a tree. The root of the tree is the "representative" of that set.
+
+*   **`parent` array:** `parent[i]` stores the parent of element `i`. If `parent[i] == i`, then `i` is the root (representative) of its set.
+*   **`size` (or `rank`) array:** `size[i]` stores the number of elements in the set rooted at `i`. This helps in `unite` to keep trees flat.
+
+**The Super Cool Tricks:**
+
+1.  **Path Compression (for `find`):** When you `find` an element's root, make all elements along the path point directly to the root. This flattens the tree, speeding up future `find` operations for those elements.
+2.  **Union by Size/Rank (for `unite`):** When merging two sets, always attach the root of the smaller tree to the root of the larger tree. This helps keep the trees balanced and shallow, preventing them from becoming long, skinny lines.
+
+### Example Problem: Counting Friend Groups
+
+**Problem:** You have `N` people, initially all in their own friend groups. You are given `M` pairs of people who become friends. If two people become friends, their entire friend groups merge. After all `M` friendships, how many distinct friend groups are there?
+
+**Input:**
+*   `N = 5` (people are 0, 1, 2, 3, 4)
+*   `Friendships:`
+    *   `(0, 1)`
+    *   `(2, 3)`
+    *   `(0, 4)`
+
+**Let's trace it:**
+
+1.  **Initial:** `N=5` people. `5` distinct groups: `{0}, {1}, {2}, {3}, {4}`.
+    *   `num_components = 5`
+
+2.  **`unite(0, 1)`:** Person 0 and Person 1 become friends.
+    *   Groups: `{0,1}, {2}, {3}, {4}`.
+    *   `num_components = 4`
+
+3.  **`unite(2, 3)`:** Person 2 and Person 3 become friends.
+    *   Groups: `{0,1}, {2,3}, {4}`.
+    *   `num_components = 3`
+
+4.  **`unite(0, 4)`:** Person 0 and Person 4 become friends.
+    *   Person 0 is in group `{0,1}`. Person 4 is in group `{4}`. These two groups merge.
+    *   Groups: `{0,1,4}, {2,3}`.
+    *   `num_components = 2`
+
+**Result:** After all friendships, there are **2** distinct friend groups.
+
+### Simple C++ Implementation
+
+Here's a lean and mean C++ implementation of DSU with path compression and union by size.
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota (though a simple loop works too)
+#include <iostream>
+#include <algorithm> // For std::swap
+
+class DSU {
+public:
+    std::vector<int> parent; // parent[i] stores the parent of element i
+    std::vector<int> sz;     // sz[i] stores the size of the set if i is the root
+    int num_components;      // Tracks the total number of disjoint sets
+
+    // Constructor: Initializes N sets, each with one element
+    DSU(int n) {
+        parent.resize(n);
+        // Initially, each element is its own parent
+        std::iota(parent.begin(), parent.end(), 0); // Fills parent with 0, 1, 2, ... n-1
+        
+        sz.assign(n, 1); // Each set initially has size 1
+        num_components = n; // Start with N distinct components
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing i
+    int find(int i) {
+        if (parent[i] == i) { // If i is its own parent, it's the root
+            return i;
+        }
+        // Path compression: Make i's parent point directly to the root
+        return parent[i] = find(parent[i]);
+    }
+
+    // Unite operation with Union by Size
+    // Merges the sets containing i and j
+    void unite(int i, int j) {
+        int root_i = find(i); // Find the root of i's set
+        int root_j = find(j); // Find the root of j's set
+
+        if (root_i != root_j) { // If they are not already in the same set
+            // Union by Size: Attach the smaller tree under the root of the larger tree
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i is the root of the larger/equal sized set
+            }
+            parent[root_j] = root_i; // Make root_i the parent of root_j
+            sz[root_i] += sz[root_j]; // Update the size of the new combined set
+            num_components--;        // One less distinct component after merging
+        }
+    }
+
+    // Returns the current number of distinct disjoint sets
+    int get_num_components() const {
+        return num_components;
+    }
+};
+
+int main() {
+    // Example Problem: Counting Friend Groups
+    int N = 5; // 5 people (0, 1, 2, 3, 4)
+    DSU dsu(N);
+
+    std::cout << "Initial number of groups: " << dsu.get_num_components() << std::endl; // Expected: 5
+
+    // Friendships
+    std::cout << "--- Processing friendships ---" << std::endl;
+    dsu.unite(0, 1); // 0 and 1 become friends
+    std::cout << "After (0,1): " << dsu.get_num_components() << " groups." << std::endl; // Expected: 4
+
+    dsu.unite(2, 3); // 2 and 3 become friends
+    std::cout << "After (2,3): " << dsu.get_num_components() << " groups." << std::endl; // Expected: 3
+
+    dsu.unite(0, 4); // 0 and 4 become friends (merges {0,1} and {4})
+    std::cout << "After (0,4): " << dsu.get_num_components() << " groups." << std::endl; // Expected: 2
+
+    std::cout << "--- Final Result ---" << std::endl;
+    std::cout << "Final number of distinct friend groups: " << dsu.get_num_components() << std::endl; // Expected: 2
+
+    // Check if elements are in the same set
+    std::cout << "Are 1 and 4 in the same group? " << (dsu.find(1) == dsu.find(4) ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Are 1 and 2 in the same group? " << (dsu.find(1) == dsu.find(2) ? "Yes" : "No") << std::endl; // Expected: No
+
+    return 0;
+}
+```
+
+---
+
+That's DSU for you! A powerful tool for keeping track of connected components and merging them efficiently. Happy coding!
+
+---
