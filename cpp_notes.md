@@ -41781,3 +41781,201 @@ int main() {
 Keep practicing, and you'll master them in no time! Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Fenwick Trees (Binary Indexed Tree)  
+🕒 2026-05-03 14:37:50
+
+Here's a friendly and simple guide to Fenwick Trees!
+
+---
+
+## Fenwick Trees (Binary Indexed Trees - BIT) 🌳✨
+
+Ever needed to quickly update values in an array and then also quickly find the sum of elements up to a certain point (a "prefix sum")? That's exactly what Fenwick Trees are for!
+
+### What is it? 🤔
+
+A Fenwick Tree, also known as a Binary Indexed Tree (BIT), is a data structure that:
+1.  **Updates individual elements** in an array.
+2.  **Queries prefix sums** (sum of elements from index 1 up to `k`).
+
+It does both of these operations much faster than a naive array or a simple prefix sum array could do together.
+
+### Why does it matter? (Why is it cool?) 😎
+
+Imagine you have a list of numbers and you frequently do two things:
+*   **Change one number:** If you have a prefix sum array, changing one number means you have to update *all* subsequent prefix sums (O(N) operation).
+*   **Ask for a prefix sum:** If you just have the original array, summing up to `k` takes O(k) time, which can be O(N).
+
+Fenwick Trees strike a beautiful balance:
+*   **Update an element:** O(log N) time
+*   **Query a prefix sum:** O(log N) time
+
+Where N is the size of your array. This is much better for problems with many updates and queries!
+
+### The "Magic" Behind It (How it works simply) ✨
+
+Fenwick Trees achieve their speed using clever binary representations and the `x & (-x)` operation.
+
+*   **`x & (-x)`:** This little trick gives you the value of the **lowest set bit** of `x`. For example:
+    *   `6 (0110_2)`: `6 & (-6)` gives `2 (0010_2)`
+    *   `8 (1000_2)`: `8 & (-8)` gives `8 (1000_2)`
+    *   `7 (0111_2)`: `7 & (-7)` gives `1 (0001_2)`
+
+    This value represents the **size of the range** that a specific node in the Fenwick tree is responsible for summing.
+
+*   **How it stores sums:** Each node `BIT[i]` doesn't store the value of `arr[i]`. Instead, `BIT[i]` stores the sum of a range of elements ending at `i`. The length of this range is `i & (-i)`.
+
+*   **Updating an element (`update(idx, val)`):**
+    When you update `arr[idx]` by `val`, you need to update all Fenwick tree nodes that *include* `arr[idx]` in their sum.
+    1.  Start at `idx`.
+    2.  Add `val` to `BIT[idx]`.
+    3.  Move to the next index `idx = idx + (idx & -idx)`.
+    4.  Repeat until `idx` exceeds the array size.
+
+*   **Querying a prefix sum (`query(idx)`):**
+    To get the sum from `arr[1]` to `arr[idx]`, you sum up the values from specific Fenwick tree nodes.
+    1.  Initialize `sum = 0`.
+    2.  Start at `idx`.
+    3.  Add `BIT[idx]` to `sum`.
+    4.  Move to the previous index `idx = idx - (idx & -idx)`.
+    5.  Repeat until `idx` becomes 0.
+
+**Important Note:** Fenwick Trees are typically **1-indexed**. If your problem uses 0-indexed arrays, you'll need to adjust indices (e.g., `idx+1` when calling BIT functions).
+
+### Example Problem 📝
+
+Let's use a small array: `arr = [0, 1, 2, 3, 4, 5]` (0-indexed, but we'll use 1-indexed for BIT for `[1, 2, 3, 4, 5]`)
+
+1.  **Initial state:** `BIT` is all zeros.
+2.  **Build the BIT from `[1, 2, 3, 4, 5]`:**
+    *   `update(1, 1)`
+    *   `update(2, 2)`
+    *   `update(3, 3)`
+    *   `update(4, 4)`
+    *   `update(5, 5)`
+3.  **Query `sum(1, 3)`:** (Sum of `arr[1] + arr[2] + arr[3]`)
+    *   `query(3)`
+    *   Expected: `1 + 2 + 3 = 6`
+4.  **Update `arr[2]` to `10`:** (Change `2` to `10`. This means an increment of `+8`)
+    *   `update(2, 8)`
+    *   Original array conceptually becomes: `[1, 10, 3, 4, 5]`
+5.  **Query `sum(1, 3)` again:**
+    *   `query(3)`
+    *   Expected: `1 + 10 + 3 = 14`
+
+### Simple C++ Implementation 💻
+
+```cpp
+#include <vector>
+#include <iostream>
+#include <numeric> // For std::accumulate (not used in BIT but useful generally)
+
+class FenwickTree {
+private:
+    std::vector<long long> bit; // The Fenwick Tree array (1-indexed)
+    int size;                   // Max index in the original array
+
+public:
+    // Constructor: initializes the Fenwick Tree with a given size
+    FenwickTree(int n) : size(n), bit(n + 1, 0) {}
+
+    // Update operation: adds 'delta' to the element at 'idx'
+    // and propagates this change upwards in the tree.
+    // 'idx' is 1-indexed.
+    void update(int idx, long long delta) {
+        // Iterate while idx is within the bounds of the tree
+        // Add (idx & -idx) to move to the next "parent" node
+        for (; idx <= size; idx += (idx & -idx)) {
+            bit[idx] += delta;
+        }
+    }
+
+    // Query operation: returns the prefix sum up to 'idx'
+    // 'idx' is 1-indexed.
+    long long query(int idx) {
+        long long sum = 0;
+        // Iterate while idx is greater than 0
+        // Subtract (idx & -idx) to move to the next "component" node
+        for (; idx > 0; idx -= (idx & -idx)) {
+            sum += bit[idx];
+        }
+        return sum;
+    }
+
+    // Function to build the Fenwick Tree from an initial 0-indexed array
+    // This is optional, you can also just call update for each element
+    void build(const std::vector<long long>& initial_array_0_indexed) {
+        // Ensure the initial_array size matches the FenwickTree size
+        if (initial_array_0_indexed.size() != size) {
+            std::cerr << "Error: Initial array size does not match Fenwick Tree size." << std::endl;
+            return;
+        }
+        for (int i = 0; i < size; ++i) {
+            update(i + 1, initial_array_0_indexed[i]); // Convert to 1-indexed
+        }
+    }
+    
+    // Helper for range sum: sum of elements from index 'l' to 'r' (inclusive, 1-indexed)
+    long long query_range(int l, int r) {
+        if (l > r) return 0; // Handle invalid range
+        return query(r) - query(l - 1);
+    }
+};
+
+int main() {
+    // Original 0-indexed array (for concept visualization)
+    std::vector<long long> original_array = {1, 2, 3, 4, 5};
+    int n = original_array.size(); // Size of the data
+
+    // Create a Fenwick Tree for 'n' elements
+    FenwickTree ft(n);
+
+    // Build the Fenwick Tree from the original array
+    // Remember to pass original_array_0_indexed for 0-indexed data
+    ft.build(original_array);
+
+    std::cout << "Initial array (conceptual, 0-indexed): ";
+    for (long long x : original_array) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // --- Example operations ---
+
+    // 1. Query prefix sum up to index 3 (1-indexed)
+    // Corresponds to sum of original_array[0], original_array[1], original_array[2]
+    std::cout << "Sum from index 1 to 3: " << ft.query(3) << std::endl; // Expected: 1+2+3 = 6
+
+    // 2. Update element at index 2 (1-indexed) to 10
+    // This means original_array[1] conceptually changes from 2 to 10.
+    // The delta is 10 - 2 = 8.
+    long long old_val = original_array[1]; // Get old value (0-indexed)
+    long long new_val = 10;
+    ft.update(2, new_val - old_val); // Update with the difference
+    original_array[1] = new_val; // Keep conceptual array updated too
+
+    std::cout << "Array after updating index 2 to 10 (conceptual): ";
+    for (long long x : original_array) {
+        std::cout << x << " ";
+    }
+    std::cout << std::endl;
+
+    // 3. Query prefix sum up to index 3 again
+    std::cout << "Sum from index 1 to 3 after update: " << ft.query(3) << std::endl; // Expected: 1+10+3 = 14
+
+    // 4. Query sum of range [2, 4] (1-indexed)
+    // Corresponds to original_array[1], original_array[2], original_array[3]
+    std::cout << "Sum from index 2 to 4: " << ft.query_range(2, 4) << std::endl; // Expected: 10+3+4 = 17
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! A quick look into Fenwick Trees. They're super handy for competitive programming and any situation where you need fast point updates and prefix sum queries. Happy coding!
+
+---
