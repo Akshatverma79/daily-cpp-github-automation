@@ -41979,3 +41979,221 @@ int main() {
 And there you have it! A quick look into Fenwick Trees. They're super handy for competitive programming and any situation where you need fast point updates and prefix sum queries. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Shortest Path (Dijkstra's Algorithm)  
+🕒 2026-05-04 08:30:49
+
+Hey there, future DSA whiz! Let's conquer one of the coolest graph algorithms: Dijkstra's!
+
+---
+
+## DSA Note: Shortest Path - Dijkstra's Algorithm
+
+### 1. What is it? (The Concept)
+
+Imagine you're trying to find the *fastest* route from your home to a friend's house, considering different roads have different traffic (weights/costs). Dijkstra's Algorithm is like your super-smart GPS!
+
+**Dijkstra's Algorithm** is a greedy algorithm that finds the **shortest path** between a starting node and *all* other nodes in a **weighted graph**.
+
+**Key conditions:**
+*   The graph must have **non-negative** edge weights. (No "time travel" roads that let you arrive before you leave!)
+*   It works for both directed and undirected graphs.
+
+**How it basically works (Intuition):**
+
+1.  Start at your "home" (source node) and mark its distance as 0. All other nodes are "infinitely" far away.
+2.  Repeatedly visit the **unvisited node** that has the **smallest known distance** from the source.
+3.  For each neighbor of this visited node, try to find a *shorter path* to it through the current node. If you find one, update its distance.
+4.  Once a node is visited, we consider its shortest path from the source to be finalized. We won't process it again with a potentially longer path.
+5.  Keep doing this until all nodes reachable from the source have been visited.
+
+### 2. Why does it matter? (Importance)
+
+Dijkstra's is incredibly practical and fundamental:
+
+*   **GPS & Map Navigation:** Finding the quickest route between two locations.
+*   **Network Routing:** Determining the most efficient path for data packets across a network.
+*   **Game AI:** Pathfinding for characters in video games.
+*   **Logistics & Delivery:** Optimizing delivery routes.
+*   **Resource Allocation:** Finding the cheapest way to connect resources.
+
+It's a foundational algorithm that helps solve many real-world optimization problems!
+
+### 3. Example Problem (Small & Sweet)
+
+Let's find the shortest path from **Node 1** to all other nodes.
+
+**Graph:**
+```
+      (2)       (1)
+  1 ----- 2 ----- 4
+  | \     |
+(7) (3)   (3)
+  |   \   |
+  3     ---
+```
+
+**Nodes:** 1, 2, 3, 4
+**Edges (Source, Destination, Weight):**
+*   (1, 2, 2)
+*   (1, 3, 7)
+*   (1, 4, 3)
+*   (2, 3, 3)
+*   (2, 4, 1)
+
+**Let's trace (starting from Node 1):**
+
+1.  **Initialize:**
+    *   `dist[1] = 0`
+    *   `dist[2] = ∞`
+    *   `dist[3] = ∞`
+    *   `dist[4] = ∞`
+    *   `Priority Queue (PQ): { (0, Node 1) }` (stores {distance, node})
+
+2.  **Pop (0, Node 1) from PQ.**
+    *   **Neighbors of 1:**
+        *   **Node 2:** `dist[1] + weight(1,2) = 0 + 2 = 2`. Since `2 < dist[2]` (∞), update `dist[2] = 2`. Push `(2, Node 2)` to PQ.
+        *   **Node 3:** `dist[1] + weight(1,3) = 0 + 7 = 7`. Since `7 < dist[3]` (∞), update `dist[3] = 7`. Push `(7, Node 3)` to PQ.
+        *   **Node 4:** `dist[1] + weight(1,4) = 0 + 3 = 3`. Since `3 < dist[4]` (∞), update `dist[4] = 3`. Push `(3, Node 4)` to PQ.
+    *   PQ: `{ (2, Node 2), (3, Node 4), (7, Node 3) }` (ordered by distance)
+
+3.  **Pop (2, Node 2) from PQ.**
+    *   **Neighbors of 2:**
+        *   **Node 1:** Already finalized (distance 0). Ignore.
+        *   **Node 3:** `dist[2] + weight(2,3) = 2 + 3 = 5`. Since `5 < dist[3]` (7), update `dist[3] = 5`. Push `(5, Node 3)` to PQ.
+        *   **Node 4:** `dist[2] + weight(2,4) = 2 + 1 = 3`. Since `3 == dist[4]` (3), no change is strictly needed, but we can push `(3, Node 4)` if we want (it will be ignored later if a smaller path for 4 is found, or simply processed again with the same distance). For simplicity, let's say we only push if `<`.
+    *   PQ: `{ (3, Node 4), (5, Node 3), (7, Node 3) }`
+
+4.  **Pop (3, Node 4) from PQ.**
+    *   Current `dist[4]` is 3. We've found the shortest path to Node 4 (1 -> 4, cost 3 OR 1 -> 2 -> 4, cost 3). No new shorter paths via Node 4 for other nodes (in this simple graph).
+    *   PQ: `{ (5, Node 3), (7, Node 3) }`
+
+5.  **Pop (5, Node 3) from PQ.**
+    *   Current `dist[3]` is 5. We've found the shortest path to Node 3 (1 -> 2 -> 3, cost 5). No new shorter paths via Node 3 for other nodes.
+    *   (The `(7, Node 3)` entry remains, but when popped, `7 > dist[3]` (which is 5), so it will be ignored.)
+    *   PQ: `{ (7, Node 3) }`
+
+6.  **Pop (7, Node 3) from PQ.**
+    *   `7 > dist[3]` (which is 5), so we ignore this entry.
+    *   PQ: `{}`
+
+**Final Shortest Distances from Node 1:**
+*   `dist[1] = 0`
+*   `dist[2] = 2` (1 -> 2)
+*   `dist[3] = 5` (1 -> 2 -> 3)
+*   `dist[4] = 3` (1 -> 4 OR 1 -> 2 -> 4)
+
+### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue> // For priority_queue
+#include <limits> // For numeric_limits::max()
+
+// Using 'pair<int, int>' for {weight, destination_node} in adjacency list
+// and {distance, node} in priority queue
+
+const int INF = std::numeric_limits<int>::max(); // Represents infinity
+
+// Dijkstra's algorithm function
+// start_node: The source node to start from
+// num_nodes: Total number of nodes in the graph
+// adj: Adjacency list representing the graph (node -> list of {neighbor, weight})
+std::vector<int> dijkstra(int start_node, int num_nodes,
+                         const std::vector<std::vector<std::pair<int, int>>>& adj) {
+
+    // dist[i] will store the shortest distance from start_node to node i
+    std::vector<int> dist(num_nodes + 1, INF); // +1 for 1-based indexing
+
+    // Min-priority queue: stores pairs of {distance, node}
+    // 'greater' makes it a min-heap, so smallest distance is at top
+    std::priority_queue<std::pair<int, int>,
+                        std::vector<std::pair<int, int>>,
+                        std::greater<std::pair<int, int>>> pq;
+
+    // Set distance to start_node as 0 and push it to the priority queue
+    dist[start_node] = 0;
+    pq.push({0, start_node}); // {distance, node}
+
+    while (!pq.empty()) {
+        int u_dist = pq.top().first;  // Current shortest distance to node u
+        int u_node = pq.top().second; // Node u
+        pq.pop();
+
+        // If we found a shorter path to u already,
+        // this entry in the PQ is stale, so skip it.
+        if (u_dist > dist[u_node]) {
+            continue;
+        }
+
+        // Iterate over all neighbors 'v' of 'u'
+        for (const auto& edge : adj[u_node]) {
+            int v_node = edge.first;   // Neighbor node
+            int weight = edge.second; // Weight of edge (u, v)
+
+            // If a shorter path to v is found through u
+            if (dist[u_node] + weight < dist[v_node]) {
+                dist[v_node] = dist[u_node] + weight;
+                pq.push({dist[v_node], v_node}); // Push the updated path to PQ
+            }
+        }
+    }
+    return dist; // Return the vector of shortest distances
+}
+
+int main() {
+    int num_nodes = 4;
+    int num_edges = 5;
+    int start_node = 1;
+
+    // Adjacency list: adj[u] stores pairs of {v, weight} for edges (u, v)
+    // Using num_nodes + 1 for 1-based indexing
+    std::vector<std::vector<std::pair<int, int>>> adj(num_nodes + 1);
+
+    // Add edges to the graph (example from above)
+    adj[1].push_back({2, 2});
+    adj[1].push_back({3, 7});
+    adj[1].push_back({4, 3});
+    adj[2].push_back({3, 3});
+    adj[2].push_back({4, 1});
+
+    // Run Dijkstra's algorithm
+    std::vector<int> shortest_distances = dijkstra(start_node, num_nodes, adj);
+
+    // Print the results
+    std::cout << "Shortest distances from Node " << start_node << ":\n";
+    for (int i = 1; i <= num_nodes; ++i) {
+        if (shortest_distances[i] == INF) {
+            std::cout << "Node " << i << ": Unreachable\n";
+        } else {
+            std::cout << "Node " << i << ": " << shortest_distances[i] << "\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Shortest distances from Node 1:
+Node 1: 0
+Node 2: 2
+Node 3: 5
+Node 4: 3
+```
+
+---
+
+**Complexity (for the curious!):**
+*   **Time:** `O(E log V)` or `O(E + V log V)` where `V` is the number of vertices (nodes) and `E` is the number of edges. This depends on the priority queue implementation. For a standard binary heap (like `std::priority_queue`), it's typically `O(E log V)`.
+*   **Space:** `O(V + E)` for storing the graph and distances.
+
+---
+
+And that's Dijkstra's Algorithm in a nutshell! It's a powerful tool once you get the hang of its greedy, "always pick the closest" nature. Happy pathfinding!
+
+---
