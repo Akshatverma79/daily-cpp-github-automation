@@ -42800,3 +42800,192 @@ int main() {
 That's it! You've got the core concept and a practical implementation of Kruskal's algorithm for finding the Minimum Spanning Tree. Pretty neat, right? Keep coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-05-07 15:55:42
+
+Hey there, future algorithm master! 👋 Let's break down Topological Sort in a clean and simple way.
+
+---
+
+### **Topic: Topological Sort (Kahn's Algorithm)**
+
+Imagine you have a list of tasks, and some tasks *must* be done before others. Topological Sort helps you find a valid order to do all tasks.
+
+---
+
+### **1. What Does It Mean? (The Concept)**
+
+*   **Goal:** To order the vertices (nodes) of a **Directed Acyclic Graph (DAG)** such that for every directed edge from vertex `U` to vertex `V`, `U` comes before `V` in the ordering.
+*   **DAG:** "Directed" means edges have a direction (A -> B, not just A-B). "Acyclic" means there are no cycles (you can't start at A, follow edges, and end up back at A). If there's a cycle, a topological sort is impossible!
+*   **Kahn's Algorithm:** A common way to do this. It works by:
+    1.  Finding all nodes with **in-degree 0** (no incoming edges, meaning no prerequisites).
+    2.  Adding them to a queue.
+    3.  Processing nodes from the queue:
+        *   Add the current node to the result.
+        *   For all its neighbors, decrement their in-degree.
+        *   If a neighbor's in-degree becomes 0, add it to the queue.
+    4.  Repeat until the queue is empty.
+
+---
+
+### **2. Why Does It Matter? (Real-World Use Cases)**
+
+Topological Sort is super useful for ordering things with dependencies!
+
+*   **Course Scheduling:** You need to take "Intro to Programming" before "Data Structures."
+*   **Task Scheduling:** In project management, Task A must complete before Task B can start.
+*   **Build Systems:** Compiling source files in the correct order based on their dependencies.
+*   **Dependency Resolution:** Installing software packages where one package depends on another.
+*   **Instruction Scheduling:** In compilers, optimizing the order of instructions.
+
+---
+
+### **3. Example Problem (Small & Sweet)**
+
+Let's say we have courses: `A`, `B`, `C`, `D`.
+And these are the prerequisites:
+*   `A` must be taken before `C` (A -> C)
+*   `B` must be taken before `C` (B -> C)
+*   `C` must be taken before `D` (C -> D)
+
+**Graph Visualization:**
+```
+  A ---\
+        C --- D
+  B ---/
+```
+
+**Kahn's Algorithm Walkthrough:**
+
+1.  **Calculate In-degrees:**
+    *   A: 0
+    *   B: 0
+    *   C: 2 (from A, B)
+    *   D: 1 (from C)
+
+2.  **Initialize Queue:** Add nodes with in-degree 0.
+    `Queue: [A, B]`
+
+3.  **Process:**
+    *   **Pop A:** `Result: [A]`. `C`'s in-degree becomes 1.
+    *   **Pop B:** `Result: [A, B]`. `C`'s in-degree becomes 0. Add `C` to queue.
+        `Queue: [C]`
+    *   **Pop C:** `Result: [A, B, C]`. `D`'s in-degree becomes 0. Add `D` to queue.
+        `Queue: [D]`
+    *   **Pop D:** `Result: [A, B, C, D]`.
+        `Queue: []` (empty)
+
+**Valid Topological Order:** `[A, B, C, D]` (Note: `[B, A, C, D]` is also valid! Multiple solutions are possible.)
+
+---
+
+### **4. Simple C++ Implementation (Kahn's Algorithm)**
+
+This code snippet assumes 0-indexed nodes and uses adjacency lists for the graph.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <numeric> // For std::iota (optional, for simple node labels)
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSort(int numNodes, const std::vector<std::vector<int>>& adj) {
+    std::vector<int> inDegree(numNodes, 0); // Stores in-degree for each node
+    std::queue<int> q;                     // Queue for nodes with in-degree 0
+    std::vector<int> result;                // Stores the sorted order
+
+    // 1. Calculate in-degrees for all nodes
+    for (int u = 0; u < numNodes; ++u) {
+        for (int v : adj[u]) {
+            inDegree[v]++;
+        }
+    }
+
+    // 2. Add all nodes with in-degree 0 to the queue
+    for (int i = 0; i < numNodes; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 3. Process nodes from the queue
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u); // Add current node to result
+
+        // For each neighbor v of u:
+        for (int v : adj[u]) {
+            inDegree[v]--; // Decrement in-degree of neighbor
+            // If neighbor's in-degree becomes 0, add it to the queue
+            if (inDegree[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    // 4. Check for cycles
+    // If result size is not equal to numNodes, a cycle exists
+    if (result.size() != numNodes) {
+        std::cout << "Error: Graph contains a cycle! Topological Sort impossible." << std::endl;
+        return {}; // Return empty vector indicating failure
+    }
+
+    return result;
+}
+
+int main() {
+    // Example from above: A(0), B(1), C(2), D(3)
+    int numNodes = 4;
+    std::vector<std::vector<int>> adj(numNodes);
+
+    // A -> C (0 -> 2)
+    adj[0].push_back(2);
+    // B -> C (1 -> 2)
+    adj[1].push_back(2);
+    // C -> D (2 -> 3)
+    adj[2].push_back(3);
+
+    std::vector<int> sortedOrder = topologicalSort(numNodes, adj);
+
+    if (!sortedOrder.empty()) {
+        std::cout << "Topological Order: ";
+        for (int node : sortedOrder) {
+            std::cout << node << " ";
+        }
+        std::cout << std::endl; // Expected: 0 1 2 3 (or 1 0 2 3)
+    }
+
+    // Example with a cycle (uncomment to test)
+    /*
+    std::cout << "\nTesting with a cycle:" << std::endl;
+    int numNodesWithCycle = 3;
+    std::vector<std::vector<int>> adjCycle(numNodesWithCycle);
+    adjCycle[0].push_back(1);
+    adjCycle[1].push_back(2);
+    adjCycle[2].push_back(0); // This creates a cycle 0 -> 1 -> 2 -> 0
+
+    std::vector<int> sortedOrderCycle = topologicalSort(numNodesWithCycle, adjCycle);
+    if (!sortedOrderCycle.empty()) {
+        std::cout << "Topological Order: ";
+        for (int node : sortedOrderCycle) {
+            std::cout << node << " ";
+        }
+        std::cout << std::endl;
+    }
+    */
+
+    return 0;
+}
+
+```
+
+---
+
+And that's Topological Sort with Kahn's Algorithm! A neat way to manage dependencies. Happy coding! ✨
+
+---
