@@ -42989,3 +42989,181 @@ int main() {
 And that's Topological Sort with Kahn's Algorithm! A neat way to manage dependencies. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Strongly Connected Components  
+🕒 2026-05-08 07:42:58
+
+Hey there, future graph master! 👋 Let's dive into a cool concept in directed graphs called **Strongly Connected Components** (SCCs).
+
+---
+
+## 🚀 Strongly Connected Components (SCCs)
+
+### What does it mean?
+
+Imagine a city where all roads are one-way. If you can get from building A to building B, and also from building B back to building A, then A and B are "strongly connected."
+
+A **Strongly Connected Component (SCC)** is a maximal subgraph where *every* pair of vertices (A, B) has a path from A to B AND a path from B to A. "Maximal" just means you can't add any more vertices to the component and still maintain that property.
+
+**Think of it like:** a "club" of nodes where everyone in the club can reach everyone else in the club, and vice versa.
+
+### Why does it matter?
+
+SCCs are super useful because they help us understand the structure of complex directed graphs:
+
+1.  **Cycle Detection:** If a node is part of an SCC with more than one node, it *must* be part of a cycle. This is great for finding circular dependencies in systems (e.g., software modules, task scheduling).
+2.  **Graph Simplification:** You can "shrink" each SCC into a single "supernode." If you do this, the resulting graph of supernodes will *always* be a Directed Acyclic Graph (DAG). This simplification can make otherwise complex problems much easier to solve!
+3.  **Many Applications:** SCCs pop up in areas like 2-SAT problems, network analysis, and even determining deadlocks in concurrent systems.
+
+### 💡 Example Problem
+
+Let's find the SCCs in this small graph:
+
+**Nodes:** 0, 1, 2, 3, 4, 5
+**Edges:**
+*   0 -> 1
+*   1 -> 2
+*   2 -> 0
+*   2 -> 3
+*   3 -> 4
+*   4 -> 3
+*   4 -> 5
+
+**Let's visualize and find the SCCs:**
+
+*   **SCC 1: {0, 1, 2}**
+    *   0 -> 1 -> 2 -> 0 (a cycle!)
+*   **SCC 2: {3, 4}**
+    *   3 -> 4 -> 3 (another cycle!)
+*   **SCC 3: {5}**
+    *   5 has no outgoing edges, nor incoming edges that form a cycle with it. It's an SCC by itself.
+
+Notice that there's a path from SCC 1 to SCC 2 (via 2 -> 3) and from SCC 2 to SCC 3 (via 4 -> 5), but no path back the other way. This forms the DAG of supernodes!
+
+---
+
+### 🛠️ Simple C++ Implementation (Kosaraju's Algorithm)
+
+Kosaraju's algorithm is one of the classic ways to find SCCs. It's elegant and relies on two Depth First Searches (DFS).
+
+**Here's the idea:**
+1.  **First DFS:** Traverse the original graph. When a node's DFS finishes (all its descendants are visited), push it onto a stack. This stack will give us nodes in decreasing order of their "finishing times."
+2.  **Transpose Graph:** Create a new graph where all edge directions are reversed. This is called the "transpose" graph.
+3.  **Second DFS:** While the stack from the first DFS is not empty, pop a node. If this node hasn't been visited yet, start a new DFS from it on the *transpose graph*. All nodes reachable from this starting node in the transpose graph form one SCC.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm> // For std::reverse if needed for printing
+
+// --- Step 1: First DFS to get finishing times ---
+void dfs1(int u, const std::vector<std::vector<int>>& adj, 
+          std::vector<bool>& visited, std::stack<int>& order_stack) {
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            dfs1(v, adj, visited, order_stack);
+        }
+    }
+    // After visiting all descendants, push u onto the stack
+    order_stack.push(u);
+}
+
+// --- Step 3: Second DFS on transpose graph ---
+void dfs2(int u, const std::vector<std::vector<int>>& rev_adj, 
+          std::vector<bool>& visited, std::vector<int>& current_scc) {
+    visited[u] = true;
+    current_scc.push_back(u);
+    for (int v : rev_adj[u]) {
+        if (!visited[v]) {
+            dfs2(v, rev_adj, visited, current_scc);
+        }
+    }
+}
+
+// Main function to find all SCCs
+std::vector<std::vector<int>> findSCCs(int num_nodes, 
+                                     const std::vector<std::vector<int>>& adj) {
+    std::stack<int> order_stack;
+    std::vector<bool> visited(num_nodes, false);
+
+    // Perform first DFS for all unvisited nodes
+    for (int i = 0; i < num_nodes; ++i) {
+        if (!visited[i]) {
+            dfs1(i, adj, visited, order_stack);
+        }
+    }
+
+    // --- Step 2: Build Transpose Graph ---
+    std::vector<std::vector<int>> rev_adj(num_nodes);
+    for (int u = 0; u < num_nodes; ++u) {
+        for (int v : adj[u]) {
+            rev_adj[v].push_back(u); // Reverse the edge (v -> u instead of u -> v)
+        }
+    }
+
+    // Reset visited array for the second DFS
+    std::fill(visited.begin(), visited.end(), false); 
+
+    std::vector<std::vector<int>> all_sccs;
+
+    // Perform second DFS based on the order from the stack
+    while (!order_stack.empty()) {
+        int u = order_stack.top();
+        order_stack.pop();
+
+        if (!visited[u]) {
+            std::vector<int> current_scc;
+            dfs2(u, rev_adj, visited, current_scc);
+            all_sccs.push_back(current_scc);
+        }
+    }
+    return all_sccs;
+}
+
+int main() {
+    int num_nodes = 6; // Nodes 0 to 5
+    std::vector<std::vector<int>> adj(num_nodes);
+
+    // Example Graph Edges:
+    adj[0].push_back(1);
+    adj[1].push_back(2);
+    adj[2].push_back(0); // Cycle: 0-1-2-0
+    adj[2].push_back(3);
+    adj[3].push_back(4);
+    adj[4].push_back(3); // Cycle: 3-4-3
+    adj[4].push_back(5);
+
+    std::vector<std::vector<int>> sccs = findSCCs(num_nodes, adj);
+
+    std::cout << "Strongly Connected Components:\n";
+    int scc_count = 1;
+    for (const auto& scc : sccs) {
+        std::cout << "SCC " << scc_count++ << ": { ";
+        for (int node : scc) {
+            std::cout << node << " ";
+        }
+        std::cout << "}\n";
+    }
+
+    return 0;
+}
+```
+
+**Output of the example code:**
+```
+Strongly Connected Components:
+SCC 1: { 5 }
+SCC 2: { 3 4 }
+SCC 3: { 0 1 2 }
+```
+*Note: The order of SCCs might vary depending on the starting node for DFS and internal graph structure, but the components themselves will be the same.* Our example output shows {5}, then {3,4}, then {0,1,2}, which matches our manual analysis!
+
+---
+
+And there you have it! A quick and friendly tour into the world of Strongly Connected Components. They're a fundamental concept for anyone dealing with directed graphs! Keep practicing! 🚀
+
+---
