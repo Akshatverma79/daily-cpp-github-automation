@@ -43389,3 +43389,157 @@ Articulation Points:
 And there you have it! Mastering Bridges and Articulation Points gives you powerful tools to analyze network robustness and find those critical components. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-05-09 07:57:32
+
+Hey there, future DSA master! 👋 Let's dive into a classic problem: **Longest Common Subsequence (LCS)**.
+
+---
+
+## LCS: Longest Common Subsequence
+
+### 1. What Does LCS Mean? 🤔
+
+Imagine you have two strings. A **subsequence** is formed by deleting zero or more characters from the original string, *without changing the order of the remaining characters*.
+
+The **Longest Common Subsequence (LCS)** of two strings is the *longest possible subsequence* that is present in *both* of them.
+
+**Key point:** Characters in a subsequence don't need to be contiguous (next to each other) in the original string, but their *relative order* must be maintained.
+
+**Example:**
+*   String: "APPLE"
+*   Subsequences: "AP", "ALE", "PLE", "A", "APPLE"
+*   NOT subsequences: "PAL" (P comes after A in "APPLE"), "PPA"
+
+---
+
+### 2. Why Does LCS Matter? 🚀
+
+LCS is not just a theoretical puzzle; it has super practical applications!
+
+*   **Diff Utilities:** Ever used Git or a file comparison tool? They use algorithms similar to LCS to show you the differences between two versions of a file, highlighting what changed, was added, or removed.
+*   **Bioinformatics:** Comparing DNA or protein sequences to find similarities and evolutionary relationships.
+*   **Plagiarism Detection:** Identifying common parts in text documents.
+*   **Version Control:** Helping merge changes in code.
+
+It essentially helps us quantify how "similar" two sequences are. Pretty neat, right?
+
+---
+
+### 3. Let's See an Example! 💡
+
+**Problem:** Find the length of the LCS of two strings:
+`text1 = "AGGTAB"`
+`text2 = "GXTXAYB"`
+
+**Thinking Process (Dynamic Programming):**
+
+This problem perfectly fits the **Dynamic Programming (DP)** paradigm. We build up our solution from smaller subproblems.
+
+Imagine creating a table (let's call it `dp`) where `dp[i][j]` stores the length of the LCS of `text1[0...i-1]` and `text2[0...j-1]`.
+
+*   **Base Cases:** If either string is empty, the LCS length is 0. So, `dp[0][j] = 0` and `dp[i][0] = 0`.
+
+*   **Recursive Step (Filling the table):**
+    *   If the characters `text1[i-1]` and `text2[j-1]` are **the same**:
+        They contribute to the LCS! So, `dp[i][j] = 1 + dp[i-1][j-1]` (we found a match, so add 1 to the LCS of the strings without these characters).
+    *   If the characters `text1[i-1]` and `text2[j-1]` are **different**:
+        We can't include both. We must choose the maximum LCS we can get by either:
+        1.  Excluding `text1[i-1]` (i.e., `dp[i-1][j]`)
+        2.  Excluding `text2[j-1]` (i.e., `dp[i][j-1]`)
+        So, `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.
+
+Let's trace `text1 = "AGGTAB"` and `text2 = "GXTXAYB"`:
+
+|       |   | G | X | T | X | A | Y | B |
+| :---- | :- | - | - | - | - | - | - | - |
+|       | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| **A** | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 |
+| **G** | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| **G** | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| **T** | 0 | 1 | 1 | 2 | 2 | 2 | 2 | 2 |
+| **A** | 0 | 1 | 1 | 2 | 2 | 3 | 3 | 3 |
+| **B** | 0 | 1 | 1 | 2 | 2 | 3 | 3 | **4** |
+
+The final answer will be in the bottom-right cell: `dp[m][n]`.
+
+**Result:** The LCS length is **4**. The actual subsequence could be "GTAB" or "GATB" (depending on how you prioritize choices, but length is 4).
+
+---
+
+### 4. C++ Implementation 🧑‍💻
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For using std::vector (our DP table)
+#include <string>   // For using std::string
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length();
+    int n = text2.length();
+
+    // Create a 2D DP table.
+    // dp[i][j] will store the length of LCS of text1[0...i-1] and text2[0...j-1]
+    // We need (m+1) x (n+1) because of the base cases (empty strings).
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the DP table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            // If characters match
+            if (text1[i - 1] == text2[j - 1]) {
+                // They form part of the LCS. Add 1 to the LCS of previous substrings.
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                // Characters don't match.
+                // Take the maximum LCS from:
+                // 1. Excluding the current character from text1 (dp[i-1][j])
+                // 2. Excluding the current character from text2 (dp[i][j-1])
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the length of the LCS for the full strings
+    return dp[m][n];
+}
+
+int main() {
+    std::string s1 = "AGGTAB";
+    std::string s2 = "GXTXAYB";
+    std::cout << "String 1: " << s1 << std::endl;
+    std::cout << "String 2: " << s2 << std::endl;
+    std::cout << "Length of LCS: " << longestCommonSubsequence(s1, s2) << std::endl; // Expected: 4
+
+    std::string s3 = "ABCDE";
+    std::string s4 = "ACE";
+    std::cout << "\nString 1: " << s3 << std::endl;
+    std::cout << "String 2: " << s4 << std::endl;
+    std::cout << "Length of LCS: " << longestCommonSubsequence(s3, s4) << std::endl; // Expected: 3 ("ACE")
+
+    std::string s5 = "ABCD";
+    std::string s6 = "EFGH";
+    std::cout << "\nString 1: " << s5 << std::endl;
+    std::cout << "String 2: " << s6 << std::endl;
+    std::cout << "Length of LCS: " << longestCommonSubsequence(s5, s6) << std::endl; // Expected: 0
+
+    return 0;
+}
+```
+
+**Complexity:**
+*   **Time Complexity:** O(m*n), where 'm' and 'n' are the lengths of the two strings. We fill an `m x n` table, and each cell takes constant time.
+*   **Space Complexity:** O(m*n), for the `dp` table.
+
+---
+
+### Quick Summary
+
+LCS is a fundamental Dynamic Programming problem that helps find the longest sequence of characters common to two strings, maintaining relative order. It's super useful in various real-world applications for comparing and quantifying similarities between sequences. Keep rocking! 🤘
+
+---
