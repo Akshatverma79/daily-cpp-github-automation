@@ -43816,3 +43816,134 @@ int main() {
 This implementation builds the solution from smaller subproblems to larger ones, ultimately finding the most efficient way to multiply the entire chain of matrices. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Trees  
+🕒 2026-05-10 14:41:03
+
+Hey there, future coding wizard! 👋 Let's break down **DP on Trees** in a super friendly way.
+
+---
+
+### 🌳 DP on Trees: The Concept
+
+Imagine you have a tree structure (like a family tree or a file system). **DP on Trees** is a technique where you solve problems by:
+1.  **Breaking it Down:** Solving smaller versions of the problem for each *subtree*.
+2.  **Building Up:** Combining the solutions from the children's subtrees to find the solution for their parent node.
+
+It's essentially Dynamic Programming applied to tree structures. You typically use a **Depth-First Search (DFS)** traversal because it naturally explores entire subtrees before returning to process their parent. The "DP state" for a node often depends directly on the "DP states" of its children.
+
+---
+
+### 💡 Why It Matters
+
+*   **Efficiency:** It's super common to solve tree problems using recursion. DP on Trees avoids recalculating the same information for subtrees multiple times, making your solution much faster (usually from exponential to polynomial time).
+*   **Structured Thinking:** It provides a systematic way to approach a whole class of tree-related problems (e.g., finding paths, counting specific structures, optimizing values within subtrees).
+*   **Interview Favorite:** It's a fundamental technique often tested in coding interviews!
+
+---
+
+### 🗺️ Example Problem: Height of a Tree
+
+Let's find the **height** of a binary tree. The height of a tree is the number of edges on the longest path from the root to a leaf.
+*   A single node tree has height 0.
+*   An empty tree has height -1 (conventionally, to make calculations easier).
+
+**How DP on Trees helps:**
+The height of any node is `1 + maximum(height of its left child, height of its right child)`. This perfectly fits the DP on Trees pattern! To find a node's height, you *must first know* the height of its children's subtrees.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <algorithm> // For std::max
+
+// --- 1. Define the Tree Node Structure ---
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+
+    // Constructor to easily create a new node
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+// --- 2. The DP on Trees Function (using DFS) ---
+int calculateTreeHeight(TreeNode* root) {
+    // Base Case: If the node is null (empty tree/subtree)
+    // Its height is -1. This helps with the '1 + max' logic.
+    if (root == nullptr) {
+        return -1; 
+    }
+
+    // DP Step: Recursively calculate the height of left and right subtrees
+    // These are our 'subproblems' being solved.
+    int leftHeight = calculateTreeHeight(root->left);
+    int rightHeight = calculateTreeHeight(root->right);
+
+    // Combine solutions: The height of the current node is 
+    // 1 (for the current node itself) + the maximum height of its children.
+    return 1 + std::max(leftHeight, rightHeight);
+}
+
+// --- 3. Example Usage ---
+int main() {
+    // Create a simple tree:
+    //      3
+    //     / \
+    //    9  20
+    //       / \
+    //      15  7
+
+    TreeNode* root = new TreeNode(3);
+    root->left = new TreeNode(9);
+    root->right = new TreeNode(20);
+    root->right->left = new TreeNode(15);
+    root->right->right = new TreeNode(7);
+
+    // Calculate and print the height
+    int height = calculateTreeHeight(root);
+    std::cout << "The height of the tree is: " << height << std::endl; // Expected: 2
+
+    // Clean up memory (important in C++!)
+    delete root->right->right;
+    delete root->right->left;
+    delete root->left;
+    delete root->right;
+    delete root;
+
+    // Another example: A single node tree
+    TreeNode* singleNodeRoot = new TreeNode(100);
+    int singleNodeHeight = calculateTreeHeight(singleNodeRoot);
+    std::cout << "The height of a single node tree is: " << singleNodeHeight << std::endl; // Expected: 0
+    delete singleNodeRoot;
+
+    // Empty tree
+    TreeNode* emptyRoot = nullptr;
+    int emptyTreeHeight = calculateTreeHeight(emptyRoot);
+    std::cout << "The height of an empty tree is: " << emptyTreeHeight << std::endl; // Expected: -1
+
+    return 0;
+}
+```
+
+---
+
+**Output of the code:**
+
+```
+The height of the tree is: 2
+The height of a single node tree is: 0
+The height of an empty tree is: -1
+```
+
+---
+
+### ✨ Key Takeaway
+
+Whenever you see a tree problem where the solution for a node depends on the solutions of its children (or sometimes its parent/grandchildren), think **DP on Trees**! It's a powerful and elegant way to solve many tree-related challenges. Happy coding!
+
+---
