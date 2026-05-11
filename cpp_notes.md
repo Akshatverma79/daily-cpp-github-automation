@@ -43947,3 +43947,158 @@ The height of an empty tree is: -1
 Whenever you see a tree problem where the solution for a node depends on the solutions of its children (or sometimes its parent/grandchildren), think **DP on Trees**! It's a powerful and elegant way to solve many tree-related challenges. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Bitmasks  
+🕒 2026-05-11 09:40:32
+
+Hey there, aspiring algorithm wizard! Let's demystify "DP on Bitmasks."
+
+---
+
+## DP on Bitmasks: Mastering Subsets with a Single Number!
+
+### 💡 What's the Concept?
+
+Imagine you're solving a Dynamic Programming problem where you need to keep track of a **subset of items or tasks** that have already been processed or included in your current solution.
+
+Instead of using a `std::vector<bool>` or a `std::set`, DP on Bitmasks lets you represent this entire subset as a single integer – a "bitmask." Each bit in the integer tells you if a specific item is "in" or "out" of your current set.
+
+*   If the $i$-th bit is `1`, it means item `i` is in the set.
+*   If the $i$-th bit is `0`, it means item `i` is not in the set.
+
+This technique is a lifesaver when the total number of items, `N`, is relatively small (typically up to around 20, because $2^{20}$ is about 1 million, which is a manageable number of states).
+
+### 🤔 Why Bother?
+
+1.  **Compact State Representation:** A single integer is incredibly memory-efficient for representing a set.
+2.  **Direct Indexing:** Since a bitmask is just an integer, you can directly use it as an index in your DP table (e.g., `dp[mask]`). No need for complex hashing of sets!
+3.  **Efficient Set Operations:** Bitwise operations (OR `|`, AND `&`, XOR `^`, left shift `<<`) are super fast for adding, checking, or removing elements from your "set."
+4.  **Solving Subset Problems:** It's perfect for problems like the Traveling Salesperson Problem (TSP), assignment problems, or any problem where you need to consider all subsets or permutations of a small number of items.
+
+### ✨ The Magic of Bitmasks (Quick Refresher)
+
+Let's say you have `N` items, indexed `0` to `N-1`.
+
+*   `1 << i`: Creates a number with only the `i`-th bit set. (e.g., `1 << 2` is `0100` in binary, representing item 2).
+*   `mask | (1 << i)`: Add item `i` to the set represented by `mask`.
+*   `mask & (1 << i)`: Check if item `i` is in the set. (Result will be non-zero if it is).
+*   `mask ^ (1 << i)`: Remove item `i` from the set (if it was there).
+*   `__builtin_popcount(mask)` (GCC/Clang specific): Counts the number of set bits (i.e., the number of items in the set). Super useful!
+
+---
+
+### 🧩 Example Problem: Minimum Cost Assignment
+
+**Problem:** You have `N` people and `N` jobs. `cost[i][j]` is the cost if `person i` does `job j`. You need to assign each person to exactly one job such that all jobs are done and the total cost is minimized.
+(Assume `N` is small, e.g., up to 15).
+
+**How DP on Bitmasks helps:**
+We need to decide which person gets which job. As we assign people one by one (say, `person 0`, then `person 1`, etc.), we need to know which jobs are still available. A bitmask can track the *set of jobs already assigned*.
+
+**DP State:**
+Let `dp[mask]` be the minimum cost to assign the `__builtin_popcount(mask)` people (from `person 0` to `person __builtin_popcount(mask)-1`) to the jobs represented by `mask`.
+
+**Base Case:**
+`dp[0] = 0` (No jobs assigned, no people assigned, cost is 0).
+
+**Transition:**
+To calculate `dp[new_mask]`:
+1.  Iterate through all possible masks `mask` from `0` to `(1 << N) - 1`.
+2.  `person_idx = __builtin_popcount(mask)`: This is the current person we are trying to assign a job to.
+3.  If `person_idx == N`, all people are assigned for this mask, so we can't extend it.
+4.  For each `job_idx` from `0` to `N-1`:
+    *   If `job_idx` is *not* in `mask` (i.e., `!(mask & (1 << job_idx))`), it means `job_idx` is available.
+    *   We can assign `person_idx` to `job_idx`.
+    *   The `new_mask` would be `mask | (1 << job_idx)`.
+    *   The cost to reach this `new_mask` state would be `dp[mask] + cost[person_idx][job_idx]`.
+    *   We update `dp[new_mask]` with the minimum of its current value and this new calculated cost.
+
+**Final Answer:**
+`dp[(1 << N) - 1]` (The mask where all bits are set, meaning all jobs are assigned).
+
+---
+
+### 🚀 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+// A large value to represent infinity (unreachable states)
+const int INF = 1e9; 
+
+int main() {
+    std::ios_base::sync_with_stdio(false); // Optimize C++ standard streams
+    std::cin.tie(NULL);                   // For faster I/O
+
+    int N = 3; // Example: 3 people, 3 jobs (N up to ~15-20 usually)
+
+    // cost[person_idx][job_idx]
+    // Example cost matrix:
+    // Person 0: Job 0=10, Job 1=20, Job 2=30
+    // Person 1: Job 0=20, Job 1=15, Job 2=25
+    // Person 2: Job 0=30, Job 1=25, Job 2=10
+    std::vector<std::vector<int>> cost = {
+        {10, 20, 30},
+        {20, 15, 25},
+        {30, 25, 10}
+    };
+
+    // dp[mask] stores the minimum cost to assign jobs in 'mask'
+    // to the first 'popcount(mask)' people.
+    std::vector<int> dp(1 << N, INF); 
+    // The size of dp table is 2^N, because there are 2^N possible masks.
+
+    // Base case: No jobs assigned (mask = 0), 0 cost.
+    dp[0] = 0;
+
+    // Iterate through all possible masks (subsets of jobs assigned so far)
+    for (int mask = 0; mask < (1 << N); ++mask) {
+        // If this 'mask' state is unreachable, skip it
+        if (dp[mask] == INF) {
+            continue;
+        }
+
+        // Determine which person we are currently trying to assign a job to.
+        // This is the (person_idx)-th person (0-indexed).
+        // The number of people assigned so far is equal to the number of jobs assigned.
+        int person_idx = 0;
+        for (int i = 0; i < N; ++i) {
+            if (mask & (1 << i)) { // If the i-th bit is set in mask
+                person_idx++;
+            }
+        }
+        // Tip: Use __builtin_popcount(mask) for a more concise way
+        // int person_idx = __builtin_popcount(mask); 
+
+        // If all N people have been assigned, we can't assign more for this mask.
+        if (person_idx == N) {
+            continue;
+        }
+
+        // Try assigning an unassigned job (job_idx) to the current person (person_idx)
+        for (int job_idx = 0; job_idx < N; ++job_idx) {
+            // Check if job_idx is NOT already in the current 'mask'
+            if (!(mask & (1 << job_idx))) {
+                int new_mask = mask | (1 << job_idx); // Create a new mask by adding job_idx
+                int current_assignment_cost = cost[person_idx][job_idx];
+
+                // Update the minimum cost for the 'new_mask' state
+                dp[new_mask] = std::min(dp[new_mask], dp[mask] + current_assignment_cost);
+            }
+        }
+    }
+
+    // The final answer is dp[(1 << N) - 1], which represents the mask
+    // where all N bits are set (all jobs assigned).
+    std::cout << "Minimum assignment cost: " << dp[(1 << N) - 1] << std::endl;
+    // Expected output for the example: 35 (10+15+10 = P0->J0, P1->J1, P2->J2)
+
+    return 0;
+}
+```
+
+---
