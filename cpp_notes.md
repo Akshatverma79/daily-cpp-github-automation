@@ -44102,3 +44102,101 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-05-11 16:20:08
+
+Hey there, future coding wizard! 👋 Let's dive into the fascinating world of **Bit Manipulation**.
+
+---
+
+### 🌟 Bit Manipulation Basics 🌟
+
+#### What is it?
+Imagine numbers aren't just big blocks, but made of tiny light switches: `0` (off) and `1` (on). Bit manipulation is just that – directly working with these individual `0`s and `1`s (bits) that make up a number's binary representation. Instead of thinking of `5` as "five", you think of it as `0101` in binary.
+
+#### Why does it matter?
+1.  **Speed Demon 💨:** Bitwise operations are super fast because they operate at the lowest level that your computer's hardware understands. Often quicker than arithmetic operations!
+2.  **Memory Saver 🧠:** You can store multiple boolean flags (true/false states) in a single integer, packing more information into less space.
+3.  **Algorithm Magic ✨:** Many clever algorithms in competitive programming, data structures (like Bitmasks), and even graphics or encryption use bit manipulation for elegant and efficient solutions.
+4.  **Hardware Interaction 🛠️:** Essential for low-level programming, device drivers, and embedded systems.
+
+#### Key Bitwise Operators (The Tools You'll Use):
+*   `&` (AND)
+*   `|` (OR)
+*   `^` (XOR)
+*   `~` (NOT)
+*   `<<` (Left Shift)
+*   `>>` (Right Shift)
+
+---
+
+### 💡 Example Problem: Is Power of Two?
+
+**Problem:** Given an integer `n`, determine if it's a power of two (e.g., 1, 2, 4, 8, 16...). Return `true` if it is, `false` otherwise.
+
+**Input:** `n = 8`
+**Output:** `true` (since `8 = 2^3`)
+
+**Input:** `n = 6`
+**Output:** `false`
+
+#### How to think about it with bits:
+
+*   Powers of two in binary look like this:
+    *   `1` ( `0001` )
+    *   `2` ( `0010` )
+    *   `4` ( `0100` )
+    *   `8` ( `1000` )
+*   Notice a pattern? A power of two always has *exactly one* bit set to `1`.
+*   Now consider `n - 1`:
+    *   If `n = 8` (`1000`), then `n - 1 = 7` (`0111`)
+    *   If `n = 4` (`0100`), then `n - 1 = 3` (`0011`)
+*   What happens if you perform `n & (n - 1)` for a power of two?
+    *   `8 & 7` => `1000 & 0111 = 0000` (which is `0`)
+    *   `4 & 3` => `0100 & 0011 = 0000` (which is `0`)
+*   If `n` is NOT a power of two (e.g., `n = 6` which is `0110`):
+    *   `n - 1 = 5` (`0101`)
+    *   `6 & 5` => `0110 & 0101 = 0100` (which is `4`, not `0`)
+*   **Aha!** If `n` is a power of two (and `n > 0`), then `n & (n - 1)` will always be `0`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output
+
+// Function to check if a number is a power of two
+bool isPowerOfTwo(int n) {
+    // 1. Handle edge case: 0 is not a power of two.
+    // 2. The core bit trick:
+    //    A number 'n' is a power of two if and only if
+    //    it has exactly one '1' bit in its binary representation.
+    //    When you do 'n & (n - 1)', it effectively clears the least significant '1' bit.
+    //    If 'n' was a power of two (e.g., 1000), 'n - 1' is (0111).
+    //    (1000 & 0111) gives 0000.
+    //    If 'n' had multiple '1' bits (e.g., 1100), 'n - 1' is (1011).
+    //    (1100 & 1011) gives 1000 (not 0).
+    return n > 0 && (n & (n - 1)) == 0;
+}
+
+int main() {
+    std::cout << "Is 8 a power of two? " << (isPowerOfTwo(8) ? "Yes" : "No") << std::endl;   // Expected: Yes
+    std::cout << "Is 6 a power of two? " << (isPowerOfTwo(6) ? "Yes" : "No") << std::endl;   // Expected: No
+    std::cout << "Is 1 a power of two? " << (isPowerOfTwo(1) ? "Yes" : "No") << std::endl;   // Expected: Yes (2^0)
+    std::cout << "Is 0 a power of two? " << (isPowerOfTwo(0) ? "Yes" : "No") << std::endl;   // Expected: No
+    std::cout << "Is 16 a power of two? " << (isPowerOfTwo(16) ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Is 15 a power of two? " << (isPowerOfTwo(15) ? "Yes" : "No") << std::endl; // Expected: No
+    
+    return 0;
+}
+```
+
+---
+
+That's your first step into bit manipulation! It might feel a bit tricky at first, but with practice, these operations become incredibly powerful tools in your coding arsenal. Happy coding! ✨
+
+---
