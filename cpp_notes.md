@@ -44325,3 +44325,144 @@ int main() {
 That's a quick dive into GCD and Primes! Understanding these basics will give you a solid footing for many mathematical problems in competitive programming and DSA. Keep practicing! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-05-12 16:08:12
+
+Here's a clean and simple note on Game Theory Basics for DSA!
+
+---
+
+## Game Theory Basics: Playing Smart! 🎮
+
+### What's the Concept?
+
+Imagine you're playing a game where two players take turns, making moves to win. Game Theory (in the context of competitive programming) is about **analyzing strategic interactions** between two (or more) players.
+
+**The core idea:** You assume both players play **optimally**. Your goal is to figure out if the first player (or sometimes the second) can win, given perfect information about the game state.
+
+**Key elements:**
+*   **Players:** Usually two (e.g., Alice and Bob).
+*   **Moves:** A set of valid actions at each turn.
+*   **States:** The current configuration of the game.
+*   **Outcome:** Who wins or loses.
+*   **Goal:** To determine winning/losing states or an optimal strategy.
+
+### Why Does It Matter?
+
+Game Theory problems are a classic type in competitive programming! They often appear in contests and test your ability to:
+
+1.  **Think strategically:** Anticipate your opponent's moves.
+2.  **Work backward:** Many problems are solved by analyzing the end states and determining who wins from previous states.
+3.  **Use Dynamic Programming (DP):** Often, memoization or DP is used to store whether a state is winning or losing.
+
+### The Core Idea: Winning & Losing States
+
+For many simple games, we categorize states:
+*   **Winning State (W-state):** A player whose turn it is in this state can make a move to reach a Losing State for the *opponent*.
+*   **Losing State (L-state):** A player whose turn it is in this state will lose, because *all* possible moves lead to Winning States for the *opponent*.
+
+**Rule of thumb:**
+*   A state is winning if there's *any* move to an L-state.
+*   A state is losing if *all* moves lead to W-states.
+
+### Example Problem: Stone Removal Game
+
+You have `N` stones. Two players take turns. In each turn, a player can remove **1, 2, or 3** stones. The player who removes the last stone wins. If you go first, can you win?
+
+Let's denote `dp[i]` as `true` if the player whose turn it is with `i` stones can win, and `false` if they lose.
+
+*   **`dp[0]` (0 stones):** The current player has no moves, so they lose. `dp[0] = false`.
+*   **`dp[1]` (1 stone):** Can take 1 stone, leaving 0. `dp[0]` is false (opponent loses). So, current player wins. `dp[1] = true`.
+*   **`dp[2]` (2 stones):**
+    *   Take 1 stone: Leaves 1. `dp[1]` is true (opponent wins).
+    *   Take 2 stones: Leaves 0. `dp[0]` is false (opponent loses).
+    *   Since taking 2 stones makes the opponent lose, current player wins. `dp[2] = true`.
+*   **`dp[3]` (3 stones):**
+    *   Take 1 stone: Leaves 2. `dp[2]` is true (opponent wins).
+    *   Take 2 stones: Leaves 1. `dp[1]` is true (opponent wins).
+    *   Take 3 stones: Leaves 0. `dp[0]` is false (opponent loses).
+    *   Since taking 3 stones makes the opponent lose, current player wins. `dp[3] = true`.
+*   **`dp[4]` (4 stones):**
+    *   Take 1 stone: Leaves 3. `dp[3]` is true (opponent wins).
+    *   Take 2 stones: Leaves 2. `dp[2]` is true (opponent wins).
+    *   Take 3 stones: Leaves 1. `dp[1]` is true (opponent wins).
+    *   All possible moves lead to a state where the *opponent wins*. So, the current player loses. `dp[4] = false`.
+
+**Notice a pattern?** `dp[i]` is true for `i=1,2,3` and false for `i=0,4`. This suggests a pattern related to `i % 4`. Indeed, for this specific game, a player wins if `N % 4 != 0`, and loses if `N % 4 == 0`. However, the DP approach is more general for different move sets.
+
+### Simple C++ Implementation (Using DP)
+
+This code calculates `dp[i]` for all `i` up to `N` using the rules we discussed: current player wins if they can make a move to an opponent's losing state.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // Not strictly needed for this example, but common.
+
+// Function to determine if the first player can win
+bool canFirstPlayerWin(int n_stones) {
+    // dp[i] will be true if the player starting with 'i' stones can win,
+    // and false if they will lose (assuming optimal play).
+    std::vector<bool> dp(n_stones + 1);
+
+    // Base case: If 0 stones, the current player cannot make a move and loses.
+    dp[0] = false;
+
+    // Fill the dp table from 1 to n_stones
+    for (int i = 1; i <= n_stones; ++i) {
+        // The current player can win if they can make a move (1, 2, or 3 stones)
+        // that leaves the opponent in a losing state (i.e., dp[next_state] is false).
+
+        // Option 1: Take 1 stone. If dp[i-1] is false, current player wins.
+        bool canWinByTaking1 = (i - 1 >= 0 && !dp[i - 1]);
+
+        // Option 2: Take 2 stones. If dp[i-2] is false, current player wins.
+        bool canWinByTaking2 = (i - 2 >= 0 && !dp[i - 2]);
+
+        // Option 3: Take 3 stones. If dp[i-3] is false, current player wins.
+        bool canWinByTaking3 = (i - 3 >= 0 && !dp[i - 3]);
+
+        // If any of these options lead to a losing state for the opponent,
+        // then the current player can win from state 'i'.
+        dp[i] = canWinByTaking1 || canWinByTaking2 || canWinByTaking3;
+    }
+
+    return dp[n_stones];
+}
+
+int main() {
+    int N;
+
+    // Test cases
+    N = 7; // Expected: Win (7 % 4 != 0)
+    std::cout << "Starting with " << N << " stones: "
+              << (canFirstPlayerWin(N) ? "First player wins" : "First player loses")
+              << std::endl;
+
+    N = 4; // Expected: Lose (4 % 4 == 0)
+    std::cout << "Starting with " << N << " stones: "
+              << (canFirstPlayerWin(N) ? "First player wins" : "First player loses")
+              << std::endl;
+
+    N = 10; // Expected: Win (10 % 4 != 0)
+    std::cout << "Starting with " << N << " stones: "
+              << (canFirstPlayerWin(N) ? "First player wins" : "First player loses")
+              << std::endl;
+
+    N = 0; // Expected: Lose (base case)
+    std::cout << "Starting with " << N << " stones: "
+              << (canFirstPlayerWin(N) ? "First player wins" : "First player loses")
+              << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+**Quick Tip:** The "working backward" approach using DP to identify winning/losing states is a fundamental technique for many Game Theory problems! Start by defining your base cases (usually terminal states), and then build up from there.
+
+---
