@@ -44466,3 +44466,91 @@ int main() {
 **Quick Tip:** The "working backward" approach using DP to identify winning/losing states is a fundamental technique for many Game Theory problems! Start by defining your base cases (usually terminal states), and then build up from there.
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Arrays Basics  
+🕒 2026-05-13 08:44:59
+
+Okay, let's dive into Arrays Basics in a clean, simple way!
+
+---
+
+## DSA Learning Note: Arrays Basics
+
+### 1. What it means (Concept)
+
+Imagine you have a row of identical lockers, each big enough for one item. An **Array** is pretty much that:
+
+*   It's a collection of items (called "elements").
+*   **All elements must be of the same data type** (e.g., all numbers, all names, all true/false values).
+*   They are stored **contiguously** in memory (right next to each other, like the lockers).
+*   You access each element using an **index**, which is like the locker number. In most programming languages (including C++), indexing starts from `0`. So, the first element is at index `0`, the second at `1`, and so on.
+*   Basic arrays usually have a **fixed size** once created.
+
+**Think of it as:** A neatly organized list of items of the same type, where you can instantly grab any item by its position.
+
+### 2. Why it matters (Importance)
+
+Arrays are fundamental and super important because:
+
+*   **Fast Access:** You can access any element directly by its index in constant time (O(1)). This is incredibly efficient! Want the 5th element? Boom, you got it instantly.
+*   **Foundation:** Many other data structures (like Stacks, Queues, Hash Tables) are often implemented using arrays.
+*   **Common Use Case:** Perfect for storing lists of fixed-size data, like a list of test scores, temperatures for a week, or a collection of game levels.
+*   **Memory Efficiency:** Because elements are stored contiguously, arrays can be more memory-efficient than other data structures for certain tasks.
+
+### 3. Example Problem (Small)
+
+**Problem:** You have a list of daily temperatures for a week. Find out what the highest temperature was.
+
+**Input:** `[25, 28, 22, 30, 27, 29, 26]` (temperatures in Celsius)
+
+**Expected Output:** `30`
+
+### 4. Simple C++ Implementation
+
+Here's how you'd solve the problem in C++ using an array (specifically `std::vector`, which is C++'s dynamic array that works very similarly for basics):
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector (dynamic array)
+#include <algorithm> // For std::max (though we'll do it manually for learning)
+
+int main() {
+    // 1. Declare and initialize an array (using std::vector for convenience)
+    // This creates an array of integers with 7 elements.
+    std::vector<int> dailyTemperatures = {25, 28, 22, 30, 27, 29, 26};
+
+    // 2. Initialize a variable to keep track of the maximum temperature found so far
+    // We start with the first element as our initial maximum.
+    int maxTemperature = dailyTemperatures[0]; // maxTemperature is now 25
+
+    // 3. Loop through the array to compare each element
+    // We start from the second element (index 1) since we already checked index 0.
+    for (int i = 1; i < dailyTemperatures.size(); ++i) {
+        // If the current temperature is greater than our current max, update maxTemperature
+        if (dailyTemperatures[i] > maxTemperature) {
+            maxTemperature = dailyTemperatures[i];
+        }
+    }
+
+    // 4. Print the result
+    std::cout << "The highest temperature for the week was: " << maxTemperature << " C" << std::endl;
+
+    return 0; // Indicate successful program execution
+}
+```
+
+**Output:**
+
+```
+The highest temperature for the week was: 30 C
+```
+
+**Quick Note:** While `std::vector` is a "dynamic array" (meaning its size can change), for basic array operations like storing a fixed set of data and iterating, it behaves just like a simple array, but with added safety and convenience. Raw C-style arrays (`int arr[7];`) also exist but `std::vector` is generally preferred in modern C++.
+
+---
+
+Hope this helps you get a clear grasp of Arrays Basics! Keep learning!
+
+---
