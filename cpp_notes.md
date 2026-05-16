@@ -45187,3 +45187,157 @@ int main() {
 That's your basic intro to Linked Lists! You've got the core concept, why they're useful, and how to build and traverse a simple one in C++. Good job!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-05-16 14:44:07
+
+Hey there, future DSA master! 👋 Let's break down Doubly Linked Lists in a super friendly and clear way.
+
+---
+
+## 🚀 Doubly Linked List: Your Two-Way Street Data Structure
+
+### 🚦 What is a Doubly Linked List? (The Concept)
+
+Imagine a regular Linked List: each item (node) knows where the *next* item is. It's like a one-way street, you can only go forward.
+
+A **Doubly Linked List (DLL)** is like upgrading to a **two-way street**! Each node not only knows about the `next` node but also remembers the `previous` node.
+
+So, each node typically has three parts:
+1.  **`data`**: The actual information it holds.
+2.  **`next` pointer**: Points to the next node in the sequence.
+3.  **`prev` pointer**: Points to the previous node in the sequence.
+
+```
+       HEAD
+        |
+        V
+null <-> [ Data | Prev | Next ] <-> [ Data | Prev | Next ] <-> [ Data | Prev | Next ] <-> null
+```
+
+Both the first node's `prev` pointer and the last node's `next` pointer typically point to `null` to mark the ends of the list.
+
+### 🌟 Why Does It Matter? (The "So What?")
+
+DLLs are super cool because they offer some key advantages:
+
+1.  **Two-Way Traversal:** You can easily move both forward and backward through the list. Think "undo/redo" features or browser history!
+2.  **Efficient Deletion:** Deleting a specific node is much simpler. If you have a pointer to the node you want to delete, you can easily access its `prev` and `next` nodes to relink them, without needing to traverse from the beginning.
+3.  **Operations at Both Ends:** If you also keep track of a `tail` pointer, operations like adding or removing elements from the end of the list become very efficient (O(1) time complexity).
+
+### 💡 Small Example Problem: Adding a Node to the End
+
+Let's say you have a Doubly Linked List of numbers and you want to add a new number to the very end.
+
+**Problem:** Implement a function `insertAtEnd(int data)` for a Doubly Linked List.
+
+**Example:**
+*   Initial List: `null <-> [1] <-> [2] <-> null` (Head points to 1, Tail points to 2)
+*   `insertAtEnd(3)`
+*   New List: `null <-> [1] <-> [2] <-> [3] <-> null` (Head points to 1, Tail points to 3)
+
+### 💻 Simple C++ Implementation
+
+Here's how you'd set up a basic Doubly Linked List and implement the `insertAtEnd` function:
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;
+    Node* next; // Pointer to the next node
+    Node* prev; // Pointer to the previous node
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// 2. Define the Doubly Linked List class
+class DoublyLinkedList {
+public:
+    Node* head; // Pointer to the first node
+    Node* tail; // Pointer to the last node
+
+    // Constructor: Initialize an empty list
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // Destructor: Clean up memory to prevent leaks
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = nullptr;
+        tail = nullptr;
+    }
+
+    // --- Example Problem Implementation: Insert a node at the end ---
+    void insertAtEnd(int data) {
+        Node* newNode = new Node(data); // Create the new node
+
+        // Case 1: List is empty
+        if (head == nullptr) {
+            head = newNode; // New node is both head and tail
+            tail = newNode;
+        }
+        // Case 2: List is not empty
+        else {
+            tail->next = newNode; // Link current tail's next to new node
+            newNode->prev = tail; // Link new node's prev to current tail
+            tail = newNode;       // Update tail to be the new node
+        }
+        std::cout << "Inserted " << data << " at the end." << std::endl;
+    }
+
+    // --- Utility functions to print the list ---
+    void printForward() {
+        Node* current = head;
+        std::cout << "List (Forward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->next;
+        }
+        std::cout << "null" << std::endl;
+    }
+
+    void printBackward() {
+        Node* current = tail;
+        std::cout << "List (Backward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->prev;
+        }
+        std::cout << "null" << std::endl;
+    }
+};
+
+int main() {
+    DoublyLinkedList myDLL;
+
+    myDLL.insertAtEnd(10);
+    myDLL.printForward(); // Output: 10 <-> null
+    myDLL.printBackward(); // Output: 10 <-> null
+
+    myDLL.insertAtEnd(20);
+    myDLL.insertAtEnd(30);
+    myDLL.printForward(); // Output: 10 <-> 20 <-> 30 <-> null
+    myDLL.printBackward(); // Output: 30 <-> 20 <-> 10 <-> null
+
+    myDLL.insertAtEnd(40);
+    myDLL.printForward(); // Output: 10 <-> 20 <-> 30 <-> 40 <-> null
+    myDLL.printBackward(); // Output: 40 <-> 30 <-> 20 <-> 10 <-> null
+
+    return 0;
+}
+```
+
+---
+
+That's your quick and friendly guide to Doubly Linked Lists! They're super useful when you need that two-way navigation power. Keep practicing! 💪
+
+---
