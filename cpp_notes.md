@@ -45501,3 +45501,191 @@ int main() {
 And that's your quick dive into Stacks! Simple, elegant, and super powerful. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-05-17 14:46:54
+
+Hey there, future DSA master! Let's dive into Queues.
+
+---
+
+## Queues: Your FIFO Friend! 🚶‍♀️🚶‍♂️
+
+### 1. What is a Queue? (The Concept)
+
+Imagine waiting in line for coffee. The first person in line is the first to get their coffee, right? That's exactly how a **Queue** works!
+
+It's a **linear data structure** where elements are added at one end (the **'rear'** or **'back'**) and removed from the other end (the **'front'**). This principle is called **FIFO (First-In, First-Out)**.
+
+**Think of it like:**
+*   A line at a store.
+*   A playlist that plays songs in the order you added them.
+*   A printer spooling documents.
+
+**Key Operations:**
+*   **`enqueue(item)`**: Add an `item` to the rear of the queue.
+*   **`dequeue()`**: Remove and return the `item` from the front of the queue.
+*   **`peek()` / `front()`**: Look at the `item` at the front without removing it.
+*   **`isEmpty()`**: Check if the queue has any elements.
+*   **`size()`**: Get the number of elements in the queue.
+
+### 2. Why Do Queues Matter?
+
+Queues are everywhere, both in the real world and in computer science!
+
+*   **Orderly Processing:** They ensure tasks are handled in the order they arrive, which is crucial for fairness and managing resources.
+*   **Real-world Applications:** Call centers (calls are answered in order), printer queues (documents printed in order), traffic management, simulating real-world processes.
+*   **Computer Science Applications:**
+    *   **Operating Systems:** Task scheduling, handling interrupts.
+    *   **Networking:** Packet buffering, managing network requests.
+    *   **Algorithms:** Breadth-First Search (BFS) in graphs, event processing, caching.
+
+They help manage flow and prevent chaos by enforcing a strict processing order.
+
+### 3. Example Problem
+
+**Problem:** You're building a simple task manager that processes tasks in the exact order they are added. How would you store and manage these tasks?
+
+**Solution:** A Queue!
+
+1.  When a new task arrives, you `enqueue()` it.
+2.  When the system is ready to process a task, it `dequeue()`s the task from the front.
+3.  The task at the `front()` is always the oldest, ensuring "first-come, first-served."
+
+Simple, right?
+
+### 4. Simple C++ Implementation (using Linked List)
+
+We'll use a `LinkedList` to implement our queue because it's dynamic (can grow/shrink) and handles insertions/deletions at both ends gracefully.
+
+```cpp
+#include <iostream>
+#include <stdexcept> // For std::runtime_error
+
+// 1. Define a Node for our Linked List
+struct Node {
+    int data;
+    Node* next;
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// 2. Define our Queue class
+class MyQueue {
+private:
+    Node* front; // Pointer to the front of the queue
+    Node* rear;  // Pointer to the rear of the queue
+    int count;   // To keep track of the number of elements
+
+public:
+    // Constructor
+    MyQueue() : front(nullptr), rear(nullptr), count(0) {}
+
+    // Destructor to free memory (important for linked lists!)
+    ~MyQueue() {
+        while (!isEmpty()) {
+            dequeue(); // Dequeue all elements to free memory
+        }
+    }
+
+    // Check if the queue is empty
+    bool isEmpty() const {
+        return front == nullptr; // Or return count == 0;
+    }
+
+    // Get the number of elements in the queue
+    int size() const {
+        return count;
+    }
+
+    // Add an element to the rear of the queue
+    void enqueue(int val) {
+        Node* newNode = new Node(val);
+        if (isEmpty()) {
+            front = newNode;
+            rear = newNode;
+        } else {
+            rear->next = newNode;
+            rear = newNode;
+        }
+        count++;
+        std::cout << "Enqueued: " << val << std::endl;
+    }
+
+    // Remove and return the element from the front of the queue
+    int dequeue() {
+        if (isEmpty()) {
+            throw std::runtime_error("Queue is empty, cannot dequeue.");
+        }
+        Node* temp = front;
+        int dequeuedVal = temp->data;
+        front = front->next;
+
+        // If front becomes null, the queue is now empty, so rear must also be null
+        if (front == nullptr) {
+            rear = nullptr;
+        }
+
+        delete temp; // Free memory of the removed node
+        count--;
+        std::cout << "Dequeued: " << dequeuedVal << std::endl;
+        return dequeuedVal;
+    }
+
+    // Get the element at the front without removing it
+    int peek() const {
+        if (isEmpty()) {
+            throw std::runtime_error("Queue is empty, no front element.");
+        }
+        return front->data;
+    }
+};
+
+// --- Let's test our Queue! ---
+int main() {
+    MyQueue myTaskQueue;
+
+    std::cout << "Is queue empty? " << (myTaskQueue.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "Queue size: " << myTaskQueue.size() << std::endl;
+
+    myTaskQueue.enqueue(10); // Task 1
+    myTaskQueue.enqueue(20); // Task 2
+    myTaskQueue.enqueue(30); // Task 3
+
+    std::cout << "Is queue empty? " << (myTaskQueue.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "Queue size: " << myTaskQueue.size() << std::endl;
+
+    std::cout << "Front element is: " << myTaskQueue.peek() << std::endl; // Should be 10
+
+    myTaskQueue.dequeue(); // Process Task 1
+    std::cout << "Front element is now: " << myTaskQueue.peek() << std::endl; // Should be 20
+
+    myTaskQueue.enqueue(40); // Task 4, added to rear
+    std::cout << "Queue size: " << myTaskQueue.size() << std::endl;
+    std::cout << "Front element is still: " << myTaskQueue.peek() << std::endl; // Still 20
+
+    myTaskQueue.dequeue(); // Process Task 2
+    myTaskQueue.dequeue(); // Process Task 3
+    myTaskQueue.dequeue(); // Process Task 4
+
+    std::cout << "Is queue empty? " << (myTaskQueue.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "Queue size: " << myTaskQueue.size() << std::endl;
+
+    try {
+        myTaskQueue.dequeue(); // Trying to dequeue from an empty queue
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Queues are a fundamental data structure for handling ordered processing. Keep practicing, and you'll master them in no time!
+
+---
