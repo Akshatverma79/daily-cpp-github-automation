@@ -46254,3 +46254,168 @@ BST (In-Order Traversal): 20 30 40 50 60 70 80
 That's your quick dive into Binary Search Trees! They're a foundational data structure, and understanding them opens doors to many other cool concepts. Keep coding! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graphs Basics  
+🕒 2026-05-19 16:41:35
+
+Alright, let's dive into the fascinating world of Graphs!
+
+---
+
+## Graphs Basics: Your First Steps into Connected Worlds!
+
+### 1. What's a Graph?
+
+Imagine a bunch of dots, and some of these dots are connected by lines. That's essentially a graph!
+
+*   **Nodes (or Vertices):** These are the "dots." They represent individual entities (e.g., cities, people, web pages).
+*   **Edges:** These are the "lines" or "connections" between nodes. They represent relationships (e.g., roads between cities, friendships between people, links between web pages).
+
+**Think of it like:**
+*   **Social Networks:** People are nodes, friendships are edges.
+*   **Maps:** Cities are nodes, roads are edges.
+*   **Computer Networks:** Computers are nodes, network cables are edges.
+
+### 2. Why Do Graphs Matter?
+
+Graphs are *super* important because they allow us to model and solve problems that involve **relationships** and **connections** in the real world.
+
+*   **Finding the shortest path:** Think Google Maps (shortest route between two places).
+*   **Friend recommendations:** "People you may know" on Facebook.
+*   **Network routing:** How data packets travel across the internet.
+*   **Dependency management:** Which tasks need to be completed before others.
+
+They provide a powerful framework to understand and optimize complex systems.
+
+### 3. Key Graph Types (Super Simple)
+
+*   **Undirected Graph:** If Node A is connected to Node B, then Node B is also connected to Node A. (Like a two-way street). Edges have no specific direction.
+*   **Directed Graph (Digraph):** If Node A is connected to Node B, it *doesn't* necessarily mean B is connected to A. (Like a one-way street). Edges have a specific direction.
+*   **Weighted Graph:** Edges have a "cost" or "value" associated with them (e.g., distance of a road, time to travel).
+*   **Unweighted Graph:** Edges simply represent a connection, no extra cost.
+
+### 4. How to Represent Graphs (in C++)
+
+How do we actually store these nodes and edges in our program? Two main ways:
+
+1.  **Adjacency Matrix:** A 2D array where `matrix[i][j]` is `1` (or `true`) if node `i` and `j` are connected, and `0` (or `false`) otherwise. Good for dense graphs (many edges), but can use a lot of memory for sparse graphs (few edges).
+    *   `vector<vector<int>> adj_matrix(N, vector<int>(N, 0));`
+
+2.  **Adjacency List:** This is often preferred! For each node, we keep a list of all nodes it's connected to. It's like: "Node 0 is connected to [1, 3], Node 1 is connected to [0, 2]," etc.
+    *   `vector<vector<int>> adj_list(N);`
+    *   This is memory-efficient for sparse graphs and generally easier to work with for many algorithms.
+
+**We'll focus on Adjacency List as it's very common!**
+
+---
+
+### Example Problem: Find Direct Neighbors
+
+**Problem:** Given a simple undirected graph and a specific starting node, list all the nodes that are *directly connected* to it.
+
+**Input:**
+*   `N`: Total number of nodes (e.g., 5)
+*   `M`: Total number of edges (e.g., 4)
+*   `M` lines follow, each with two numbers `u v` representing an edge between node `u` and node `v`.
+*   `startNode`: The node whose neighbors we want to find.
+
+**Example Input:**
+```
+5 4      // N=5 nodes, M=4 edges
+0 1      // Edge between 0 and 1
+0 2      // Edge between 0 and 2
+1 3      // Edge between 1 and 3
+2 4      // Edge between 2 and 4
+0        // Find neighbors of node 0
+```
+
+**Expected Output for `startNode = 0`:**
+```
+Neighbors of node 0: 1 2 
+```
+
+---
+
+### C++ Implementation (Adjacency List)
+
+```cpp
+#include <iostream> // For input/output operations (cin, cout)
+#include <vector>   // For using std::vector to create adjacency lists
+#include <algorithm> // Not strictly needed for this problem, but good for general use
+
+int main() {
+    // Make I/O faster (optional, but good practice in competitive programming)
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int N; // Number of nodes
+    int M; // Number of edges
+
+    std::cout << "Enter number of nodes (N) and edges (M): ";
+    std::cin >> N >> M;
+
+    // Create an adjacency list:
+    // It's a vector where each element is another vector (list of neighbors).
+    // adj[i] will store a list of nodes directly connected to node i.
+    // We use N size (0-indexed nodes 0 to N-1). If you prefer 1-indexed, use N+1.
+    std::vector<std::vector<int>> adj(N); 
+
+    std::cout << "Enter " << M << " edges (u v): \n";
+    for (int i = 0; i < M; ++i) {
+        int u, v; // Nodes connected by an edge
+        std::cin >> u >> v;
+
+        // Since it's an UNDIRECTED graph:
+        // Add v to u's list
+        adj[u].push_back(v);
+        // Add u to v's list (because if u is connected to v, v is connected to u)
+        adj[v].push_back(u); 
+    }
+
+    int startNode;
+    std::cout << "Enter the node to find its neighbors: ";
+    std::cin >> startNode;
+
+    // Check if the startNode is valid
+    if (startNode < 0 || startNode >= N) {
+        std::cout << "Invalid node. Please enter a node between 0 and " << N - 1 << ".\n";
+        return 1; // Indicate an error
+    }
+
+    // Print neighbors of the startNode
+    std::cout << "Neighbors of node " << startNode << ": ";
+    if (adj[startNode].empty()) {
+        std::cout << "None\n";
+    } else {
+        // Iterate through the list of neighbors for startNode
+        for (int neighbor : adj[startNode]) {
+            std::cout << neighbor << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    return 0; // Indicate successful execution
+}
+```
+
+**How to Compile & Run (e.g., using g++):**
+
+1.  Save the code as `graph_neighbors.cpp`.
+2.  Open your terminal/command prompt.
+3.  Navigate to the directory where you saved the file.
+4.  Compile: `g++ graph_neighbors.cpp -o graph_neighbors`
+5.  Run: `./graph_neighbors`
+6.  Follow the prompts to enter N, M, edges, and the `startNode`.
+
+---
+
+**What's next?**
+This is just the very beginning! Once you understand graph representation, the next big steps are learning **Graph Traversal Algorithms** like:
+*   **Breadth-First Search (BFS):** Explores "layer by layer." Great for shortest paths in unweighted graphs.
+*   **Depth-First Search (DFS):** Explores as "deep" as possible before backtracking. Great for finding connected components, cycles, etc.
+
+Happy coding!
+
+---
