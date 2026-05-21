@@ -46722,3 +46722,140 @@ int main() {
 And there you have it! A quick and friendly introduction to Dynamic Programming. Remember: Break down, solve once, store, and reuse! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-05-21 09:41:33
+
+Hey there, future problem-solver! 👋 Let's unpack the **Knapsack Problem** – a classic in the world of Data Structures and Algorithms (DSA).
+
+---
+
+## Knapsack Problems: Your Guide to Packing Smart!
+
+### 🎒 What's the Concept Mean?
+
+Imagine you have a backpack (your knapsack!) with a limited weight capacity. You're presented with a bunch of items, each having its own **weight** and a corresponding **value**. Your mission? Pick items to put in your backpack to get the *maximum total value* without going over your backpack's weight limit.
+
+It's all about making the best choices given constraints!
+
+### 🤔 Why Does It Matter?
+
+Knapsack problems are super important because they model real-world optimization challenges:
+
+1.  **Resource Allocation:** Which projects should a company invest in to maximize return, given a budget?
+2.  **Logistics:** How do you load a truck to maximize the value of goods transported, without exceeding its weight limit?
+3.  **Financial Planning:** Building an investment portfolio that maximizes returns within a certain risk tolerance.
+4.  **Cutting Stock:** How to cut raw materials to minimize waste while fulfilling orders.
+
+In DSA, it's a *cornerstone* dynamic programming problem, teaching you a powerful way to solve complex optimization problems by breaking them into smaller, manageable pieces.
+
+### 📝 0/1 Knapsack: A Small Example
+
+While there are variations (like Fractional Knapsack where you can take parts of items, or Unbounded Knapsack where you have infinite copies), we'll focus on the most common one: **0/1 Knapsack**.
+
+This means for each item, you either **take it entirely (1)** or **don't take it at all (0)**. No cutting items into pieces!
+
+**Problem:** You have a knapsack with a capacity of `W = 5`.
+
+**Items Available:**
+*   **Item 1:** weight = 2, value = 3
+*   **Item 2:** weight = 3, value = 4
+*   **Item 3:** weight = 4, value = 5
+
+**Goal:** What's the maximum total value you can achieve without exceeding capacity `W = 5`?
+
+**Thinking it through:**
+
+*   If we take Item 1 (w=2, v=3) and Item 2 (w=3, v=4):
+    *   Total weight = 2 + 3 = 5 (Fits perfectly!)
+    *   Total value = 3 + 4 = 7
+*   If we just take Item 3 (w=4, v=5):
+    *   Total weight = 4 (Fits)
+    *   Total value = 5
+*   Other combinations might exceed capacity or give less value.
+
+So, the best combination is Item 1 + Item 2, giving a maximum value of **7**.
+
+### 💻 Simple C++ Implementation (Dynamic Programming)
+
+This problem is a classic for **Dynamic Programming (DP)**. We build up a solution by considering each item and each possible capacity, making the best choice at each step.
+
+We'll use a 2D array, `dp[i][w]`, to store the maximum value we can get using the *first `i` items* with a *knapsack capacity of `w`*.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+// Function to solve the 0/1 Knapsack problem
+int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values, int n) {
+    // Create a 2D DP table
+    // dp[i][w] will store the maximum value that can be obtained
+    // using the first 'i' items with a knapsack capacity of 'w'.
+    // +1 because we need to handle 0 items/0 capacity as base cases
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
+
+    // Build table dp[][] in a bottom-up manner
+    // i represents the number of items considered (from 0 to n)
+    for (int i = 0; i <= n; ++i) { 
+        // w represents the current knapsack capacity (from 0 to W)
+        for (int w = 0; w <= W; ++w) {
+            // Base cases:
+            // If no items are considered (i == 0) or no capacity (w == 0),
+            // the maximum value is 0.
+            if (i == 0 || w == 0) {
+                dp[i][w] = 0;
+            }
+            // If the weight of the current item (weights[i-1]) is less than or equal to 
+            // the current capacity (w)
+            else if (weights[i - 1] <= w) {
+                // We have two choices for the current item:
+                // 1. Don't include the current item: The value is the same as dp[i-1][w]
+                // 2. Include the current item: Add its value (values[i-1]) to the 
+                //    max value obtained from the remaining capacity (w - weights[i-1])
+                //    with previous items (dp[i-1][w - weights[i-1]])
+                // We take the maximum of these two options.
+                dp[i][w] = std::max(dp[i - 1][w], values[i - 1] + dp[i - 1][w - weights[i - 1]]);
+            }
+            // If the current item's weight is greater than the current capacity,
+            // we cannot include it. So, the value is the same as without this item
+            // (i.e., using the previous 'i-1' items with the same capacity 'w').
+            else {
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+
+    // The maximum value for 'n' items and 'W' capacity is at dp[n][W]
+    return dp[n][W];
+}
+
+int main() {
+    // Our example problem values
+    std::vector<int> weights = {2, 3, 4}; // Weights of items
+    std::vector<int> values = {3, 4, 5};   // Values of items
+    int W = 5;                           // Knapsack capacity
+    int n = weights.size();              // Number of items
+
+    int max_value = knapsack(W, weights, values, n);
+
+    std::cout << "For knapsack capacity " << W << " and given items:" << std::endl;
+    for (int i = 0; i < n; ++i) {
+        std::cout << "  Item " << i + 1 << ": Weight=" << weights[i] << ", Value=" << values[i] << std::endl;
+    }
+    std::cout << "The maximum value that can be obtained is: " << max_value << std::endl; // Expected: 7
+
+    return 0;
+}
+
+```
+
+### 🎉 Conclusion
+
+And there you have it! The 0/1 Knapsack problem is a fantastic introduction to dynamic programming. Once you grasp this, you'll find similar patterns in many other optimization problems.
+
+**What's next?** You can try optimizing the space complexity of this DP solution from O(nW) to O(W) using only two rows (or even one row!) in your DP table. Happy packing!
+
+---
