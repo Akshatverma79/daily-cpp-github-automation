@@ -46859,3 +46859,169 @@ And there you have it! The 0/1 Knapsack problem is a fantastic introduction to d
 **What's next?** You can try optimizing the space complexity of this DP solution from O(nW) to O(W) using only two rows (or even one row!) in your DP table. Happy packing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Greedy Algorithms  
+🕒 2026-05-21 16:30:20
+
+Hey there, future algorithm master! 👋 Let's dive into Greedy Algorithms.
+
+---
+
+## 🧭 Greedy Algorithms: The "Now or Never" Strategy
+
+### What does it mean?
+
+Imagine you're at a buffet and you always grab the biggest, most delicious-looking piece of cake *right now*, hoping that will lead to the best overall meal. That's essentially what a **Greedy Algorithm** does!
+
+It's an algorithmic paradigm that **makes the locally optimal choice at each stage** with the hope of finding a global optimum. In simpler terms, it picks the best immediate option without worrying about future consequences.
+
+**Key Idea:**
+*   **Local Optimal Choice:** What's the best decision I can make *right now*?
+*   **Global Optimal Solution:** Will making these "best now" choices ultimately lead to the best overall result? (Sometimes yes, sometimes no!)
+
+### Why does it matter?
+
+1.  **Simplicity:** Greedy algorithms are often very intuitive and straightforward to design and implement.
+2.  **Efficiency:** For problems where they work, they are usually very fast because they make a decision and move on, without backtracking or exploring multiple paths.
+3.  **Foundation:** They are a fundamental concept in DSA, often taught alongside Dynamic Programming as a way to solve optimization problems. Knowing when and where they apply (or don't) is crucial.
+
+### Example Problem: Activity Selection
+
+You have a list of activities, each with a start time and an end time. You can only do one activity at a time. Your goal is to **select the maximum number of non-overlapping activities**.
+
+**Input:** A list of activities `[(start1, end1), (start2, end2), ...]`
+
+**Example:**
+*   Activity A: (1, 4)
+*   Activity B: (3, 5)
+*   Activity C: (0, 6)
+*   Activity D: (5, 7)
+*   Activity E: (3, 8)
+*   Activity F: (5, 9)
+
+**Greedy Strategy:**
+Which activity should we pick first?
+*   Picking the one that starts earliest (C: (0, 6)) leaves less time for subsequent activities.
+*   Picking the one that's shortest (A: (1, 4)) seems promising.
+
+The optimal greedy strategy for Activity Selection is: **Always pick the activity that finishes earliest among the currently available ones.**
+
+**Why?** By finishing an activity as early as possible, you free up the resource (yourself) sooner, allowing more time slots to be available for subsequent activities. This maximizes your chances of picking more activities later.
+
+Let's apply it to our example:
+
+1.  **Sort activities by their finish times:**
+    *   A: (1, 4)
+    *   B: (3, 5)
+    *   C: (0, 6)
+    *   D: (5, 7)
+    *   E: (3, 8)
+    *   F: (5, 9)
+
+2.  **Select the first activity (it finishes earliest):**
+    *   Pick **A: (1, 4)**. (Current finish time: 4)
+    *   Selected: [A]
+
+3.  **Look for the next activity that starts *after or at* the current finish time (4):**
+    *   B (3, 5): Starts at 3, which is < 4. Cannot pick.
+    *   C (0, 6): Starts at 0, which is < 4. Cannot pick.
+    *   **D (5, 7):** Starts at 5, which is >= 4. **Pick D.** (Current finish time: 7)
+    *   Selected: [A, D]
+
+4.  **Look for the next activity that starts *after or at* the current finish time (7):**
+    *   E (3, 8): Starts at 3, which is < 7. Cannot pick.
+    *   F (5, 9): Starts at 5, which is < 7. Cannot pick.
+
+We've iterated through all activities.
+**Result:** We selected 2 activities: A and D. This is the maximum!
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::sort
+
+// Define a structure for an activity
+struct Activity {
+    int start;
+    int end;
+};
+
+// Custom comparison function for sorting activities by finish time
+bool compareActivities(const Activity& a, const Activity& b) {
+    return a.end < b.end;
+}
+
+int main() {
+    std::vector<Activity> activities = {
+        {1, 4},
+        {3, 5},
+        {0, 6},
+        {5, 7},
+        {3, 8},
+        {5, 9}
+    };
+
+    std::cout << "Original Activities:" << std::endl;
+    for (const auto& act : activities) {
+        std::cout << "(" << act.start << ", " << act.end << ") ";
+    }
+    std::cout << std::endl << std::endl;
+
+    // 1. Sort activities by their finish times
+    std::sort(activities.begin(), activities.end(), compareActivities);
+
+    std::cout << "Activities sorted by finish time:" << std::endl;
+    for (const auto& act : activities) {
+        std::cout << "(" << act.start << ", " << act.end << ") ";
+    }
+    std::cout << std::endl << std::endl;
+
+    int numSelectedActivities = 0;
+    int lastFinishTime = -1; // Initialize with a time before any activity can start
+
+    std::cout << "Selected Activities:" << std::endl;
+
+    // 2. Iterate through sorted activities and pick non-overlapping ones
+    for (const auto& currentActivity : activities) {
+        // If the current activity starts after or at the time the last selected activity finished
+        if (currentActivity.start >= lastFinishTime) {
+            numSelectedActivities++;
+            lastFinishTime = currentActivity.end; // Update the finish time
+            std::cout << "(" << currentActivity.start << ", " << currentActivity.end << ") ";
+        }
+    }
+    std::cout << std::endl << std::endl;
+
+    std::cout << "Maximum number of non-overlapping activities: " << numSelectedActivities << std::endl;
+
+    return 0;
+}
+```
+
+**Output:**
+```
+Original Activities:
+(1, 4) (3, 5) (0, 6) (5, 7) (3, 8) (5, 9) 
+
+Activities sorted by finish time:
+(1, 4) (3, 5) (0, 6) (5, 7) (3, 8) (5, 9) 
+
+Selected Activities:
+(1, 4) (5, 7) 
+
+Maximum number of non-overlapping activities: 2
+```
+
+---
+
+### A Little Caveat!
+
+Greedy algorithms are amazing when they work, but they **don't always lead to the global optimum**. You need to either prove that a greedy choice works for a specific problem or recognize it as a standard problem where a greedy approach is known to be optimal (like Activity Selection or Dijkstra's algorithm for shortest paths). For other problems, a more exhaustive approach like Dynamic Programming might be required.
+
+That's your quick intro to Greedy Algorithms! Keep practicing, and you'll get the hang of when to be "greedy." Happy coding! 🎉
+
+---
