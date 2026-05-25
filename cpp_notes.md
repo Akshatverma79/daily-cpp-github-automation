@@ -47934,3 +47934,105 @@ The character 'z' is not found.
 HashMaps (`std::unordered_map` in C++) are your go-to for lightning-fast key-value lookups, insertions, and deletions. They're a fundamental tool in any developer's arsenal for solving a wide array of problems efficiently! Keep rocking! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Manipulation Basics  
+🕒 2026-05-25 10:07:18
+
+Hey there, future coder! 👋 Let's unlock the power of text with String Manipulation Basics.
+
+---
+
+### **String Manipulation Basics: Your Text Toolkit!**
+
+#### **What is String Manipulation?**
+
+Imagine a string as a sequence of characters – like `H`, `e`, `l`, `l`, `o` forming "Hello".
+**String Manipulation** is simply the act of working with these sequences:
+*   **Changing them:** (e.g., making text uppercase)
+*   **Analyzing them:** (e.g., finding how long a word is)
+*   **Extracting parts:** (e.g., getting just the first name from "John Doe")
+*   **Comparing them:** (e.g., checking if two passwords match)
+
+It's your fundamental toolkit for handling any kind of text data!
+
+#### **Why Does It Matter?**
+
+Strings are *everywhere* in the real world:
+1.  **User Input:** Validating emails, passwords, usernames.
+2.  **Data Processing:** Reading and parsing information from files (like CSVs, JSON).
+3.  **Web Development:** Handling URLs, search queries, user comments.
+4.  **Text Editors & Search Engines:** Finding and replacing text, indexing documents.
+5.  **Game Development:** Displaying messages, player names.
+
+Mastering string manipulation is like getting a superpower for dealing with information!
+
+---
+
+#### **Let's Practice! (A Small Problem)**
+
+**Problem:** Count Vowels in a String
+Given a string, write a program to count the number of vowels (a, e, i, o, u) in it. The count should be case-insensitive.
+
+**Example:**
+Input: `"Hello World"`
+Output: `3` (e, o, o)
+
+---
+
+#### **Simple C++ Implementation**
+
+```cpp
+#include <iostream> // For input/output operations (like printing to console)
+#include <string>   // To use the std::string class
+#include <cctype>   // For character functions like tolower()
+
+// Function to count vowels in a given string
+int countVowels(const std::string& text) {
+    int vowelCount = 0; // Initialize a counter for vowels
+    
+    // Iterate through each character in the string
+    // 'char c' gets a copy of the character
+    // ': text' means iterate over the 'text' string
+    for (char c : text) {
+        // Convert the character to lowercase to handle case-insensitivity
+        char lowerC = std::tolower(c); // 'a' is same as 'A'
+
+        // Check if the lowercase character is one of the vowels
+        if (lowerC == 'a' || lowerC == 'e' || lowerC == 'i' || lowerC == 'o' || lowerC == 'u') {
+            vowelCount++; // If it's a vowel, increment our counter
+        }
+    }
+    
+    return vowelCount; // Return the total count
+}
+
+int main() {
+    std::string input1 = "Hello World";
+    std::string input2 = "Programming is Fun!";
+    std::string input3 = "BRR"; // No vowels
+
+    std::cout << "String: \"" << input1 << "\" | Vowel count: " << countVowels(input1) << std::endl; // Expected: 3
+    std::cout << "String: \"" << input2 << "\" | Vowel count: " << countVowels(input2) << std::endl; // Expected: 6
+    std::cout << "String: \"" << input3 << "\" | Vowel count: " << countVowels(input3) << std::endl; // Expected: 0
+    
+    return 0; // Indicate successful execution
+}
+
+```
+
+**Quick Explanation of the Code:**
+
+*   **`#include <string>`**: This brings in the `std::string` class, which is C++'s way to handle strings.
+*   **`#include <cctype>`**: Provides `std::tolower()`, a super useful function to convert any character to its lowercase equivalent. This makes our vowel check case-insensitive.
+*   **`for (char c : text)`**: This is a "range-based for loop" – a clean C++ way to iterate over every character (`c`) in the `text` string.
+*   **`std::tolower(c)`**: Converts the current character `c` to lowercase before checking if it's a vowel. This means 'A' becomes 'a', and 'E' becomes 'e', etc.
+*   **`if (lowerC == 'a' || ...)`**: A simple conditional check to see if our lowercase character matches any of the vowels.
+*   **`vowelCount++`**: If it's a vowel, we increment our counter.
+
+---
+
+And there you have it! Your first step into string manipulation. Keep practicing, and you'll be a text wizard in no time! ✨
+
+---
