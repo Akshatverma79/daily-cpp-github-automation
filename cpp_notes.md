@@ -48488,3 +48488,129 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-05-26 09:57:09
+
+Let's dive into Backtracking!
+
+---
+
+## Backtracking Basics
+
+Imagine you're lost in a maze. You try a path. If it leads to a dead end, you **go back** to the last decision point and try a different path. That's essentially Backtracking!
+
+### 🧭 What it means
+
+Backtracking is a problem-solving technique where you try to build a solution step-by-step. At each step, you make a choice.
+
+*   If the choice leads to a valid path towards a solution, you continue exploring down that path (recursive call).
+*   If the choice leads to a dead end (a situation where no valid solution can be formed), you **undo** that choice and try another option from the previous step. This "undoing" is the "backtrack" part.
+
+It's typically implemented using **recursion**.
+
+### ✨ Why it matters
+
+Backtracking is super useful for problems where you need to find *all possible ways* to do something, or explore a search space to find a specific solution. Think puzzles like Sudoku, finding all permutations of a list, or solving mazes. It helps systematically explore all potential solutions without getting stuck on dead ends.
+
+### 🧩 Example Problem: Generate Subsets
+
+**Problem:** Given a set of numbers, find all its possible subsets (including the empty set).
+
+**Input:** `nums = [1, 2, 3]`
+
+**Output:** `[[], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3]]`
+
+**How Backtracking Applies:**
+For each number in the input, you have two choices:
+1.  **Include** it in the current subset.
+2.  **Exclude** it from the current subset.
+
+We explore both possibilities. When we've made decisions for all numbers, we've formed a complete subset. Then, we "backtrack" to explore other combinations.
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <vector>
+#include <iostream> // For printing output
+
+class Solution {
+public:
+    std::vector<std::vector<int>> allSubsets; // Stores all valid subsets found
+    std::vector<int> currentSubset;          // Stores the subset being built
+
+    // Helper function to perform backtracking
+    // 'nums': The original input array
+    // 'start_index': The index from which we start considering numbers
+    void backtrack(const std::vector<int>& nums, int start_index) {
+        // --- Base Case / Record Solution ---
+        // Every 'currentSubset' we form is a valid subset, so add it to our results.
+        allSubsets.push_back(currentSubset);
+
+        // --- Recursive Step / Explore Choices ---
+        // Iterate through numbers starting from 'start_index'
+        for (int i = start_index; i < nums.size(); ++i) {
+            // 1. Choose: Include the current number nums[i]
+            currentSubset.push_back(nums[i]);
+
+            // 2. Explore: Recurse to find subsets with this choice
+            // We start the next decision from 'i + 1' to avoid duplicates
+            // and maintain non-decreasing order for subsets.
+            backtrack(nums, i + 1);
+
+            // 3. Un-choose (Backtrack!): Remove nums[i] to explore other paths.
+            // This is the core "backtracking" step. We undo the previous choice
+            // to try different combinations.
+            currentSubset.pop_back();
+        }
+    }
+
+    // Main function to initiate the backtracking process
+    std::vector<std::vector<int>> subsets(std::vector<int>& nums) {
+        allSubsets.clear();    // Ensure results are clear for a new call
+        currentSubset.clear(); // Ensure current subset is clear
+        backtrack(nums, 0);    // Start the backtracking from the first element (index 0)
+        return allSubsets;
+    }
+};
+
+// --- How to run and see the output ---
+int main() {
+    Solution sol;
+    std::vector<int> nums = {1, 2, 3};
+    std::vector<std::vector<int>> result = sol.subsets(nums);
+
+    std::cout << "Subsets of {1, 2, 3}:" << std::endl;
+    for (const auto& subset : result) {
+        std::cout << "[";
+        for (size_t i = 0; i < subset.size(); ++i) {
+            std::cout << subset[i] << (i == subset.size() - 1 ? "" : ", ");
+        }
+        std::cout << "]" << std::endl;
+    }
+    /* Expected Output:
+    Subsets of {1, 2, 3}:
+    []
+    [1]
+    [1, 2]
+    [1, 2, 3]
+    [1, 3]
+    [2]
+    [2, 3]
+    [3]
+    */
+    return 0;
+}
+```
+
+### Key Takeaways
+
+1.  **Choice:** At each step, you make a decision.
+2.  **Explore:** You recursively call the function with the new choice.
+3.  **Un-choose (Backtrack):** After exploring, you *undo* your last choice to try other options. This is crucial for exploring all paths.
+4.  **Base Case:** A condition to stop recursing (e.g., when a full solution is found, or a dead end is reached).
+5.  **State Management:** You need a way to keep track of the current path/solution being built (`currentSubset` in our example).
+
+---
