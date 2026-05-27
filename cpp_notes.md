@@ -48822,3 +48822,164 @@ You'd write a `solveSudoku(board)` function:
 And there you have it! N-Queens and Sudoku Solver are fantastic ways to grasp the power and elegance of backtracking. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2026-05-27 16:54:58
+
+Hey there, future DSA master! 👋 Let's dive into Heaps and Priority Queues – your secret weapon for managing "most important" items efficiently.
+
+---
+
+## Heaps & Priority Queues: Your Go-To for 'Most Important' Items!
+
+### 1. What is the Concept?
+
+Imagine you have a list of tasks, but you don't want to do them in the order you got them. You want to do the *most urgent* one first! That's exactly what a **Priority Queue** does.
+
+*   **Priority Queue (PQ):** It's an abstract data type, just like a regular queue, but with a twist. Instead of "First-In, First-Out" (FIFO), it's "First-In, **Priority-Out**" (FIPO). The item with the highest priority always gets to the front.
+    *   **Operations:**
+        *   `push(item)`: Add an item with its priority.
+        *   `top()`: Look at the highest priority item without removing it.
+        *   `pop()`: Remove and return the highest priority item.
+        *   `empty()`, `size()`: Check if empty or get the count.
+
+*   **Heaps:** Think of Heaps as the engine under the hood that makes Priority Queues super fast. A Heap is a special tree-based data structure (specifically, a **complete binary tree**) that satisfies the **heap property**:
+    *   **Max Heap:** For any given node `i`, the value of `i` is greater than or equal to the values of its children. The largest item is always at the root.
+    *   **Min Heap:** For any given node `i`, the value of `i` is less than or equal to the values of its children. The smallest item is always at the root.
+
+    This structure allows for very efficient `O(log N)` insertion and deletion of the top element.
+
+### 2. Why Does It Matter?
+
+Heaps and Priority Queues are incredibly useful in many real-world and algorithmic scenarios:
+
+*   **Task Scheduling:** Operating systems use them to decide which process to run next based on priority.
+*   **Event Simulation:** Managing events in the correct chronological order.
+*   **Graph Algorithms:** Essential for algorithms like Dijkstra's (shortest path) and Prim's (minimum spanning tree) to efficiently select the next edge/node.
+*   **System Design:** Load balancing, managing network packets, and more.
+*   **Top K Problems:** Finding the Kth largest/smallest element, merging K sorted lists.
+
+Essentially, anytime you need to efficiently keep track of the "best," "worst," "largest," or "smallest" item in a dynamic collection, Heaps/Priority Queues are your go-to!
+
+### 3. Example Problem
+
+**Problem:** You have a list of students and their scores on a test. You want to quickly find out who got the top 3 scores.
+
+**Input:**
+Students: `[ (Alice, 85), (Bob, 92), (Charlie, 78), (David, 95), (Eve, 88) ]`
+
+**Expected Output (Top 3 Scores):**
+```
+David (95)
+Bob (92)
+Eve (88)
+```
+*(Note: If scores are tied, any order for tied scores is fine.)*
+
+### 4. Simple C++ Implementation (`std::priority_queue`)
+
+C++ comes with a fantastic built-in `std::priority_queue` that uses a Max Heap by default.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>    // For std::priority_queue
+#include <string>
+#include <functional> // For std::greater (if you want a Min Heap)
+
+// --- Understanding std::priority_queue ---
+
+// By default, std::priority_queue is a Max Heap:
+// std::priority_queue<int> max_pq;
+//    - Pushing `5, 2, 8` would make `8` the top.
+
+// To make a Min Heap:
+// std::priority_queue<int, std::vector<int>, std::greater<int>> min_pq;
+//    - Pushing `5, 2, 8` would make `2` the top.
+//    - `std::greater<int>` means "smaller values have higher priority"
+
+// --- Solution to Example Problem ---
+
+// 1. Define a struct for our Student, as std::priority_queue
+//    needs to know how to compare complex objects.
+struct Student {
+    std::string name;
+    int score;
+
+    // Optional: A constructor for easy initialization
+    Student(std::string n, int s) : name(n), score(s) {}
+};
+
+// 2. Define a custom comparator for our Student struct.
+//    std::priority_queue uses a comparator to determine priority.
+//    For a MAX HEAP (we want highest score at top),
+//    'a < b' means 'a has LOWER priority than b', so b should come first.
+struct CompareStudents {
+    bool operator()(const Student& a, const Student& b) {
+        return a.score < b.score; // If a.score is less than b.score,
+                                  // 'a' has lower priority than 'b'.
+                                  // This puts higher scores at the top.
+    }
+};
+
+
+int main() {
+    std::cout << "--- Priority Queue Demo: Top 3 Students ---\n";
+
+    // Create a priority queue of Students using our custom comparator.
+    // std::priority_queue<Type, UnderlyingContainer, Comparator>
+    std::priority_queue<Student, std::vector<Student>, CompareStudents> top_students_pq;
+
+    // Add students to our priority queue
+    top_students_pq.push(Student("Alice", 85));
+    top_students_pq.push(Student("Bob", 92));
+    top_students_pq.push(Student("Charlie", 78));
+    top_students_pq.push(Student("David", 95));
+    top_students_pq.push(Student("Eve", 88));
+
+    std::cout << "Total students in PQ: " << top_students_pq.size() << "\n";
+    std::cout << "Highest scoring student (top): " << top_students_pq.top().name
+              << " (" << top_students_pq.top().score << ")\n\n";
+
+    // Extract the top 3 students
+    int count = 0;
+    std::cout << "Top 3 students by score:\n";
+    while (!top_students_pq.empty() && count < 3) {
+        Student current_top = top_students_pq.top(); // Get the top student
+        top_students_pq.pop();                       // Remove the top student
+
+        std::cout << count + 1 << ". " << current_top.name
+                  << " (" << current_top.score << ")\n";
+        count++;
+    }
+
+    std::cout << "\nRemaining students in PQ after extracting top 3: "
+              << top_students_pq.size() << "\n";
+
+    return 0;
+}
+```
+
+**Explanation of the C++ Code:**
+
+1.  **`#include <queue>`:** This header is essential for `std::priority_queue`.
+2.  **`Student` Struct:** We define a simple struct to hold a student's `name` and `score`.
+3.  **`CompareStudents` Struct:** This is the *magic* for custom objects! `std::priority_queue` needs to know how to compare two `Student` objects to decide which one has higher priority.
+    *   The `operator()` overload defines this comparison.
+    *   `return a.score < b.score;` means: "If `a`'s score is *less than* `b`'s score, then `a` has *lower priority* than `b`." This ensures that students with *higher scores* float to the top of our Max Heap.
+4.  **`std::priority_queue<Student, std::vector<Student>, CompareStudents> top_students_pq;`**
+    *   `Student`: The type of elements it will store.
+    *   `std::vector<Student>`: The underlying container (usually `std::vector` is fine).
+    *   `CompareStudents`: Our custom comparator struct that tells the PQ how to order `Student` objects.
+5.  **`push()`:** Adds a new student to the priority queue. The heap structure is automatically maintained.
+6.  **`top()`:** Returns a reference to the element at the top (the one with the highest priority) without removing it.
+7.  **`pop()`:** Removes the top element. The heap is re-organized to find the next highest priority item.
+8.  **`empty()` & `size()`:** Standard container functions to check if it's empty or get the number of elements.
+
+---
+
+That's a quick rundown of Heaps and Priority Queues! They're powerful tools once you get the hang of them. Happy prioritizing!
+
+---
