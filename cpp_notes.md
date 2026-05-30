@@ -49510,3 +49510,140 @@ int main() {
 That's the core idea of Segment Trees! They might look a bit intimidating at first with all the recursion, but once you understand the three functions (`build`, `update`, `query`), you'll find them incredibly useful. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Fenwick Trees (Binary Indexed Tree)  
+🕒 2026-05-30 08:28:15
+
+Okay, let's break down Fenwick Trees (or Binary Indexed Trees) in a clean, friendly way!
+
+---
+
+## Fenwick Trees (Binary Indexed Tree - BIT)
+
+### 🌳 What is it? (The Concept)
+
+Imagine you have a list of numbers, and you constantly need to:
+1.  **Update** a single number in the list.
+2.  Find the **sum of numbers** from the beginning of the list up to a certain point (a "prefix sum").
+
+A Fenwick Tree is a clever data structure that lets you do both of these operations super fast – in `O(log N)` time, where `N` is the size of your list.
+
+Think of it as an array that doesn't just store values, but *partial sums* in a special way that allows quick updates and prefix sum queries. It's often used for **Range Sum Query (RSQ)** problems.
+
+### 🤔 Why Does It Matter?
+
+*   **Speed:** Much faster than a simple array for these operations. A naive array takes `O(1)` for update but `O(N)` for prefix sum. Fenwick Tree does both in `O(log N)`.
+*   **Simplicity (compared to Segment Trees):** While Segment Trees can do more complex range queries, Fenwick Trees are simpler to implement for point updates and prefix sums. They also often have lower constant factors, making them slightly faster in practice for these specific tasks.
+*   **Memory Efficiency:** Uses `O(N)` space, just like a regular array.
+
+**The Magic Behind It:**
+Fenwick Trees use the binary representation of indices. Each node in the Fenwick Tree `bit[i]` stores the sum of a specific range of elements from the original array. The size of this range is determined by the lowest set bit of `i`.
+
+*   To **update** an element at index `i`, you "propagate" the change upwards to all `bit` nodes that *include* `i` in their sum. This is done by repeatedly adding `i & -i` to `i`.
+*   To **query** the prefix sum up to index `i`, you sum up the values from specific `bit` nodes that *combine* to form the sum `[1...i]`. This is done by repeatedly subtracting `i & -i` from `i`.
+    *(Note: `i & -i` isolates the lowest set bit in `i`'s binary representation. E.g., `6 (0110_2) & -6 (1010_2)` is `0010_2 = 2`)*
+
+### 📝 Example Problem
+
+Let's say we have an initial array: `A = [0, 1, 2, 3, 4, 5]` (we'll use 1-based indexing for convenience with Fenwick Trees, so `A[0]` is ignored).
+
+1.  **Initial Array (conceptually):** `[1, 2, 3, 4, 5]`
+2.  **Query:** What is the sum of elements up to index 3? (`sum(A[1]...A[3])`)
+    *   Expected: `1 + 2 + 3 = 6`
+3.  **Update:** Change the value at index 2 from `2` to `10`.
+    *   Array becomes: `[1, 10, 3, 4, 5]`
+4.  **Query:** What is the sum of elements up to index 3 now? (`sum(A[1]...A[3])`)
+    *   Expected: `1 + 10 + 3 = 14`
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <vector>
+#include <iostream>
+
+// Fenwick Tree (Binary Indexed Tree) implementation
+class FenwickTree {
+private:
+    std::vector<int> bit; // The Fenwick Tree array (1-based indexing)
+    int N;                // Size of the original array (or max index)
+
+public:
+    // Constructor: Initializes the Fenwick Tree with size 'n'
+    FenwickTree(int n) : N(n), bit(n + 1, 0) {}
+
+    // Constructor: Initializes the Fenwick Tree from an existing array 'arr'
+    // 'arr' is expected to be 0-indexed, so we convert to 1-indexed for BIT
+    FenwickTree(const std::vector<int>& arr) {
+        N = arr.size();
+        bit.assign(N + 1, 0); // Initialize BIT with zeros
+
+        // Build the Fenwick Tree by calling update for each element
+        for (int i = 0; i < N; ++i) {
+            update(i + 1, arr[i]); // arr[i] is at (i+1) in 1-based BIT
+        }
+    }
+
+    // Update the value at 'idx' by 'delta'
+    // 'idx' is 1-based
+    void update(int idx, int delta) {
+        // Iterate while idx is within the bounds of the tree
+        // 'idx += idx & -idx' moves to the next parent responsible for this index
+        for (; idx <= N; idx += idx & -idx) {
+            bit[idx] += delta;
+        }
+    }
+
+    // Query the prefix sum up to 'idx'
+    // Sums elements from original_array[1] to original_array[idx]
+    // 'idx' is 1-based
+    int query(int idx) {
+        int sum = 0;
+        // Iterate while idx is greater than 0
+        // 'idx -= idx & -idx' moves to the parent that covers the previous range
+        for (; idx > 0; idx -= idx & -idx) {
+            sum += bit[idx];
+        }
+        return sum;
+    }
+
+    // Query the sum of elements in a range [left, right]
+    // 'left' and 'right' are 1-based
+    int range_query(int left, int right) {
+        if (left > right) return 0; // Handle invalid range
+        return query(right) - query(left - 1);
+    }
+};
+
+int main() {
+    // Example from above: Initial conceptual array [1, 2, 3, 4, 5]
+    std::vector<int> initial_arr = {1, 2, 3, 4, 5};
+    FenwickTree ft(initial_arr); // Initialize BIT with these values
+
+    std::cout << "Initial array (conceptually 1-based): [1, 2, 3, 4, 5]\n";
+
+    // 1. Query: Sum up to index 3 (elements A[1] to A[3])
+    int sum_to_3 = ft.query(3);
+    std::cout << "Sum up to index 3: " << sum_to_3 << " (Expected: 6)\n";
+
+    // 2. Update: Change value at index 2 from 2 to 10
+    // The original value at index 2 was 2. New value is 10.
+    // Delta = New Value - Old Value = 10 - 2 = 8
+    ft.update(2, 8); // Update index 2 by adding 8
+
+    std::cout << "After updating index 2 to 10. Array: [1, 10, 3, 4, 5]\n";
+
+    // 3. Query: Sum up to index 3 again
+    int new_sum_to_3 = ft.query(3);
+    std::cout << "New sum up to index 3: " << new_sum_to_3 << " (Expected: 14)\n";
+
+    // Example range query
+    int range_sum = ft.range_query(2, 4); // Sum of A[2], A[3], A[4] (10 + 3 + 4 = 17)
+    std::cout << "Sum from index 2 to 4: " << range_sum << " (Expected: 17)\n";
+
+    return 0;
+}
+```
+
+---
