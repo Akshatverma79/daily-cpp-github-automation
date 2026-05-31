@@ -49820,3 +49820,161 @@ This matches our manual trace! 🎉
 That's Dijkstra's Algorithm in a nutshell! It's powerful, versatile, and a must-know for any DSA journey. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bellman-Ford Algorithm  
+🕒 2026-05-31 08:46:11
+
+Hey there, future algorithm master! 👋 Let's break down the Bellman-Ford algorithm in a super friendly way.
+
+---
+
+## Bellman-Ford Algorithm: Your Path to Shortest Paths!
+
+### 1. What does it mean? (The Concept)
+
+Imagine you're trying to find the quickest way to get from your house to all your friends' houses, but some "roads" (edges) might actually *subtract* travel time (negative weights – weird, right? Like a time warp!).
+
+The **Bellman-Ford Algorithm** is a workhorse algorithm designed to find the **shortest paths** from a single source node to all other nodes in a weighted graph.
+
+Here's its superpower:
+*   It can handle **negative edge weights**! 🎉 (Unlike Dijkstra's algorithm, which throws a fit with negative weights).
+*   It can **detect negative cycles**! 🔄 A negative cycle is a loop where if you travel around it, your total path cost decreases. If such a cycle is reachable from the source, you could keep looping to get an infinitely small (negative) path, which means no "shortest" path exists. Bellman-Ford tells you if this nightmare scenario is happening.
+
+**How it works (Simplified):**
+1.  **Initialize:** Start with an infinite distance to all nodes except the source (which has 0 distance).
+2.  **Relaxation Rounds:** It then iterates `V-1` times (where `V` is the number of nodes). In each iteration, it tries to "relax" every edge. "Relaxing" an edge means checking if taking that edge provides a shorter path to its destination node than the one currently recorded.
+3.  **Negative Cycle Check:** After `V-1` iterations, all shortest paths should be found (if no negative cycles). It then does one final check: if any edge can still be relaxed, it means there's a negative cycle.
+
+### 2. Why does it matter?
+
+*   **Handling the "Bad" Stuff:** In many real-world scenarios, costs aren't always positive. Think about financial transactions where you might gain money (negative cost to you), or network routing where some links might offer a "bonus" (negative latency). Bellman-Ford is your go-to when negative weights are involved.
+*   **Arbitrage Detection:** In finance, if you can find a sequence of trades that results in a risk-free profit, that's called arbitrage. This can often be modeled as finding a negative cycle in a graph where nodes are currencies and edge weights are exchange rates (logarithmic transformation typically makes it a sum).
+*   **Routing Protocols:** Some network routing protocols (like RIP) are based on the Bellman-Ford principle, though they might not explicitly handle negative weights in the same way.
+
+### 3. Example Problem (Small & Sweet)
+
+Let's find the shortest paths from node `0` to all other nodes.
+
+**Graph:**
+*   Nodes: 0, 1, 2, 3
+*   Edges:
+    *   `0 -> 1` (weight: 5)
+    *   `0 -> 2` (weight: 4)
+    *   `1 -> 3` (weight: 3)
+    *   `2 -> 1` (weight: -6)  ⬅️ **Aha! A negative edge!**
+    *   `2 -> 3` (weight: 2)
+
+**Goal:** Find shortest path from `0` to `0, 1, 2, 3`.
+
+**Expected Shortest Paths:**
+*   **To 0:** 0 (straightforward)
+*   **To 1:** `0 -> 2 -> 1` (4 + (-6) = -2). Much better than `0 -> 1` (5)!
+*   **To 2:** `0 -> 2` (4)
+*   **To 3:** `0 -> 2 -> 1 -> 3` (4 + (-6) + 3 = 1). Better than `0 -> 2 -> 3` (4 + 2 = 6)!
+
+So, final distances: `dist[0]=0, dist[1]=-2, dist[2]=4, dist[3]=1`.
+
+### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <tuple> // For std::tuple to store edges
+#include <limits> // For std::numeric_limits
+
+// A large value to represent infinity
+// Using long long for INF is safer to prevent overflow during additions
+const long long INF = std::numeric_limits<long long>::max();
+
+// Function to run Bellman-Ford algorithm
+void bellmanFord(int numNodes, const std::vector<std::tuple<int, int, int>>& edges, int startNode) {
+    // Initialize distances: all to INF, source to 0
+    std::vector<long long> dist(numNodes, INF);
+    dist[startNode] = 0;
+
+    // Step 1: Relax all edges (numNodes - 1) times
+    // A path can have at most (numNodes - 1) edges
+    for (int i = 0; i < numNodes - 1; ++i) {
+        bool any_relaxation = false; // To optimize: if no relaxation in a pass, we are done
+        for (const auto& edge : edges) {
+            int u = std::get<0>(edge); // Source node of edge
+            int v = std::get<1>(edge); // Destination node of edge
+            int weight = std::get<2>(edge); // Weight of edge
+
+            // If the source node 'u' is reachable AND
+            // a shorter path to 'v' is found through 'u'
+            if (dist[u] != INF && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+                any_relaxation = true;
+            }
+        }
+        if (!any_relaxation) { // If no distance was updated, we've converged early
+            break;
+        }
+    }
+
+    // Step 2: Check for negative cycles
+    // If we can still relax any edge, there's a negative cycle
+    bool hasNegativeCycle = false;
+    for (const auto& edge : edges) {
+        int u = std::get<0>(edge);
+        int v = std::get<1>(edge);
+        int weight = std::get<2>(edge);
+
+        if (dist[u] != INF && dist[u] + weight < dist[v]) {
+            hasNegativeCycle = true;
+            break;
+        }
+    }
+
+    // Output results
+    if (hasNegativeCycle) {
+        std::cout << "Graph contains a negative weight cycle!\n";
+    } else {
+        std::cout << "Shortest distances from node " << startNode << ":\n";
+        for (int i = 0; i < numNodes; ++i) {
+            if (dist[i] == INF) {
+                std::cout << "  Node " << i << ": Not reachable\n";
+            } else {
+                std::cout << "  Node " << i << ": " << dist[i] << "\n";
+            }
+        }
+    }
+}
+
+int main() {
+    int numNodes = 4; // Nodes 0, 1, 2, 3
+    // Edges are stored as (source, destination, weight) tuples
+    std::vector<std::tuple<int, int, int>> edges = {
+        {0, 1, 5},
+        {0, 2, 4},
+        {1, 3, 3},
+        {2, 1, -6}, // Our negative edge!
+        {2, 3, 2}
+    };
+    int startNode = 0;
+
+    bellmanFord(numNodes, edges, startNode);
+
+    // --- Example with a negative cycle ---
+    std::cout << "\n--- Example with a negative cycle ---\n";
+    numNodes = 3; // Nodes 0, 1, 2
+    std::vector<std::tuple<int, int, int>> negativeCycleEdges = {
+        {0, 1, 1},
+        {1, 2, -1},
+        {2, 0, -1} // This creates a cycle: 0 -> 1 -> 2 -> 0 with total weight 1 + (-1) + (-1) = -1
+    };
+    startNode = 0;
+    bellmanFord(numNodes, negativeCycleEdges, startNode);
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Bellman-Ford in a nutshell. It's a bit slower than Dijkstra's (O(V*E) vs O(E log V) or O(E+V log V) for Dijkstra), but its ability to handle negative weights and detect cycles makes it incredibly valuable. Keep up the great work! 💪
+
+---
