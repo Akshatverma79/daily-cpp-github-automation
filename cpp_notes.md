@@ -49978,3 +49978,211 @@ int main() {
 And there you have it! Bellman-Ford in a nutshell. It's a bit slower than Dijkstra's (O(V*E) vs O(E log V) or O(E+V log V) for Dijkstra), but its ability to handle negative weights and detect cycles makes it incredibly valuable. Keep up the great work! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2026-05-31 15:06:44
+
+Here's a clean and simple note on the Floyd-Warshall Algorithm!
+
+---
+
+## Floyd-Warshall Algorithm: Your All-Pairs Shortest Path Buddy!
+
+### 🗺️ What's the Concept?
+
+Imagine you have a map with several cities and roads connecting them. You want to know the **shortest route between *every single pair* of cities** on that map. That's exactly what the Floyd-Warshall algorithm does!
+
+It's an **All-Pairs Shortest Path (APSP)** algorithm. It finds the shortest path between all possible pairs of vertices (cities) in a weighted graph.
+
+The magic happens by gradually improving estimates of the shortest path. It considers every vertex `k` as a possible intermediate stop between any two other vertices `i` and `j`.
+
+### ✨ Why Does It Matter?
+
+1.  **Comprehensive Shortest Paths:** When you need *all* the shortest paths, not just from one starting point. Think navigation systems pre-calculating routes, or network routing.
+2.  **Negative Edge Weights:** Unlike Dijkstra's algorithm, Floyd-Warshall can handle graphs with negative edge weights.
+3.  **Simplicity:** It's relatively easy to understand and implement due to its dynamic programming nature.
+4.  **Applications:** Beyond navigation, it's used in areas like analyzing transitive closures of graphs, finding optimal delivery routes, and even detecting arbitrage opportunities in finance.
+
+**Complexity:**
+*   **Time:** O(V³) (where V is the number of vertices)
+*   **Space:** O(V²)
+
+### 🤔 How It Works (The Core Idea)
+
+Floyd-Warshall is a **Dynamic Programming** algorithm. It builds up the solution step by step:
+
+1.  **Initialization:** Start with a distance matrix `dist[i][j]` where `dist[i][j]` is the direct weight of the edge from `i` to `j`. If there's no direct edge, it's infinity. `dist[i][i]` is 0.
+
+2.  **Iteration (The Magic Loop):** It uses three nested loops:
+    *   The outermost loop iterates through all possible intermediate vertices, let's call it `k`.
+    *   The two inner loops iterate through all possible source vertices `i` and destination vertices `j`.
+
+    For each `(i, j)` pair, it asks:
+    "Is the current shortest path from `i` to `j` (`dist[i][j]`) shorter than going from `i` to `k` (`dist[i][k]`) and then from `k` to `j` (`dist[k][j]`)?"
+
+    If `dist[i][k] + dist[k][j]` is shorter, then we update `dist[i][j]` with this new, shorter path.
+
+    **The Formula:**
+    `dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`
+
+    **Important Loop Order:** The `k` loop MUST be the outermost loop. This ensures that when we consider paths through `k`, all paths involving intermediate vertices *smaller than `k`* have already been optimized.
+
+### 📝 Example Problem
+
+Let's use a super small graph with 3 vertices (0, 1, 2):
+
+*   Edge 0 -> 1 with weight 3
+*   Edge 1 -> 2 with weight 1
+*   Edge 0 -> 2 with weight 7
+
+Let `INF` be a very large number representing no direct path.
+
+**Initial Distance Matrix (`k=-1`):**
+```
+     0   1   2
+   -----------
+0 |  0   3   7
+1 | INF  0   1
+2 | INF INF  0
+```
+
+**Step 1: `k = 0` (Can we go through vertex 0 to make any path shorter?)**
+*   No path gets shorter by going through vertex 0. For example, `dist[1][2]` could potentially be `dist[1][0] + dist[0][2]`, but `dist[1][0]` is `INF`, so no change.
+
+**Step 2: `k = 1` (Can we go through vertex 1 to make any path shorter?)**
+*   Consider `(i, j) = (0, 2)`:
+    *   Current `dist[0][2]` = 7
+    *   Path via `k=1`: `dist[0][1] + dist[1][2]` = `3 + 1 = 4`
+    *   Since `4 < 7`, update `dist[0][2] = 4`.
+*   All other paths remain the same as no shorter path via 1 is found.
+
+**Distance Matrix after `k=1`:**
+```
+     0   1   2
+   -----------
+0 |  0   3   4  (Updated 0->2 from 7 to 4)
+1 | INF  0   1
+2 | INF INF  0
+```
+
+**Step 3: `k = 2` (Can we go through vertex 2 to make any path shorter?)**
+*   No path gets shorter in this example by going through vertex 2.
+
+**Final Shortest Distance Matrix:**
+```
+     0   1   2
+   -----------
+0 |  0   3   4
+1 | INF  0   1
+2 | INF INF  0
+```
+This matrix now shows the shortest path between all pairs! Notice the path `0 -> 2` is now `4` (via `0 -> 1 -> 2`), which is shorter than the direct edge `0 -> 2` (weight `7`).
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int INF = 1e9; // A large number to represent infinity
+
+void floydWarshall(std::vector<std::vector<int>>& dist) {
+    int V = dist.size(); // Number of vertices
+
+    // The core of the Floyd-Warshall algorithm
+    // k is the intermediate vertex
+    for (int k = 0; k < V; ++k) {
+        // i is the source vertex
+        for (int i = 0; i < V; ++i) {
+            // j is the destination vertex
+            for (int j = 0; j < V; ++j) {
+                // If path from i to k and k to j exists,
+                // and their sum is less than current direct path i to j
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+
+    // Optional: Detect negative cycles
+    // If dist[i][i] becomes negative, there's a negative cycle reachable from i
+    for (int i = 0; i < V; ++i) {
+        if (dist[i][i] < 0) {
+            std::cout << "Negative cycle detected involving vertex " << i << "!\n";
+            // Depending on requirements, you might want to break or handle this.
+            // For true shortest paths, negative cycles make the concept ill-defined.
+        }
+    }
+}
+
+void printSolution(const std::vector<std::vector<int>>& dist) {
+    int V = dist.size();
+    std::cout << "Shortest distances between all pairs of vertices:\n";
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF\t";
+            } else {
+                std::cout << dist[i][j] << "\t";
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
+int main() {
+    // Example graph from above: 3 vertices
+    // Edges: 0->1 (3), 1->2 (1), 0->2 (7)
+
+    std::vector<std::vector<int>> graph = {
+        {0,   3,   7},    // From 0 to 0, 1, 2
+        {INF, 0,   1},    // From 1 to 0, 1, 2
+        {INF, INF, 0}     // From 2 to 0, 1, 2
+    };
+
+    // Make a copy to preserve original graph if needed,
+    // or modify in place if graph won't be reused.
+    std::vector<std::vector<int>> dist = graph; 
+
+    floydWarshall(dist);
+    printSolution(dist);
+
+    // Another example: With a negative edge but no negative cycle
+    std::cout << "\n--- Another Example (with negative edge) ---\n";
+    std::vector<std::vector<int>> graph2 = {
+        {0,   3,   INF, 5},
+        {INF, 0,  -2,  INF},
+        {INF, INF, 0,   1},
+        {INF, INF, INF, 0}
+    };
+    std::vector<std::vector<int>> dist2 = graph2;
+    floydWarshall(dist2);
+    printSolution(dist2);
+
+    // Example with a negative cycle:
+    // 0 --(1)--> 1 --(-2)--> 2 --(1)--> 0 (cycle 0->1->2->0 has total weight 1 + (-2) + 1 = 0)
+    // Actually, let's make it a *negative* cycle:
+    // 0 --(1)--> 1 --(-5)--> 2 --(1)--> 0 (cycle 0->1->2->0 has total weight 1 + (-5) + 1 = -3)
+    std::cout << "\n--- Example (with negative cycle) ---\n";
+    std::vector<std::vector<int>> graph3 = {
+        {0,   1,   INF},
+        {INF, 0,  -5},
+        {1,   INF, 0}
+    };
+    std::vector<std::vector<int>> dist3 = graph3;
+    floydWarshall(dist3);
+    printSolution(dist3); // dist[0][0], dist[1][1], dist[2][2] will be negative if paths go through the cycle.
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! The Floyd-Warshall algorithm is a powerful tool for understanding all-pairs shortest paths in a straightforward way. Happy coding!
+
+---
