@@ -50357,3 +50357,208 @@ int main() {
 And there you have it! A quick dive into the world of Minimum Spanning Trees. Keep connecting those dots (and nodes!) efficiently! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-06-01 19:13:54
+
+Hey there, future algorithm master! Let's dive into Topological Sort with Kahn's Algorithm – it's super useful and pretty intuitive.
+
+---
+
+## 🧭 Topological Sort (Kahn's Algorithm)
+
+### What it means: The Concept
+
+Imagine you have a bunch of tasks, and some tasks *must* be done before others (e.g., "bake cake" before "decorate cake"). Topological Sort is a way to find a **linear ordering** of these tasks such that if task A must come before task B, then A appears earlier in the list than B.
+
+**Key things to remember:**
+
+*   It only works for **Directed Acyclic Graphs (DAGs)**. "Directed" means edges have a direction (A → B). "Acyclic" means there are no cycles (you can't start at A and follow edges to get back to A). If there's a cycle, no valid topological sort exists!
+*   A node's **in-degree** is the number of incoming edges it has. Think of it as how many prerequisites a task has.
+
+**Kahn's Algorithm** specifically works by:
+
+1.  Finding all nodes that have **no incoming edges** (in-degree 0). These are tasks that have no prerequisites and can be done first.
+2.  Adding these nodes to a queue.
+3.  Repeatedly taking a node from the queue, adding it to our sorted list, and then "removing" its outgoing edges. When an outgoing edge is removed, the in-degree of its neighbor decreases.
+4.  If a neighbor's in-degree drops to 0, it means all *its* prerequisites are now met, so we add it to the queue.
+5.  We continue until the queue is empty!
+
+### Why it matters: Real-World Use
+
+Topological Sort might sound abstract, but it's everywhere:
+
+*   **Task Scheduling:** Figuring out the order to complete project tasks with dependencies.
+*   **Course Prerequisites:** Deciding which courses to take each semester.
+*   **Build Systems:** Compiling software modules in the correct order.
+*   **Dependency Resolution:** Package managers (like `apt` or `npm`) use it to install libraries in the right sequence.
+*   **Spreadsheet Recalculation:** Reordering cell calculations to ensure correct values.
+
+### 🧩 Example Problem
+
+Let's say we have courses:
+*   `Math` (0)
+*   `Physics` (1) - requires Math
+*   `Chemistry` (2) - requires Math
+*   `Advanced Physics` (3) - requires Physics, Chemistry
+*   `History` (4)
+
+Dependencies (edges): `0 -> 1`, `0 -> 2`, `1 -> 3`, `2 -> 3`, `4 -> 2`
+
+**Graph:**
+```
+  (4) History --> (2) Chemistry
+                 /|\      |
+                  |       |
+  (0) Math   --> (1) Physics
+      |        /          |
+      |       /           |
+      |      /            \|/
+      +---->(2) Chemistry ---> (3) Advanced Physics
+```
+
+**Let's trace Kahn's Algorithm:**
+
+1.  **Calculate Initial In-degrees:**
+    *   `Math (0)`: 0
+    *   `Physics (1)`: 1 (from 0)
+    *   `Chemistry (2)`: 2 (from 0, from 4)
+    *   `Advanced Physics (3)`: 2 (from 1, from 2)
+    *   `History (4)`: 0
+
+2.  **Initialize Queue:** Nodes with in-degree 0: `[0, 4]` (Math, History)
+
+3.  **Process:**
+    *   **Dequeue `0` (Math).** Result: `[0]`.
+        *   Neighbors of `0`: `1` and `2`.
+        *   `inDegree[1]` (Physics) becomes `1-1=0`. Add `1` to queue.
+        *   `inDegree[2]` (Chemistry) becomes `2-1=1`.
+        *   Queue: `[4, 1]`
+    *   **Dequeue `4` (History).** Result: `[0, 4]`.
+        *   Neighbors of `4`: `2`.
+        *   `inDegree[2]` (Chemistry) becomes `1-1=0`. Add `2` to queue.
+        *   Queue: `[1, 2]`
+    *   **Dequeue `1` (Physics).** Result: `[0, 4, 1]`.
+        *   Neighbors of `1`: `3`.
+        *   `inDegree[3]` (Adv. Physics) becomes `2-1=1`.
+        *   Queue: `[2]`
+    *   **Dequeue `2` (Chemistry).** Result: `[0, 4, 1, 2]`.
+        *   Neighbors of `2`: `3`.
+        *   `inDegree[3]` (Adv. Physics) becomes `1-1=0`. Add `3` to queue.
+        *   Queue: `[3]`
+    *   **Dequeue `3` (Advanced Physics).** Result: `[0, 4, 1, 2, 3]`.
+        *   No neighbors.
+        *   Queue: `[]`
+
+4.  **Queue is empty.** Final Topological Sort: `[0, 4, 1, 2, 3]` (Math, History, Physics, Chemistry, Advanced Physics).
+    *   *Self-check:* Does Math come before Physics? Yes. Does Physics come before Advanced Physics? Yes. Great!
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <map> // For mapping string names to int nodes if needed
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSortKahn(int numNodes, const std::vector<std::vector<int>>& edges) {
+    // 1. Adjacency List: Represents the graph
+    // adj[u] will store a list of all nodes v such that there's an edge u -> v
+    std::vector<std::vector<int>> adj(numNodes);
+
+    // 2. In-degree Array: Stores the count of incoming edges for each node
+    std::vector<int> inDegree(numNodes, 0);
+
+    // Build the graph (adjacency list) and calculate initial in-degrees
+    for (const auto& edge : edges) {
+        int u = edge[0]; // source node
+        int v = edge[1]; // destination node
+        adj[u].push_back(v);
+        inDegree[v]++; // Increment in-degree for the destination node
+    }
+
+    // 3. Queue: Stores all nodes that currently have an in-degree of 0
+    std::queue<int> q;
+
+    // Initialize the queue with all nodes having 0 in-degree
+    for (int i = 0; i < numNodes; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 4. Result List: Will store the topologically sorted order
+    std::vector<int> result;
+
+    // Process nodes from the queue
+    while (!q.empty()) {
+        int u = q.front(); // Get the node with 0 in-degree
+        q.pop();
+        result.push_back(u); // Add it to our sorted list
+
+        // "Remove" this node and its outgoing edges
+        // For each neighbor 'v' of 'u':
+        for (int v : adj[u]) {
+            inDegree[v]--; // Decrement 'v's in-degree
+            // If 'v's in-degree becomes 0, all its prerequisites are met
+            if (inDegree[v] == 0) {
+                q.push(v); // Add 'v' to the queue
+            }
+        }
+    }
+
+    // Check for cycles: If result.size() is not equal to numNodes,
+    // it means there was a cycle and not all nodes could be included.
+    if (result.size() != numNodes) {
+        std::cout << "Error: A cycle was detected in the graph. Topological sort is not possible." << std::endl;
+        return {}; // Return an empty vector to indicate failure
+    }
+
+    return result;
+}
+
+int main() {
+    int numCourses = 5; // Courses 0, 1, 2, 3, 4 (Math, Physics, Chemistry, Advanced Physics, History)
+
+    // Edges: {u, v} means u -> v (u must be taken before v)
+    std::vector<std::vector<int>> prerequisites = {
+        {0, 1}, // Math -> Physics
+        {0, 2}, // Math -> Chemistry
+        {1, 3}, // Physics -> Advanced Physics
+        {2, 3}, // Chemistry -> Advanced Physics
+        {4, 2}  // History -> Chemistry (just an example, maybe History is a prerequisite for some aspect of Chemistry)
+    };
+
+    std::vector<int> sortedCourses = topologicalSortKahn(numCourses, prerequisites);
+
+    if (!sortedCourses.empty()) {
+        std::cout << "Topological Sort Order (Kahn's Algorithm): ";
+        for (int course : sortedCourses) {
+            std::cout << course << " ";
+        }
+        std::cout << std::endl;
+        // Expected: 0 4 1 2 3 (or 4 0 1 2 3, order of 0 and 4 can vary as they are independent)
+    }
+
+    // Example with a cycle (uncomment to test):
+    // int numCycleNodes = 3;
+    // std::vector<std::vector<int>> cycleEdges = {
+    //     {0, 1},
+    //     {1, 2},
+    //     {2, 0} // Creates a cycle: 0 -> 1 -> 2 -> 0
+    // };
+    // std::cout << "\nTesting with a cycle:\n";
+    // std::vector<int> sortedCycle = topologicalSortKahn(numCycleNodes, cycleEdges);
+    // if (sortedCycle.empty()) {
+    //     std::cout << "As expected, cycle detection worked." << std::endl;
+    // }
+
+    return 0;
+}
+
+```
+
+---
