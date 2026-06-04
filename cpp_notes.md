@@ -51196,3 +51196,150 @@ int main() {
 This DP approach has a time complexity of **O(N^2)**, where N is the number of elements in the array. It's a great starting point for understanding LIS! There's also a more optimized **O(N log N)** solution using binary search, but the DP method is usually taught first for its clear logic.
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Matrix Chain Multiplication  
+🕒 2026-06-04 09:56:29
+
+Hey there, future coding superstar! Let's break down Matrix Chain Multiplication in a friendly, no-fuss way.
+
+---
+
+## 🚀 Matrix Chain Multiplication (MCM)
+
+### What is it? (The Concept)
+
+Imagine you have a bunch of matrices you need to multiply together, like `A * B * C * D`.
+Matrix multiplication is **associative**, meaning `(A * B) * C` gives the same result as `A * (B * C)`.
+
+However, the *number of individual (scalar) multiplications* can be drastically different depending on the order you choose!
+
+**MCM is all about finding the optimal way to parenthesize this chain of matrices to minimize the total number of scalar multiplications required.**
+
+It's a classic example of a **Dynamic Programming** problem. We solve smaller subproblems (how to multiply a sub-chain of matrices) and use those solutions to build up the solution for the whole chain.
+
+### Why does it matter? (The Relevance)
+
+1.  **Efficiency:** Matrix multiplication is computationally expensive. Choosing the right order can save an enormous amount of time and processing power, especially with large matrices.
+2.  **Optimization Skill:** It's a fundamental problem that teaches you how to identify overlapping subproblems and optimal substructure – key characteristics for Dynamic Programming. Mastering MCM helps you tackle other complex optimization problems.
+3.  **Real-world Applications:** Used in computer graphics, scientific computing, machine learning algorithms, and anywhere large matrix operations are common.
+
+### 💡 Example Problem
+
+Let's say we have 3 matrices with these dimensions:
+*   **A**: 10 x 100
+*   **B**: 100 x 5
+*   **C**: 5 x 50
+
+We want to calculate `A * B * C`.
+
+**How many ways to parenthesize?**
+1.  `(A * B) * C`
+2.  `A * (B * C)`
+
+Let's calculate the scalar multiplications for each:
+
+**Case 1: `(A * B) * C`**
+*   First, `A * B`: (10x100) * (100x5)
+    *   Cost: `10 * 100 * 5 = 5000` scalar multiplications.
+    *   Resulting matrix `AB` will be 10x5.
+*   Then, `(AB) * C`: (10x5) * (5x50)
+    *   Cost: `10 * 5 * 50 = 2500` scalar multiplications.
+*   **Total Cost: `5000 + 2500 = 7500`**
+
+**Case 2: `A * (B * C)`**
+*   First, `B * C`: (100x5) * (5x50)
+    *   Cost: `100 * 5 * 50 = 25000` scalar multiplications.
+    *   Resulting matrix `BC` will be 100x50.
+*   Then, `A * (BC)`: (10x100) * (100x50)
+    *   Cost: `10 * 100 * 50 = 50000` scalar multiplications.
+*   **Total Cost: `25000 + 50000 = 75000`**
+
+**Conclusion:** `(A * B) * C` is vastly more efficient, with **7500** multiplications compared to 75000!
+
+### 💻 Simple C++ Implementation
+
+We'll represent the dimensions of `n` matrices `M1, M2, ..., Mn` using an array `p` of size `n+1`.
+`Mi` has dimensions `p[i-1] x p[i]`.
+
+For our example: `p = {10, 100, 5, 50}` (for 3 matrices: A(10x100), B(100x5), C(5x50)).
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <climits>   // For INT_MAX
+
+// Function to find the minimum number of scalar multiplications
+// p: A vector containing the dimensions of matrices.
+//    p[0] x p[1], p[1] x p[2], ..., p[n-1] x p[n]
+//    So, if there are 'n' matrices, 'p' will have 'n+1' elements.
+int matrixChainMultiplication(const std::vector<int>& p) {
+    int n = p.size() - 1; // Number of matrices
+
+    // dp[i][j] stores the minimum number of scalar multiplications
+    // needed to multiply the chain of matrices from i to j.
+    // We use (n+1) x (n+1) for 1-based indexing for matrices M1...Mn
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(n + 1, 0));
+
+    // A single matrix chain (length 1) needs 0 multiplications.
+    // This is implicitly handled by dp[i][i] being initialized to 0.
+
+    // len is chain length. It varies from 2 to n.
+    for (int len = 2; len <= n; ++len) {
+        // i is the starting matrix index.
+        // It varies from 1 to n - len + 1.
+        for (int i = 1; i <= n - len + 1; ++i) {
+            int j = i + len - 1; // j is the ending matrix index.
+
+            // Initialize current subproblem cost to maximum possible
+            dp[i][j] = INT_MAX;
+
+            // Try all possible split points 'k'
+            // Matrices (i to k) * (k+1 to j)
+            for (int k = i; k <= j - 1; ++k) {
+                // Cost = cost to multiply (i to k) +
+                //        cost to multiply (k+1 to j) +
+                //        cost to multiply the two resulting matrices
+                //        (dimensions: p[i-1] x p[k]) * (p[k] x p[j])
+                int cost = dp[i][k] + dp[k + 1][j] + (p[i - 1] * p[k] * p[j]);
+
+                // Update dp[i][j] if current cost is less
+                if (cost < dp[i][j]) {
+                    dp[i][j] = cost;
+                }
+            }
+        }
+    }
+
+    // The result is stored in dp[1][n], representing the minimum cost
+    // for multiplying matrices from M1 to Mn.
+    return dp[1][n];
+}
+
+int main() {
+    // Example from above: A(10x100), B(100x5), C(5x50)
+    // Dimensions array: {p0, p1, p2, p3}
+    // A: p0 x p1
+    // B: p1 x p2
+    // C: p2 x p3
+    std::vector<int> dimensions = {10, 100, 5, 50};
+
+    int minMultiplications = matrixChainMultiplication(dimensions);
+    std::cout << "Minimum scalar multiplications: " << minMultiplications << std::endl; // Expected: 7500
+
+    // Another example: W(30x35), X(35x15), Y(15x5), Z(5x10)
+    std::vector<int> dimensions2 = {30, 35, 15, 5, 10};
+    int minMultiplications2 = matrixChainMultiplication(dimensions2);
+    std::cout << "Minimum scalar multiplications for WXYZ: " << minMultiplications2 << std::endl; // Expected: 9375
+
+    return 0;
+}
+```
+
+---
+
+That's MCM in a nutshell! It's a beautiful problem that really highlights the power of Dynamic Programming to optimize seemingly complex problems by breaking them down into simpler, overlapping pieces. Keep coding!
+
+---
