@@ -51717,3 +51717,126 @@ Okay, the code is correct. My previous manual output was likely a typo or cached
 That's DP on Bitmasks! It's a powerful tool once you get the hang of representing subsets and transitions. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-06-05 16:20:55
+
+Hey there, aspiring coder! 👋 Let's dive into a super cool and fundamental topic in DSA: **Bit Manipulation**.
+
+---
+
+### 🧠 Bit Manipulation Basics
+
+**What it means:**
+
+Imagine numbers not just as regular digits (0, 1, 2...), but as a sequence of **binary digits** (bits) – a bunch of `0`s and `1`s. For example, `5` in binary is `101`, and `10` is `1010`.
+
+Bit manipulation is simply performing operations directly on these individual `0`s and `1`s within a number. Instead of adding or subtracting the whole number, we're twisting and turning its internal bits!
+
+**Why it matters:**
+
+1.  **Efficiency:** Bitwise operations are often much faster than their arithmetic counterparts because they work directly at the hardware level. This can be crucial in competitive programming or high-performance systems.
+2.  **Space Saving:** You can pack multiple boolean flags into a single integer, saving memory.
+3.  **Specialized Algorithms:** Many clever algorithms rely heavily on bit manipulation for tasks like hashing, compression, encryption, and quickly identifying unique elements.
+4.  **Interview Skills:** It's a common topic in technical interviews to test your understanding of low-level operations and problem-solving creativity.
+
+---
+
+### 🛠️ Core Bitwise Operations
+
+Here are the basic tools in your bit manipulation toolkit:
+
+*   **AND (`&`)**: Sets a bit to `1` only if **both** corresponding bits are `1`. Useful for checking if a bit is set.
+    *   `1 & 1 = 1`
+    *   `1 & 0 = 0`
+*   **OR (`|`)**: Sets a bit to `1` if **at least one** of the corresponding bits is `1`. Useful for setting a bit.
+    *   `1 | 0 = 1`
+    *   `0 | 0 = 0`
+*   **XOR (`^`)**: Sets a bit to `1` if the corresponding bits are **different**. Useful for toggling a bit or finding unique elements.
+    *   `1 ^ 0 = 1`
+    *   `1 ^ 1 = 0`
+*   **NOT (`~`)**: Flips all the bits of a number (0 becomes 1, 1 becomes 0). Be careful, it also flips the sign bit for signed integers!
+    *   `~0 = 1`
+    *   `~1 = 0`
+*   **Left Shift (`<<`)**: Shifts bits to the left. `n << k` is like multiplying `n` by `2^k`.
+    *   `1 << k` creates a number with only the `k`-th bit set (useful for masks).
+    *   `5 (0101) << 1 = 10 (1010)`
+*   **Right Shift (`>>`)**: Shifts bits to the right. `n >> k` is like dividing `n` by `2^k`.
+    *   `5 (0101) >> 1 = 2 (0010)`
+
+---
+
+### 💡 Example Problem: Check if the K-th Bit is Set
+
+**Problem:** Given an integer `n` and an integer `k`, determine if the `k`-th bit (0-indexed from the right) of `n` is set (i.e., is `1`).
+
+**Example:**
+*   `n = 10` (binary `1010`)
+*   `k = 1`
+*   The 1st bit (from right, 0-indexed) is `1`. So, output `true`.
+
+*   `n = 10` (binary `1010`)
+*   `k = 2`
+*   The 2nd bit is `0`. So, output `false`.
+
+---
+
+### 💻 C++ Implementation
+
+```cpp
+#include <iostream>
+
+/**
+ * @brief Checks if the k-th bit of a number n is set (1).
+ *        Bits are 0-indexed from the right.
+ * 
+ * @param n The integer to check.
+ * @param k The 0-indexed position of the bit.
+ * @return true if the k-th bit is 1, false otherwise.
+ */
+bool isKthBitSet(int n, int k) {
+    // 1. Shift n right by k positions:
+    //    This moves the k-th bit to the 0th (rightmost) position.
+    //    Example: n=10 (1010), k=1. (1010 >> 1) becomes 0101 (5)
+    //    Now the original 1st bit is at the 0th position.
+    
+    // 2. Perform a bitwise AND with 1:
+    //    (0101 & 0001) will be 0001 (1) if the 0th bit is 1.
+    //    (0100 & 0001) will be 0000 (0) if the 0th bit is 0.
+    
+    // The result of (n >> k) & 1 will be 1 if the bit was set, and 0 if not.
+    return (n >> k) & 1; 
+}
+
+int main() {
+    int n1 = 10; // Binary: 1010
+    int k1 = 1;  // Expected: true (the second '1' from the right)
+    std::cout << "Is " << k1 << "-th bit set in " << n1 << "? " 
+              << (isKthBitSet(n1, k1) ? "True" : "False") << std::endl; // Output: True
+
+    int n2 = 10; // Binary: 1010
+    int k2 = 2;  // Expected: false (the '0' in the middle)
+    std::cout << "Is " << k2 << "-th bit set in " << n2 << "? " 
+              << (isKthBitSet(n2, k2) ? "True" : "False") << std::endl; // Output: False
+
+    int n3 = 7; // Binary: 0111
+    int k3 = 0; // Expected: true (rightmost '1')
+    std::cout << "Is " << k3 << "-th bit set in " << n3 << "? " 
+              << (isKthBitSet(n3, k3) ? "True" : "False") << std::endl; // Output: True
+              
+    int n4 = 7; // Binary: 0111
+    int k4 = 3; // Expected: false (the leading '0')
+    std::cout << "Is " << k4 << "-th bit set in " << n4 << "? " 
+              << (isKthBitSet(n4, k4) ? "True" : "False") << std::endl; // Output: False
+
+    return 0;
+}
+```
+
+---
+
+And that's your quick intro to Bit Manipulation! It's a powerful tool once you get the hang of it. Keep practicing and happy coding! ✨
+
+---
