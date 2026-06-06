@@ -51995,3 +51995,98 @@ int main() {
 And that's a quick look at GCD and Prime Numbers! Understanding these basics will give you a solid foundation for many DSA problems. Keep practicing, and you'll master them in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-06-06 15:02:35
+
+Alright, let's dive into the fascinating world of Game Theory, simplified for your DSA journey!
+
+---
+
+## Game Theory Basics: The Art of Strategic Play
+
+Hey there, future problem-solver! Ever played a game and tried to figure out your opponent's next move, or how to guarantee your win? That's the core of Game Theory in action!
+
+### 💡 What Game Theory Means
+
+Game Theory in DSA is about **analyzing strategic interactions** between two or more "players" (often just two). In competitive programming, we usually deal with:
+
+1.  **Two Players:** Let's call them Player 1 (P1) and Player 2 (P2).
+2.  **Alternating Turns:** They take turns making moves.
+3.  **Perfect Information:** Both players know everything about the game state.
+4.  **Rational Players:** Both players play optimally to win (or maximize their gain).
+5.  **Finite Games:** The game always ends.
+
+The main goal is often to determine if the **first player has a winning strategy**, assuming optimal play from both sides. This often involves identifying "winning states" (from which you can force a win) and "losing states" (from which any move leads to a winning state for your opponent).
+
+### ✨ Why It Matters
+
+*   **Common Pattern:** Many problems in competitive programming are disguised game theory problems (e.g., Nim game, Stone game variants).
+*   **Strategic Thinking:** It trains your brain to think about optimal decisions, anticipate opponent's moves, and identify critical "losing positions."
+*   **Problem Transformation:** Sometimes, a complex problem can be reduced to a simple game theory check.
+
+### 🧩 Example Problem: The Stone Game Lite
+
+Imagine a pile of `N` stones. Two players take turns. On each turn, a player can remove either **1, 2, or 3 stones** from the pile. The player who takes the last stone wins.
+
+**Question:** If `N` stones are initially on the pile, can the first player always win, assuming optimal play?
+
+**Let's think:**
+
+*   **P1 wants to win.**
+*   **P2 also wants to win.**
+*   If you can force your opponent into a "losing position," you win!
+
+Consider small `N`:
+*   **N=1:** P1 takes 1. P1 wins.
+*   **N=2:** P1 takes 2. P1 wins.
+*   **N=3:** P1 takes 3. P1 wins.
+*   **N=4:** Uh oh. What if P1 takes 1? `N=3` remains. P2 takes 3 and wins.
+    *   What if P1 takes 2? `N=2` remains. P2 takes 2 and wins.
+    *   What if P1 takes 3? `N=1` remains. P2 takes 1 and wins.
+    *   It seems if `N=4`, P1 *always* loses if P2 plays optimally! **N=4 is a losing position for the current player.**
+
+This pattern continues! If you are faced with `N` stones such that `N % 4 == 0`, you're in a losing position. No matter what you take (1, 2, or 3), you'll leave your opponent with `N-1`, `N-2`, or `N-3` stones, which are *not* multiples of 4. From any of these states, your opponent can make a move to leave you with a multiple of 4 again.
+
+**The Strategy:** If the current number of stones `N` is a multiple of 4, the current player loses. Otherwise, the current player can always win.
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+int main() {
+    std::cout << "--- Stone Game Lite ---" << std::endl;
+    std::cout << "You can take 1, 2, or 3 stones." << std::endl;
+    std::cout << "The player who takes the last stone wins." << std::endl << std::endl;
+
+    int numStones;
+    std::cout << "Enter the initial number of stones (N): ";
+    std::cin >> numStones;
+
+    // Based on the optimal strategy for this particular game:
+    // If N is a multiple of 4, the current player (First Player) is in a losing position.
+    // Otherwise, the current player (First Player) has a winning strategy.
+    if (numStones % 4 == 0) {
+        std::cout << "With " << numStones << " stones, the First Player will LOSE (assuming optimal play from Second Player)." << std::endl;
+    } else {
+        std::cout << "With " << numStones << " stones, the First Player will WIN (assuming optimal play)." << std::endl;
+    }
+
+    std::cout << "\nHow? If N is not a multiple of 4, the First Player can always take (N % 4) stones." << std::endl;
+    std::cout << "This leaves the Second Player with a multiple of 4 stones, forcing Second Player into a losing position." << std::endl;
+
+    return 0;
+}
+```
+
+**Explanation for the C++ code:**
+The code directly applies the derived winning strategy. If `numStones` is a multiple of 4, the `numStones % 4` operation yields 0, indicating a losing position for the current player. Otherwise, it indicates a winning position.
+
+---
+
+This is just the tip of the iceberg for Game Theory, but understanding winning/losing states and simple modular arithmetic strategies is a fantastic starting point! Keep practicing, and you'll spot these patterns more and more often. Happy coding!
+
+---
