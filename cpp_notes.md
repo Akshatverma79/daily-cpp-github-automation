@@ -51840,3 +51840,158 @@ int main() {
 And that's your quick intro to Bit Manipulation! It's a powerful tool once you get the hang of it. Keep practicing and happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Math for DSA (GCD, Primes)  
+🕒 2026-06-06 08:33:48
+
+Hey there, future DSA master! 👋 Let's dive into some fundamental math concepts that pop up everywhere in competitive programming and algorithm design. Don't worry, we'll keep it super simple and friendly!
+
+---
+
+## Math for DSA: GCD & Primes 🤓
+
+Some basic number theory can unlock elegant solutions to tricky problems. Let's look at two big ones: Greatest Common Divisor and Prime Numbers.
+
+### 1. Greatest Common Divisor (GCD)
+
+#### What is it? 🤔
+The **Greatest Common Divisor (GCD)** of two or more non-zero integers is the largest positive integer that divides each of the integers without leaving a remainder.
+*Example: GCD(12, 18) is 6.* Both 12 and 18 are divisible by 6, and no larger number does that.
+
+#### Why it matters? 🚀
+GCD is super useful!
+*   **Simplifying fractions:** To reduce a fraction like 12/18 to its simplest form (2/3), you divide both numerator and denominator by their GCD (6).
+*   **Least Common Multiple (LCM):** You can find the LCM of two numbers using their GCD: `LCM(a, b) = (a * b) / GCD(a, b)`.
+*   **Number Theory Problems:** It's a building block for many other algorithms, especially those involving modular arithmetic.
+
+#### Example Problem 🎯
+Find the GCD of 48 and 18.
+
+*Solution:*
+*   Divisors of 48: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48
+*   Divisors of 18: 1, 2, 3, 6, 9, 18
+*   The greatest common divisor is 6.
+
+#### Simple C++ Implementation (Euclidean Algorithm) 💻
+The most efficient way to find GCD is the **Euclidean Algorithm**. It's based on the principle that `GCD(a, b) = GCD(b, a % b)`.
+
+```cpp
+#include <iostream> // For input/output
+#include <numeric>  // For std::gcd in C++17 onwards
+
+// Our own custom GCD function using the Euclidean Algorithm
+long long findGCD(long long a, long long b) {
+    while (b != 0) {
+        long long temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+int main() {
+    long long num1 = 48;
+    long long num2 = 18;
+
+    std::cout << "GCD of " << num1 << " and " << num2 << " is: " << findGCD(num1, num2) << std::endl;
+    
+    // C++17 onwards has a built-in std::gcd
+    // std::cout << "Using std::gcd: " << std::gcd(num1, num2) << std::endl;
+
+    long long num3 = 101; // A prime number
+    long long num4 = 103; // Another prime number
+    std::cout << "GCD of " << num3 << " and " << num4 << " is: " << findGCD(num3, num4) << std::endl; // Should be 1
+
+    return 0;
+}
+```
+*Output:*
+```
+GCD of 48 and 18 is: 6
+GCD of 101 and 103 is: 1
+```
+
+---
+
+### 2. Prime Numbers
+
+#### What is it? 🤔
+A **prime number** is a natural number greater than 1 that has no positive divisors other than 1 and itself.
+*Example: 2, 3, 5, 7, 11, 13 are prime numbers.*
+*Numbers like 4 (divisible by 2) or 6 (divisible by 2, 3) are called composite numbers.*
+
+#### Why it matters? 🚀
+Prime numbers are the "building blocks" of all natural numbers!
+*   **Factorization:** Every integer greater than 1 can be uniquely expressed as a product of prime numbers (Fundamental Theorem of Arithmetic). This is crucial for many number theory problems.
+*   **Cryptography:** Many modern encryption techniques (like RSA) rely heavily on the properties of large prime numbers.
+*   **Optimization:** When dealing with divisors or multiples in problems, knowing about primes can help optimize solutions (e.g., checking divisibility only up to `sqrt(N)`).
+
+#### Example Problem 🎯
+Is the number 29 a prime number?
+
+*Solution:* To check if 29 is prime, we try dividing it by numbers from 2 up to its square root.
+*   `sqrt(29)` is approximately 5.38.
+*   We check divisibility by 2, 3, 4, 5.
+*   29 % 2 != 0
+*   29 % 3 != 0
+*   29 % 4 != 0
+*   29 % 5 != 0
+*   Since it's not divisible by any of these, 29 is a prime number!
+
+#### Simple C++ Implementation (Primality Test) 💻
+This function checks if a single number `n` is prime.
+
+```cpp
+#include <iostream>
+#include <cmath> // For std::sqrt
+
+// Function to check if a number is prime
+bool isPrime(long long n) {
+    if (n <= 1) { // Numbers less than or equal to 1 are not prime
+        return false;
+    }
+    if (n <= 3) { // 2 and 3 are prime numbers
+        return true;
+    }
+    if (n % 2 == 0 || n % 3 == 0) { // Divisible by 2 or 3? Not prime.
+        return false;
+    }
+    // Check for divisors from 5 onwards
+    // We can skip multiples of 2 and 3 by checking i and i+2
+    for (long long i = 5; i * i <= n; i = i + 6) { // Optimized loop: checks 5, 7, 11, 13, 17, 19...
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    long long testNum1 = 29;
+    long long testNum2 = 91; // 7 * 13
+    long long testNum3 = 2;
+
+    std::cout << testNum1 << " is " << (isPrime(testNum1) ? "prime" : "not prime") << std::endl;
+    std::cout << testNum2 << " is " << (isPrime(testNum2) ? "prime" : "not prime") << std::endl;
+    std::cout << testNum3 << " is " << (isPrime(testNum3) ? "prime" : "not prime") << std::endl;
+    std::cout << "1 is " << (isPrime(1) ? "prime" : "not prime") << std::endl;
+
+    return 0;
+}
+```
+*Output:*
+```
+29 is prime
+91 is not prime
+2 is prime
+1 is not prime
+```
+*Note:* For finding **all** prime numbers up to a certain limit (e.g., 10^7), the **Sieve of Eratosthenes** is a much more efficient algorithm. This `isPrime` function is good for checking individual numbers.
+
+---
+
+And that's a quick look at GCD and Prime Numbers! Understanding these basics will give you a solid foundation for many DSA problems. Keep practicing, and you'll master them in no time! Happy coding! ✨
+
+---
