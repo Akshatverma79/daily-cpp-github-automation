@@ -52090,3 +52090,107 @@ The code directly applies the derived winning strategy. If `numStones` is a mult
 This is just the tip of the iceberg for Game Theory, but understanding winning/losing states and simple modular arithmetic strategies is a fantastic starting point! Keep practicing, and you'll spot these patterns more and more often. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Arrays Basics  
+🕒 2026-06-07 08:56:10
+
+Okay, let's dive into Arrays – your first building block in DSA!
+
+---
+
+### DSA Notes: Arrays Basics
+
+Hey there, future coding wizard! Let's start with something super fundamental: **Arrays**.
+
+---
+
+#### 📦 What's an Array?
+
+Think of an array like a neat row of identical boxes on a shelf.
+
+*   **Ordered Collection:** It's a way to store multiple items.
+*   **Same Type:** All items in the array *must* be of the same type (e.g., all numbers, all names, all true/false values).
+*   **Contiguous Memory:** These "boxes" are stored right next to each other in your computer's memory. This is a big deal for speed!
+*   **Index:** Each item has a unique "address" or position, called an **index**. In C++ (and most languages), indices start from **0**.
+    *   So, the first item is at index 0, the second at index 1, and so on.
+
+**Example:**
+`[ 10, 20, 30, 40, 50 ]`
+Index: ` 0,  1,  2,  3,  4 `
+
+---
+
+#### 💪 Why Does It Matter?
+
+Arrays are like the bedrock of many other data structures and algorithms!
+
+*   **Super Fast Access:** Because elements are stored next to each other, accessing any element by its index is incredibly fast (constant time, O(1)). You just tell the computer "give me the item at index 3," and it finds it instantly.
+*   **Efficient Storage:** Simple and direct way to store a fixed number of similar items.
+*   **Foundation:** Many complex structures like Strings, Stacks, Queues, and even Hash Tables often use arrays internally.
+*   **Common Use Cases:** Storing lists of scores, sensor readings, image pixels, game board states, etc.
+
+---
+
+#### 🎯 Example Problem: Summing Elements
+
+Let's try a quick problem to see arrays in action!
+
+**Problem:** You have a list of daily temperatures. Calculate the total sum of these temperatures.
+
+**Input:** An array of integers representing temperatures.
+`temperatures = [25, 28, 22, 29, 27]`
+
+**Output:** The sum of all elements in the array.
+`131` (25 + 28 + 22 + 29 + 27)
+
+---
+
+#### 💻 C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+
+int main() {
+    // 1. Declare and initialize an array of integers (temperatures)
+    // C++ arrays start indexing from 0!
+    int temperatures[] = {25, 28, 22, 29, 27}; 
+
+    // 2. Calculate the number of elements in the array
+    // This is a common way for C-style arrays: total size / size of one element
+    int arraySize = sizeof(temperatures) / sizeof(temperatures[0]);
+
+    // 3. Initialize a variable to store the sum
+    int totalSum = 0;
+
+    // 4. Loop through the array to access each element
+    // 'i' goes from 0 up to (but not including) arraySize
+    for (int i = 0; i < arraySize; ++i) {
+        totalSum = totalSum + temperatures[i]; // Add the current temperature to the sum
+    }
+
+    // 5. Print the final sum
+    std::cout << "The temperatures are: ";
+    for (int i = 0; i < arraySize; ++i) {
+        std::cout << temperatures[i] << (i == arraySize - 1 ? "" : ", ");
+    }
+    std::cout << std::endl; // New line
+
+    std::cout << "Sum of temperatures: " << totalSum << std::endl;
+
+    return 0; // Indicate successful program execution
+}
+```
+
+**Output of the code:**
+```
+The temperatures are: 25, 28, 22, 29, 27
+Sum of temperatures: 131
+```
+
+---
+
+**Key Takeaway:** Arrays are your go-to for storing collections of *same-type* data when you need fast, direct access to elements using an index. They're a fundamental concept you'll use constantly!
+
+---
