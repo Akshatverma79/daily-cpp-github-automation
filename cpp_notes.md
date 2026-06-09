@@ -52596,3 +52596,102 @@ Always define your **Base Case** first when writing a recursive function. It's y
 Happy coding! You're doing great! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Problems  
+🕒 2026-06-09 16:22:42
+
+Hey there, future DSA master! Let's dive into **Recursion**. It's a super cool way to solve problems that often feels like magic once you get it. ✨
+
+---
+
+## Recursion Problems
+
+### What is Recursion?
+
+Think of it like a set of **Russian nesting dolls** 🎁. You open one doll, and inside is a smaller, identical doll. You keep opening them until you reach the smallest one that can't be opened anymore.
+
+In programming, **Recursion** is when a function calls *itself* to solve a problem. It breaks a big problem into smaller, identical sub-problems, handles the simplest case, and then combines the results.
+
+**Key components:**
+1.  **Base Case:** This is the "smallest doll." It's the condition that tells the function when to *stop* calling itself. Without it, you get an infinite loop!
+2.  **Recursive Step:** This is where the function calls itself with a *modified* (usually smaller or simpler) input, moving towards the base case.
+
+### Why Does It Matter?
+
+*   **Elegance & Readability:** For certain problems (especially those involving trees, graphs, or fractals), recursive solutions can be much cleaner and easier to understand than iterative (loop-based) ones.
+*   **Problem-Solving Power:** Many complex algorithms (like Depth-First Search, Merge Sort, Quick Sort) are inherently recursive. Mastering recursion unlocks a whole new level of problem-solving.
+*   **Interview Essential:** It's a fundamental concept frequently tested in technical interviews.
+
+### Example Problem: Factorial
+
+Let's calculate the factorial of a number `N` (denoted as `N!`).
+`N! = N * (N-1) * (N-2) * ... * 1`
+
+**Example:**
+`5! = 5 * 4 * 3 * 2 * 1 = 120`
+
+**How can we define this recursively?**
+*   `N! = N * (N-1)!`
+*   **Base Case:** `0! = 1` (or `1! = 1`) – This is where we stop!
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial recursively
+int factorial(int n) {
+    // 1. Base Case: If n is 0, we know the answer directly.
+    if (n == 0) {
+        return 1; 
+    }
+    // Handle negative numbers if needed, for simplicity we assume n >= 0
+    if (n < 0) {
+        std::cout << "Factorial is not defined for negative numbers.\n";
+        return -1; // Or throw an exception
+    }
+
+    // 2. Recursive Step: Call the function with a smaller problem (n-1)
+    //    and combine its result with the current 'n'.
+    return n * factorial(n - 1); 
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 120
+
+    num = 0;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 1
+
+    num = 3;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 6
+    
+    return 0;
+}
+
+```
+
+**How `factorial(5)` works:**
+
+1.  `factorial(5)` calls `5 * factorial(4)`
+2.  `factorial(4)` calls `4 * factorial(3)`
+3.  `factorial(3)` calls `3 * factorial(2)`
+4.  `factorial(2)` calls `2 * factorial(1)`
+5.  `factorial(1)` calls `1 * factorial(0)`
+6.  `factorial(0)` hits the **base case** and returns `1`.
+7.  Now the results propagate back up:
+    *   `factorial(1)` gets `1 * 1` (from `factorial(0)`) returns `1`
+    *   `factorial(2)` gets `2 * 1` (from `factorial(1)`) returns `2`
+    *   `factorial(3)` gets `3 * 2` (from `factorial(2)`) returns `6`
+    *   `factorial(4)` gets `4 * 6` (from `factorial(3)`) returns `24`
+    *   `factorial(5)` gets `5 * 24` (from `factorial(4)`) returns `120`
+
+---
+
+**Quick Tip:** Always, *always* make sure your recursive function has a clear **base case** and that the **recursive step** moves the input closer to that base case. Otherwise, you'll end up with a "stack overflow" error! 💥
+
+That's recursion in a nutshell! Keep practicing, and it'll become second nature. Happy coding!
+
+---
