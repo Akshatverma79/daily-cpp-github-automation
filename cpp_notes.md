@@ -52487,3 +52487,112 @@ After swap: num1 = 20, num2 = 10
 See? Pointers are just special variables for "room numbers" (memory addresses). Once you get comfortable with `&` and `*`, you'll unlock a whole new level of C++ programming, especially vital for DSA! Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-06-09 09:44:59
+
+## 📝 DSA Learning Note: Recursion Basics (C++)
+
+Hey there, future coding wizard! Let's unravel Recursion – it's a super cool concept!
+
+---
+
+### 🧠 What is Recursion?
+
+Imagine a function that solves a problem by calling *itself* to solve smaller versions of the same problem. That's recursion in a nutshell!
+
+*   Think of it like a set of **Russian nesting dolls**: each doll contains a smaller, identical doll, until you reach the tiniest one.
+*   In programming, a recursive function keeps calling itself with a simpler input until it hits a very basic case it knows how to solve directly.
+
+---
+
+### 🤔 Why Does It Matter?
+
+Recursion is a powerful problem-solving technique because it:
+
+1.  **Simplifies Complex Problems:** It can make code much more elegant and readable for certain types of problems.
+2.  **Natural for Certain Structures:** It's a very natural fit for problems involving hierarchical structures like trees, graphs, and fractals.
+3.  **Core of Algorithms:** Many important algorithms (like quicksort, mergesort, depth-first search) are built upon recursion.
+
+---
+
+### 🛠️ Key Elements of a Recursive Function
+
+Every good recursive function needs two things to work correctly and avoid infinite loops:
+
+1.  **Base Case:**
+    *   This is the "stop" condition. The simplest version of the problem that the function can solve directly, *without* calling itself again.
+    *   **Crucial:** Without a base case, your function would call itself forever!
+
+2.  **Recursive Step:**
+    *   This is where the function calls itself again, but with a *modified* (usually smaller or simpler) input.
+    *   It breaks down the problem into sub-problems until it hits the base case.
+
+---
+
+### 🎯 Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a non-negative integer `n`.
+The factorial of `n` (written as `n!`) is the product of all positive integers less than or equal to `n`.
+
+*   **Definition:** `n! = n * (n-1) * (n-2) * ... * 1`
+*   **Example:** `5! = 5 * 4 * 3 * 2 * 1 = 120`
+*   **Base Case:** `0! = 1` (by mathematical definition) and `1! = 1`.
+
+Notice how `n!` can be defined in terms of `(n-1)!`:
+`n! = n * (n-1)!`
+
+---
+
+### 💻 Simple C++ Implementation: Factorial
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case:
+    // If n is 0 or 1, the factorial is 1.
+    // This is where the recursion stops.
+    if (n == 0 || n == 1) {
+        return 1;
+    } 
+    // Handle negative numbers (optional, but good practice)
+    else if (n < 0) {
+        std::cout << "Factorial is not defined for negative numbers." << std::endl;
+        return -1; // Or throw an exception
+    }
+    // 2. Recursive Step:
+    // For n > 1, factorial(n) is n multiplied by factorial(n-1).
+    // The function calls itself with a smaller input (n-1).
+    else {
+        return n * factorial(n - 1);
+    }
+}
+
+int main() {
+    int num1 = 5;
+    int num2 = 0;
+    int num3 = 1;
+    int num4 = -3;
+
+    std::cout << "Factorial of " << num1 << " is: " << factorial(num1) << std::endl; // Output: 120
+    std::cout << "Factorial of " << num2 << " is: " << factorial(num2) << std::endl; // Output: 1
+    std::cout << "Factorial of " << num3 << " is: " << factorial(num3) << std::endl; // Output: 1
+    std::cout << "Factorial of " << num4 << " is: " << factorial(num4) << std::endl; // Output: Error message and -1
+
+    return 0;
+}
+```
+
+---
+
+### 🚀 Quick Tip!
+
+Always define your **Base Case** first when writing a recursive function. It's your safety net against infinite loops!
+
+Happy coding! You're doing great! ✨
+
+---
