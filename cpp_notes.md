@@ -53050,3 +53050,110 @@ int main() {
 Doubly Linked Lists are a super flexible data structure that allow you to move both ways, making certain operations (especially deletions and insertions) much more efficient if you have a pointer to the specific node you're working with. Just remember the extra memory for that `prev` pointer! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Stacks Implementation  
+🕒 2026-06-11 17:28:18
+
+Hey there, future DSA master! 👋 Let's dive into Stacks – one of the most fundamental and intuitive data structures.
+
+---
+
+## Stacks: Last-In, First-Out (LIFO) Fun!
+
+### 1. What's a Stack? 🤔
+
+Imagine a **stack of plates** 🍽️.
+*   When you add a new plate, you put it on **top**.
+*   When you take a plate, you take it from the **top**.
+
+That's exactly how a Stack works! It follows the **LIFO** principle: **L**ast **I**n, **F**irst **O**ut. The last item you put in is always the first one you can take out.
+
+**Key Operations:**
+*   `push(item)`: Adds an `item` to the top of the stack.
+*   `pop()`: Removes the item from the top of the stack.
+*   `top()`: Looks at (returns) the item currently at the top without removing it.
+*   `empty()`: Checks if the stack is empty (returns true or false).
+*   `size()`: Returns the number of items in the stack.
+
+### 2. Why Are Stacks Useful? 🚀
+
+Stacks pop up everywhere in computer science because of their simple, ordered nature!
+
+*   **Undo/Redo Features:** When you type something, it's pushed onto a stack. "Undo" pops it off.
+*   **Browser History:** The "Back" button navigates through web pages, effectively popping previous pages from a history stack.
+*   **Function Calls (Call Stack):** When a function calls another function, the calling function is "pushed" onto a call stack. When the called function finishes, it's "popped" off, and control returns to the previous function. This is super important for recursion!
+*   **Expression Evaluation:** Converting infix expressions (like `2 + 3 * 4`) to postfix or prefix, or evaluating them directly.
+*   **Parentheses Balancing:** Checking if `({[]})` is valid or `([)]` is invalid.
+
+### 3. Let's Solve a Mini-Problem! 💡
+
+**Problem:** Reverse a given string using a stack.
+
+**Example:**
+Input: `"hello"`
+Output: `"olleh"`
+
+**How a Stack Helps:**
+1.  We'll push each character of the original string onto the stack.
+2.  Because of LIFO, when we start popping, the characters will come out in reverse order!
+
+### 4. C++ Implementation Time! 🛠️
+
+C++ provides a super convenient `std::stack` in its Standard Library. It's a "container adapter," meaning it uses other container types (like `std::deque` by default, or `std::vector`, `std::list`) to manage its elements, but only exposes the stack (LIFO) interface.
+
+```cpp
+#include <iostream> // For input/output
+#include <stack>    // For std::stack
+#include <string>   // For std::string
+#include <algorithm> // Not strictly needed for this stack solution, but good for general string ops
+
+// Function to reverse a string using a stack
+std::string reverseString(const std::string& s) {
+    // 1. Create an empty stack of characters
+    std::stack<char> charStack;
+
+    // 2. Push each character of the input string onto the stack
+    for (char c : s) {
+        charStack.push(c);
+    }
+
+    // 3. Create an empty string to store the reversed characters
+    std::string reversedStr = "";
+
+    // 4. Pop characters from the stack and append them to the new string
+    //    until the stack is empty. This will give us the reversed order.
+    while (!charStack.empty()) {
+        reversedStr += charStack.top(); // Get the top character
+        charStack.pop();               // Remove the top character
+    }
+
+    return reversedStr;
+}
+
+int main() {
+    std::string original1 = "hello";
+    std::string original2 = "world";
+    std::string original3 = "Data Structures";
+
+    std::cout << "Original: " << original1 << ", Reversed: " << reverseString(original1) << std::endl;
+    std::cout << "Original: " << original2 << ", Reversed: " << reverseString(original2) << std::endl;
+    std::cout << "Original: " << original3 << ", Reversed: " << reverseString(original3) << std::endl;
+
+    return 0;
+}
+```
+
+**Output:**
+```
+Original: hello, Reversed: olleh
+Original: world, Reversed: dlrow
+Original: Data Structures, Reversed: serutcurtS ataD
+```
+
+---
+
+That's Stacks in a nutshell! Simple, powerful, and a must-know for any programmer. Keep practicing, and you'll master them in no time! ✨
+
+---
