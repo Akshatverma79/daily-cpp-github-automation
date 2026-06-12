@@ -53326,3 +53326,136 @@ int main() {
 That's it for Queues! Simple, right? Understanding this concept is a stepping stone to many more complex algorithms and system designs. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Binary Trees Basics  
+🕒 2026-06-12 16:34:22
+
+Hey there, future DSA wizard! 👋 Let's dive into the fascinating world of **Binary Trees Basics**.
+
+---
+
+### 🌳 Binary Trees Basics
+
+#### 1. What is a Binary Tree?
+
+Imagine a family tree, but with a strict rule: each person can have at most **two** children. That's essentially a Binary Tree!
+
+*   It's a **hierarchical** data structure.
+*   Each element is called a **Node**.
+*   A **Node** can have a value, and pointers to its **left child** and **right child**.
+*   The very top node is called the **Root**.
+*   Nodes with no children are called **Leaf Nodes**.
+*   The "binary" part means each node has **at most two children**. (Could be zero, one, or two).
+
+Think of it like this:
+
+```
+      (Root)
+        A
+       / \
+      B   C
+     / \   \
+    D   E   F (Leaf)
+```
+
+#### 2. Why Does It Matter? (Why Care?)
+
+Binary Trees are super fundamental and useful in computer science!
+
+*   **Efficient Searching & Sorting:** Especially Binary Search Trees (a special type of binary tree) allow for very fast data retrieval.
+*   **Data Organization:** Used in databases, file systems (conceptually), and for representing hierarchical data.
+*   **Foundation for Other Structures:** Many advanced data structures like Heaps, AVL Trees, and Red-Black Trees are built upon binary tree principles.
+*   **Expression Parsing:** Compilers often use binary trees to represent mathematical expressions.
+
+#### 3. Example Problem: Count Nodes!
+
+Let's start with a super simple task to get our hands dirty:
+
+**Problem:** Given the root of a binary tree, return the total number of nodes in the tree.
+
+**Example Tree:**
+
+```
+      1
+     / \
+    2   3
+   / \
+  4   5
+```
+
+**Expected Output:** 5 (Nodes are 1, 2, 3, 4, 5)
+
+#### 4. Simple C++ Implementation
+
+To represent a binary tree node, we'll use a `struct` or `class`. Counting nodes is a perfect job for **recursion**!
+
+```cpp
+#include <iostream> // For input/output
+#include <cstddef>  // For nullptr
+
+// 1. Define the Node structure
+struct TreeNode {
+    int val;         // Value stored in the node
+    TreeNode* left;  // Pointer to the left child
+    TreeNode* right; // Pointer to the right child
+
+    // Constructor to easily create a new node
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+// 2. Function to count nodes recursively
+int countNodes(TreeNode* root) {
+    // Base Case: If the current node is null (empty tree/subtree),
+    // there are 0 nodes here.
+    if (root == nullptr) {
+        return 0;
+    }
+
+    // Recursive Step:
+    // 1. Count the current node (which is 1)
+    // 2. Add the count of nodes from its left subtree
+    // 3. Add the count of nodes from its right subtree
+    return 1 + countNodes(root->left) + countNodes(root->right);
+}
+
+// 3. Main function to demonstrate
+int main() {
+    // Let's build our example tree:
+    //      1
+    //     / \
+    //    2   3
+    //   / \
+    //  4   5
+
+    TreeNode* root = new TreeNode(1);
+    root->left = new TreeNode(2);
+    root->right = new TreeNode(3);
+    root->left->left = new TreeNode(4);
+    root->left->right = new TreeNode(5);
+
+    // Call our function and print the result
+    int totalNodes = countNodes(root);
+    std::cout << "Total nodes in the tree: " << totalNodes << std::endl; // Expected: 5
+
+    // --- Clean up memory (important in C++!) ---
+    // For a small example, we'll manually delete.
+    // In larger applications, you'd often use smart pointers or a destructor
+    // that recursively deletes children.
+    delete root->left->left;
+    delete root->left->right;
+    delete root->left;
+    delete root->right;
+    delete root;
+    root = nullptr; // Good practice to nullify freed pointers
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! A quick rundown on what binary trees are, why they're useful, and a hands-on example of how to implement a basic operation (counting nodes) in C++. Keep exploring, this is just the beginning! ✨
+
+---
