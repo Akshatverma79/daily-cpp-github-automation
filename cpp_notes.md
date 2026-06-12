@@ -53157,3 +53157,172 @@ Original: Data Structures, Reversed: serutcurtS ataD
 That's Stacks in a nutshell! Simple, powerful, and a must-know for any programmer. Keep practicing, and you'll master them in no time! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-06-12 10:14:13
+
+Hey there, future coding wizard! Let's dive into Queues – a super common and intuitive data structure.
+
+---
+
+## Queues: The Waiting Line of Data
+
+Imagine a real-world waiting line – at a coffee shop, a bus stop, or a printer. That's exactly how a Queue works in programming!
+
+### 1. What's a Queue?
+
+A Queue is a linear data structure that follows the **First-In, First-Out (FIFO)** principle.
+*   The first element added to the queue will be the first one to be removed.
+*   Think of it like a conveyor belt: items go in one end and come out the other, in the exact order they arrived.
+
+**Core Operations:**
+*   **Enqueue (or Push):** Adds an element to the **rear** (back) of the queue.
+*   **Dequeue (or Pop):** Removes an element from the **front** of the queue.
+*   **Peek (or Front):** Looks at the element at the **front** of the queue without removing it.
+*   **isEmpty:** Checks if the queue has any elements.
+*   **Size:** Returns the number of elements in the queue.
+
+### 2. Why Do We Need Queues?
+
+Queues are incredibly useful because they model real-world scenarios so well:
+*   **Task Scheduling:** Operating systems use queues to manage processes, giving CPU time to tasks in the order they were requested.
+*   **Printer Queues:** Documents are printed in the order they were sent.
+*   **Buffering:** Handling data streams (e.g., in networking, media playback) where data arrives and is processed sequentially.
+*   **Algorithms:** Crucial for graph traversal algorithms like **Breadth-First Search (BFS)**.
+*   **Simulations:** Modeling any system where entities wait their turn.
+
+### 3. Example Problem: Simple Print Job Manager
+
+**Scenario:** You're building a simple system to manage print jobs. When users send documents to the printer, they should be printed in the exact order they were received.
+
+**How a Queue Fits:**
+*   Each print request (e.g., "Document A", "Report B", "Image C") is `enqueued` (added) to the back of the print queue.
+*   The printer always `dequeues` (takes) the job from the front of the queue, ensuring the oldest job gets processed first.
+*   If you want to see which document is next to be printed, you `peek` at the front of the queue.
+
+### 4. C++ Implementation (Using a Linked List)
+
+We'll implement a Queue using a **Linked List**. This is a common and flexible way to do it because it can grow and shrink dynamically without needing to pre-allocate a fixed size.
+
+```cpp
+#include <iostream>
+
+// 1. Define a Node for our Linked List
+struct Node {
+    int data;     // The data the node holds
+    Node* next;   // Pointer to the next node in the list
+
+    // Constructor to easily create a new Node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// 2. Define our Queue Class
+class MyQueue {
+private:
+    Node* front; // Pointer to the front of the queue
+    Node* rear;  // Pointer to the rear of the queue
+    int currentSize; // To keep track of the number of elements
+
+public:
+    // Constructor: Initialize an empty queue
+    MyQueue() : front(nullptr), rear(nullptr), currentSize(0) {}
+
+    // Destructor: Clean up memory to prevent leaks
+    ~MyQueue() {
+        while (!isEmpty()) {
+            dequeue(); // Keep dequeuing until the queue is empty
+        }
+    }
+
+    // Method to add an element to the rear of the queue
+    void enqueue(int value) {
+        Node* newNode = new Node(value); // Create a new node
+
+        if (isEmpty()) { // If queue is empty, new node is both front and rear
+            front = newNode;
+            rear = newNode;
+        } else { // Otherwise, add new node after current rear and update rear
+            rear->next = newNode;
+            rear = newNode;
+        }
+        currentSize++;
+        std::cout << "Enqueued: " << value << std::endl;
+    }
+
+    // Method to remove an element from the front of the queue
+    void dequeue() {
+        if (isEmpty()) {
+            std::cout << "Queue is empty. Cannot dequeue." << std::endl;
+            return;
+        }
+        Node* temp = front; // Store front node to delete it later
+        std::cout << "Dequeued: " << temp->data << std::endl;
+        front = front->next; // Move front pointer to the next node
+        delete temp;         // Free the memory of the removed node
+        currentSize--;
+
+        if (front == nullptr) { // If queue became empty after dequeue
+            rear = nullptr;     // Rear must also be null
+        }
+    }
+
+    // Method to look at the front element without removing it
+    int peek() {
+        if (isEmpty()) {
+            std::cout << "Queue is empty. No element to peek." << std::endl;
+            return -1; // Or throw an exception
+        }
+        return front->data;
+    }
+
+    // Method to check if the queue is empty
+    bool isEmpty() {
+        return front == nullptr;
+    }
+
+    // Method to get the current number of elements in the queue
+    int size() {
+        return currentSize;
+    }
+};
+
+// --- Let's test our Queue! ---
+int main() {
+    MyQueue printQueue; // Our print job manager!
+
+    std::cout << "Queue is empty? " << (printQueue.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "Queue size: " << printQueue.size() << std::endl;
+
+    printQueue.enqueue(101); // Job 101 arrives
+    printQueue.enqueue(102); // Job 102 arrives
+    printQueue.enqueue(103); // Job 103 arrives
+
+    std::cout << "\nQueue size: " << printQueue.size() << std::endl;
+    std::cout << "Next job to print (peek): " << printQueue.peek() << std::endl;
+
+    printQueue.dequeue(); // Printer processes Job 101
+    printQueue.dequeue(); // Printer processes Job 102
+
+    std::cout << "\nQueue is empty? " << (printQueue.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "Next job to print (peek): " << printQueue.peek() << std::endl;
+    std::cout << "Queue size: " << printQueue.size() << std::endl;
+
+    printQueue.enqueue(104); // Job 104 arrives
+    printQueue.dequeue();    // Printer processes Job 103
+    printQueue.dequeue();    // Printer processes Job 104
+
+    printQueue.dequeue(); // Try to dequeue from an empty queue
+
+    std::cout << "\nQueue is empty? " << (printQueue.isEmpty() ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+That's it for Queues! Simple, right? Understanding this concept is a stepping stone to many more complex algorithms and system designs. Keep practicing!
+
+---
