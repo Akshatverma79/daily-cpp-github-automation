@@ -54075,3 +54075,179 @@ Now that you know how to represent graphs, the next big step is learning how to 
 These two algorithms are fundamental and will unlock countless graph problems! Keep going, you're doing great!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graph Traversals (BFS/DFS)  
+🕒 2026-06-14 15:30:18
+
+Hey there, aspiring coder! 👋 Let's dive into Graph Traversals – your map-reading skills for the digital world!
+
+---
+
+## Graph Traversals: Your Pathfinders!
+
+Imagine a network of cities connected by roads, or friends connected on a social media platform. That's a **graph**! It's a collection of **nodes** (or vertices, like cities/people) and **connections** (or edges, like roads/friendships).
+
+### What are Graph Traversals?
+
+Graph traversal is just a fancy way of saying: "How do we systematically visit every node (or a specific node) in a graph, making sure we don't get lost or visit the same place twice?" It's like exploring every corner of a new city or finding a specific landmark.
+
+The two most common strategies are:
+1.  **Breadth-First Search (BFS)**
+2.  **Depth-First Search (DFS)**
+
+### Why Do They Matter?
+
+Graph traversals are super fundamental and used everywhere!
+*   **Finding the shortest path:** Think GPS navigation (BFS is great for unweighted graphs!).
+*   **Social networks:** Finding friends of friends, recommendations.
+*   **Web crawlers:** How search engines explore the internet.
+*   **Garbage collection:** In programming languages, finding reachable objects.
+*   **Maze solving:** Finding a path from start to finish.
+*   **Detecting cycles:** Is there a loop in my graph?
+*   **Network broadcast:** Sending a message to all connected devices.
+
+---
+
+## 1. Breadth-First Search (BFS)
+
+### What it Means: "Explore Layer by Layer"
+
+Think of BFS like dropping a pebble in a pond. The ripples spread outwards, visiting everything at the first "level" (direct neighbors) before moving to the next "level" (neighbors of neighbors), and so on.
+
+It uses a **Queue** to keep track of nodes to visit.
+
+### When to Use It:
+*   Finding the **shortest path** in an **unweighted graph** (where all connections have the same "cost").
+*   Finding all nodes within a certain distance from a starting node.
+
+---
+
+## 2. Depth-First Search (DFS)
+
+### What it Means: "Dive Deep, Then Backtrack"
+
+Imagine exploring a maze. DFS is like picking one path, going as far as you possibly can down that path until you hit a dead end, then backtracking a step and trying the next available path. It tries to go deep before it goes wide.
+
+It typically uses a **Stack** (often implicitly through recursion) to keep track of paths.
+
+### When to Use It:
+*   Detecting **cycles** in a graph.
+*   **Topological sorting** (ordering tasks with dependencies).
+*   Finding **connected components** in a graph.
+*   Pathfinding (just *any* path, not necessarily the shortest).
+
+---
+
+## Example Problem & C++ Implementations
+
+Let's use a simple graph:
+Imagine friendships: `0` is friends with `1` and `2`. `1` is friends with `3`. `2` is friends with `4`.
+
+```
+        0
+       / \
+      1   2
+     /     \
+    3       4
+```
+
+**Problem:** Starting from node `0`, visit all reachable nodes using both BFS and DFS.
+
+We'll represent our graph using an **Adjacency List** (a vector of vectors):
+`adj[i]` will contain a list of all nodes connected to `i`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <stack> // For explicit stack in DFS, though recursion is more common
+
+// --- BFS Implementation ---
+void bfs(int startNode, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {
+    std::queue<int> q; // Our queue for nodes to visit
+
+    // 1. Start by adding the initial node to the queue
+    q.push(startNode);
+    visited[startNode] = true; // Mark it as visited
+
+    std::cout << "BFS Traversal starting from node " << startNode << ": ";
+
+    // 2. Process nodes as long as the queue is not empty
+    while (!q.empty()) {
+        int currentNode = q.front(); // Get the node at the front of the queue
+        q.pop();                     // Remove it
+
+        std::cout << currentNode << " "; // "Visit" the node (here, just print it)
+
+        // 3. Add all unvisited neighbors of the current node to the queue
+        for (int neighbor : adj[currentNode]) {
+            if (!visited[neighbor]) {
+                visited[neighbor] = true; // Mark as visited BEFORE adding to queue
+                q.push(neighbor);
+            }
+        }
+    }
+    std::cout << std::endl;
+}
+
+// --- DFS Implementation (Recursive) ---
+void dfs(int currentNode, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {
+    visited[currentNode] = true; // Mark current node as visited
+    std::cout << currentNode << " "; // "Visit" the node (here, just print it)
+
+    // Explore all unvisited neighbors
+    for (int neighbor : adj[currentNode]) {
+        if (!visited[neighbor]) {
+            dfs(neighbor, adj, visited); // Recursively call DFS for the neighbor
+        }
+    }
+}
+
+int main() {
+    int numNodes = 5; // We have 5 nodes (0 to 4)
+
+    // Adjacency List to represent the graph
+    // adj[i] contains a list of nodes connected to node i
+    std::vector<std::vector<int>> adj(numNodes);
+
+    // Define the connections (edges)
+    adj[0].push_back(1);
+    adj[0].push_back(2);
+    adj[1].push_back(0); // Undirected graph, so if 0-1, then 1-0
+    adj[1].push_back(3);
+    adj[2].push_back(0);
+    adj[2].push_back(4);
+    adj[3].push_back(1);
+    adj[4].push_back(2);
+
+    // --- BFS Traversal ---
+    std::vector<bool> visitedBFS(numNodes, false); // Keep track of visited nodes for BFS
+    bfs(0, adj, visitedBFS); // Start BFS from node 0
+
+    // --- DFS Traversal ---
+    std::vector<bool> visitedDFS(numNodes, false); // Reset visited array for DFS
+    std::cout << "DFS Traversal starting from node 0: ";
+    dfs(0, adj, visitedDFS); // Start DFS from node 0
+    std::cout << std::endl;
+
+    return 0;
+}
+```
+
+**Output:**
+```
+BFS Traversal starting from node 0: 0 1 2 3 4 
+DFS Traversal starting from node 0: 0 1 3 2 4 
+```
+
+Notice the difference in output!
+*   **BFS** explores `0`, then `1` and `2` (its direct neighbors), then `3` (neighbor of `1`) and `4` (neighbor of `2`).
+*   **DFS** goes `0`, then `1`, then `3` (dives deep down one path), then it hits a dead end, backtracks to `1`, then `0`, then goes down the other path `2`, then `4`.
+
+---
+
+And there you have it! BFS and DFS are powerful tools. Understand their core logic and you'll unlock so many graph problems. Happy traversing! 🗺️✨
+
+---
