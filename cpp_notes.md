@@ -53907,3 +53907,171 @@ Searching for 90: Not Found.
 And there you have it! A clean and simple look at Binary Search Trees. It's a foundational concept, so understanding it well will open doors to many more advanced data structures and algorithms! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graphs Basics  
+🕒 2026-06-14 09:35:06
+
+Alright, let's dive into the world of Graphs! It's super cool once you get the hang of it.
+
+---
+
+## Graphs Basics: Connecting the Dots!
+
+Graphs are one of the most versatile data structures. Think of anything connected – that's probably a graph!
+
+### 1. What's a Graph?
+
+Imagine a bunch of **points** and **lines** connecting some of them. That's essentially a graph!
+
+*   **Nodes (or Vertices):** These are the points. In a social network, these would be people. In a map, cities.
+*   **Edges:** These are the lines connecting the nodes. In a social network, friendships. In a map, roads.
+
+**Types you'll often see:**
+*   **Undirected Graph:** If A is connected to B, then B is connected to A (like a friendship). Edges have no direction.
+*   **Directed Graph:** Connections go one way (like a "follower" relationship on social media). Edges have a specific direction.
+*   **Weighted Graph:** Edges have a "cost" or "value" (like the distance of a road, or the strength of a friendship).
+
+### 2. Why Do Graphs Matter?
+
+Graphs are everywhere! Learning them helps you model and solve real-world problems:
+
+*   **Social Networks:** Friendships, followers, recommendations.
+*   **GPS & Maps:** Finding the shortest route between two places.
+*   **The Internet:** How data packets travel from one computer to another.
+*   **Dependencies:** Project tasks, build systems (what needs to finish before what).
+*   **Computer Networks:** Connecting servers and devices.
+
+They are the foundation for many powerful algorithms you'll learn later, like finding shortest paths, network flow, and more.
+
+### 3. How to Represent Graphs (In Memory)
+
+Before we can do anything with a graph, we need a way to store its structure in our program. The two most common ways are:
+
+#### a) Adjacency Matrix
+*   **Idea:** A 2D array `adj[V][V]` where `V` is the number of vertices. `adj[i][j] = 1` if there's an edge from `i` to `j`, `0` otherwise. For weighted graphs, store the weight instead of `1`.
+*   **Pros:** Fast to check if an edge exists between two nodes.
+*   **Cons:** Uses `O(V^2)` space, which can be inefficient for "sparse" graphs (graphs with few edges).
+
+#### b) Adjacency List (Most Common & Recommended for Competitive Programming)
+*   **Idea:** An array (or `std::vector` in C++) where each element `i` contains a list (or `std::vector`) of all nodes adjacent to `i`.
+*   **Pros:** Uses `O(V + E)` space (`E` is number of edges), which is efficient for sparse graphs.
+*   **Cons:** Checking if an edge exists might require iterating through a list (slower than matrix).
+
+**We'll use an Adjacency List for our example!**
+
+### 4. Example Problem: Direct Friends?
+
+**Problem:** You're given a list of `N` people (numbered 0 to `N-1`) and `M` friendships. Each friendship connects two people. All friendships are mutual (undirected).
+Your task is to determine if two specific people, let's say `Person A` and `Person B`, are **directly friends**.
+
+**Let's say:**
+*   `N = 4` people (0, 1, 2, 3)
+*   `M = 3` friendships:
+    *   0 is friends with 1
+    *   1 is friends with 2
+    *   3 is friends with 0
+*   **Query:** Are `Person 0` and `Person 2` directly friends?
+
+**Thought Process:**
+1.  We need to store who is friends with whom. An Adjacency List is perfect for this. `adj[i]` will store all friends of person `i`.
+2.  Since friendships are mutual, if `u` is friends with `v`, we add `v` to `adj[u]` *and* `u` to `adj[v]`.
+3.  To check if `Person A` and `Person B` are directly friends, we just need to look at `Person A`'s list of friends (`adj[A]`). If `Person B` is in that list, they are friends!
+
+### 5. Simple C++ Implementation (Adjacency List)
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For using std::vector (our adjacency list)
+#include <algorithm> // For std::find (to check if an element is in a vector)
+
+int main() {
+    // Fast I/O (optional, but good practice in competitive programming)
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int num_people; // N: Number of people (vertices)
+    std::cout << "Enter the number of people (N): ";
+    std::cin >> num_people;
+
+    // Our adjacency list:
+    // `adj[i]` will be a vector containing all friends of person `i`.
+    // People are 0-indexed, so from 0 to num_people-1.
+    std::vector<std::vector<int>> adj(num_people);
+
+    int num_friendships; // M: Number of friendships (edges)
+    std::cout << "Enter the number of friendships (M): ";
+    std::cin >> num_friendships;
+
+    std::cout << "Enter " << num_friendships << " friendships (e.g., '0 1' for person 0 and 1 being friends):\n";
+    for (int i = 0; i < num_friendships; ++i) {
+        int person1, person2;
+        std::cin >> person1 >> person2;
+
+        // Add friendship to both lists because it's an undirected graph
+        adj[person1].push_back(person2);
+        adj[person2].push_back(person1);
+    }
+
+    // --- Now, let's check a specific friendship ---
+    int query_person1, query_person2;
+    std::cout << "\nEnter two people to check if they are directly friends (e.g., '0 2'): ";
+    std::cin >> query_person1 >> query_person2;
+
+    // Basic validation for input people
+    if (query_person1 < 0 || query_person1 >= num_people ||
+        query_person2 < 0 || query_person2 >= num_people) {
+        std::cout << "Invalid person ID entered. Please use IDs between 0 and " << num_people - 1 << ".\n";
+        return 1;
+    }
+
+    // Check if query_person2 is in query_person1's adjacency list
+    bool are_friends = false;
+    // `std::find` searches for an element in a range.
+    // It returns an iterator to the element if found, or `adj[query_person1].end()` if not found.
+    if (std::find(adj[query_person1].begin(), adj[query_person1].end(), query_person2) != adj[query_person1].end()) {
+        are_friends = true;
+    }
+
+    if (are_friends) {
+        std::cout << "Yes, Person " << query_person1 << " and Person " << query_person2 << " are directly friends!\n";
+    } else {
+        std::cout << "No, Person " << query_person1 << " and Person " << query_person2 << " are NOT directly friends.\n";
+    }
+
+    return 0;
+}
+```
+
+**How to Compile & Run (e.g., using g++):**
+1.  Save the code as `graph_basics.cpp`
+2.  Open your terminal/command prompt and navigate to where you saved the file.
+3.  Compile: `g++ graph_basics.cpp -o graph_basics`
+4.  Run: `./graph_basics`
+
+**Example Run with the problem above:**
+
+```
+Enter the number of people (N): 4
+Enter the number of friendships (M): 3
+Enter 3 friendships (e.g., '0 1' for person 0 and 1 being friends):
+0 1
+1 2
+3 0
+
+Enter two people to check if they are directly friends (e.g., '0 2'): 0 2
+No, Person 0 and Person 2 are NOT directly friends.
+```
+*(Correct! 0 is friends with 1 and 3, but not directly with 2)*
+
+### What's Next?
+
+Now that you know how to represent graphs, the next big step is learning how to **traverse** them – meaning, how to systematically visit every node. The two main ways are:
+
+1.  **Breadth-First Search (BFS):** Explores "level by level" (like ripples in water).
+2.  **Depth-First Search (DFS):** Explores "as deep as possible" before backtracking.
+
+These two algorithms are fundamental and will unlock countless graph problems! Keep going, you're doing great!
+
+---
