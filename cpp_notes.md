@@ -54251,3 +54251,112 @@ Notice the difference in output!
 And there you have it! BFS and DFS are powerful tools. Understand their core logic and you'll unlock so many graph problems. Happy traversing! 🗺️✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Dynamic Programming Intro  
+🕒 2026-06-15 12:14:56
+
+Let's dive into Dynamic Programming! It sounds fancy, but it's really just a smart way to solve certain problems.
+
+---
+
+## Dynamic Programming (DP) Intro
+
+### 🤔 What does it mean?
+
+Dynamic Programming is a technique to solve complex problems by breaking them down into simpler, overlapping subproblems. The core idea is to:
+
+1.  **Solve each subproblem only once.**
+2.  **Store the results** of these subproblems.
+3.  **Reuse the stored results** when the same subproblem comes up again.
+
+Think of it like building a big Lego structure: instead of re-building the same small sections every time you need them, you build each small section once, put it aside, and grab it when you need it again.
+
+### ✨ Why does it matter?
+
+*   **Efficiency:** DP transforms slow, often exponential-time (brute-force) solutions into much faster, often polynomial-time solutions. It saves a *ton* of computation time by preventing redundant calculations.
+*   **Problem Solving Power:** Many complex problems in computer science (like pathfinding, resource allocation, sequence alignment) can be efficiently solved using DP. It's a fundamental tool in a programmer's toolkit.
+
+---
+
+### 💡 Example Problem: Fibonacci Numbers
+
+A classic example to understand DP is calculating Fibonacci numbers.
+
+*   **Problem:** Find the `n`-th Fibonacci number, `F(n)`.
+*   **Definition:**
+    *   `F(0) = 0`
+    *   `F(1) = 1`
+    *   `F(n) = F(n-1) + F(n-2)` for `n > 1`
+
+**The Naive Recursive Way:**
+If you try to calculate `F(5)` directly with recursion:
+`F(5)` needs `F(4)` and `F(3)`
+`F(4)` needs `F(3)` and `F(2)`
+`F(3)` needs `F(2)` and `F(1)`
+Notice `F(3)` and `F(2)` are calculated multiple times! This redundancy gets worse very quickly as `n` grows.
+
+**DP Approach (Memoization):**
+We'll calculate `F(n)` but store each `F(k)` result. If we need `F(k)` again, we just look up the stored value instead of recalculating.
+
+---
+
+### 💻 Simple C++ Implementation (Memoization)
+
+This is a **top-down** DP approach called **memoization**. We start from `F(n)` and go down, storing results as we compute them.
+
+```cpp
+#include <iostream>
+#include <vector> // We'll use a vector to store our calculated results
+
+// Function to calculate the n-th Fibonacci number using Dynamic Programming (Memoization)
+int fibonacci_dp(int n, std::vector<int>& memo) {
+    // 1. Base Cases:
+    // F(0) is 0, F(1) is 1.
+    if (n <= 1) {
+        return n;
+    }
+
+    // 2. Check if already computed (Lookup):
+    // If memo[n] is not -1, it means we've already calculated F(n)
+    // and stored it. Just return the stored value.
+    if (memo[n] != -1) {
+        return memo[n];
+    }
+
+    // 3. Compute and Store:
+    // If not computed, calculate F(n) using the recurrence relation
+    // and store it in our memoization table before returning.
+    memo[n] = fibonacci_dp(n - 1, memo) + fibonacci_dp(n - 2, memo);
+
+    // 4. Return the result
+    return memo[n];
+}
+
+int main() {
+    int n_to_find = 10; // Let's find the 10th Fibonacci number
+
+    // Initialize our memoization table (vector).
+    // It needs to be of size n+1 to store F(0) through F(n).
+    // We initialize with -1 to signify that no value has been computed yet for that index.
+    std::vector<int> memo(n_to_find + 1, -1);
+
+    std::cout << "The " << n_to_find << "-th Fibonacci number is: ";
+    std::cout << fibonacci_dp(n_to_find, memo) << std::endl; // Expected: 55
+
+    // Let's try another one
+    n_to_find = 20;
+    std::vector<int> memo2(n_to_find + 1, -1); // Reset memo for new n
+    std::cout << "The " << n_to_find << "-th Fibonacci number is: ";
+    std::cout << fibonacci_dp(n_to_find, memo2) << std::endl; // Expected: 6765
+
+    return 0;
+}
+```
+
+---
+
+That's your quick intro to Dynamic Programming! Remember, it's all about being smart with recursion: solve subproblems once, store, and reuse. Happy coding!
+
+---
