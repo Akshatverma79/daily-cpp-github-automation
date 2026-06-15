@@ -54360,3 +54360,123 @@ int main() {
 That's your quick intro to Dynamic Programming! Remember, it's all about being smart with recursion: solve subproblems once, store, and reuse. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-06-15 18:17:55
+
+Hey there, future DSA wizard! Let's demystify Knapsack Problems.
+
+---
+
+### 🎒 Knapsack Problems: Packing Smart
+
+#### 💡 What's the Concept?
+
+Imagine you have a **backpack** (your "knapsack") with a limited **weight capacity**. You're faced with a bunch of items, each with its own **weight** and a certain **value**.
+
+The **Knapsack Problem** asks: "Which items should you put into your backpack to get the *maximum total value* without exceeding its *weight limit*?"
+
+Think of it as making optimal choices under a constraint.
+
+*   **0/1 Knapsack:** This is the most common type. For each item, you either *take it entirely* (1) or *leave it entirely* (0). You can't take a fraction of an item.
+
+#### ✨ Why Does It Matter?
+
+Knapsack problems are super important because they model a ton of real-world optimization challenges:
+
+1.  **Resource Allocation:** Which projects should a company invest in given a budget to maximize profit?
+2.  **Cutting Stock:** How to cut raw materials (like fabric or metal sheets) to minimize waste and fulfill orders.
+3.  **Investment Portfolios:** Selecting stocks to maximize returns while staying within risk tolerance.
+4.  **Logistics:** Packing a cargo container efficiently.
+
+It's a classic problem that helps you understand **Dynamic Programming (DP)**, a fundamental technique in algorithms.
+
+#### 🚶‍♂️ Example Problem: Hiker's Backpack
+
+You're going on a hike and your backpack can carry a maximum of **5 kg**. Here are the items you're considering:
+
+| Item   | Weight (kg) | Value (Utility Score) |
+| :----- | :---------- | :-------------------- |
+| Water  | 3           | 10                    |
+| Snacks | 2           | 7                     |
+| Map    | 1           | 3                     |
+
+**Question:** Which items should you pack to maximize your total utility score, without exceeding 5 kg?
+
+---
+
+#### 💻 Simple C++ Implementation (0/1 Knapsack)
+
+We'll use Dynamic Programming (DP) for this. The core idea is to build up our solution for smaller capacities first.
+
+Let `dp[w]` be the maximum value we can achieve with a capacity of `w`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+int main() {
+    // 1. Define the problem parameters
+    std::vector<int> weights = {3, 2, 1}; // Weights of Water, Snacks, Map
+    std::vector<int> values = {10, 7, 3};  // Values of Water, Snacks, Map
+    int capacity = 5;                      // Max weight capacity of the backpack
+    int numItems = weights.size();
+
+    // 2. Create our DP table
+    // dp[w] will store the maximum value for a knapsack of capacity 'w'
+    std::vector<int> dp(capacity + 1, 0); 
+    // Initialize with 0s, meaning 0 value for 0 capacity, or if no items fit.
+
+    // 3. Populate the DP table
+    // Iterate through each item
+    for (int i = 0; i < numItems; ++i) {
+        int currentWeight = weights[i];
+        int currentValue = values[i];
+
+        // Iterate through the knapsack capacities, from max down to current item's weight
+        // We iterate downwards to ensure each item is considered only once (0/1 property)
+        for (int w = capacity; w >= currentWeight; --w) {
+            // Two choices for each item and current capacity 'w':
+            // 1. Don't take the current item: value remains dp[w]
+            // 2. Take the current item: value is currentValue + dp[w - currentWeight]
+            //    (where dp[w - currentWeight] is the max value from previous items
+            //     for the remaining capacity after taking current item)
+            dp[w] = std::max(dp[w], currentValue + dp[w - currentWeight]);
+        }
+    }
+
+    // 4. The answer is in dp[capacity]
+    std::cout << "Maximum value for a backpack of " << capacity << "kg: " << dp[capacity] << std::endl;
+
+    // Expected Output:
+    // With capacity 5kg:
+    // - Water (3kg, 10) + Map (1kg, 3) = 4kg, value 13
+    // - Snacks (2kg, 7) + Water (3kg, 10) = 5kg, value 17
+    // - Snacks (2kg, 7) + Map (1kg, 3) = 3kg, value 10
+    // The optimal is Water + Snacks, giving 17.
+
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+Maximum value for a backpack of 5kg: 17
+```
+
+**Explanation for the example:**
+
+1.  **Capacity 0-1kg:** Only Map (1kg, val 3) fits. `dp[1]=3`.
+2.  **Capacity 2kg:** Snacks (2kg, val 7) fits. `dp[2]=7`.
+3.  **Capacity 3kg:** Water (3kg, val 10) fits. `dp[3]=10`. Also, Map + Snacks (1+2=3kg, val 3+7=10)
+4.  **Capacity 4kg:** Water (3kg, val 10) + Map (1kg, val 3) = 13.
+5.  **Capacity 5kg:** Water (3kg, val 10) + Snacks (2kg, val 7) = 17. This is the optimal solution!
+
+---
+
+That's your quick dive into Knapsack Problems! It's a fantastic way to practice your DP skills. Keep up the great work!
+
+---
