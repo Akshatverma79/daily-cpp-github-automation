@@ -55500,3 +55500,119 @@ n: 1
 **In a Nutshell:** HashMaps are your go-to data structure for super-fast key-value lookups. They use hashing to provide an average O(1) time complexity for most operations, making them incredibly efficient for many common programming tasks. Keep practicing, and you'll master them!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Manipulation Basics  
+🕒 2026-06-19 16:24:22
+
+## String Manipulation Basics (C++) - Your Text Toolkit! 🚀
+
+Hey there, future coder! Let's dive into the world of strings – it's super fundamental and super fun!
+
+---
+
+### What does "String Manipulation" mean?
+
+Think of a **string** as a fancy array where each "slot" holds a character (like a letter, number, or symbol). It's how computers store and work with text!
+
+**String Manipulation** is simply the art of playing with these sequences of characters. It involves operations like:
+*   **Accessing** individual characters (e.g., getting the 3rd letter).
+*   **Searching** for specific characters or patterns.
+*   **Modifying** parts of a string (e.g., replacing text).
+*   **Combining** strings (e.g., joining first name and last name).
+*   **Extracting** substrings (e.g., getting a word from a sentence).
+
+In C++, `std::string` is the powerful type we use for this.
+
+---
+
+### Why does it matter?
+
+Strings are *everywhere*! Usernames, emails, file paths, web pages, tweets, data logs – even what you're reading right now.
+
+Mastering string manipulation helps you:
+*   Process user input (e.g., validate a password format).
+*   Parse data (e.g., extract information from a log file).
+*   Build user interfaces (e.g., display formatted text).
+*   Search and filter information (e.g., find all documents containing a keyword).
+*   It's a core skill for almost any programming task, making your code smarter and more interactive!
+
+---
+
+### Example Problem: "Does it contain that character?"
+
+**Problem:** Given a string `s` and a character `c`, determine if the string `s` contains the character `c`.
+
+**Example:**
+*   `s = "hello", c = 'o'` -> `true`
+*   `s = "world", c = 'a'` -> `false`
+*   `s = "C++ rocks", c = ' '` -> `true` (spaces are characters too!)
+
+---
+
+### Simple C++ Implementation
+
+Here's how you can solve the example problem with a clean C++ function:
+
+```cpp
+#include <iostream> // For input/output operations (like std::cout)
+#include <string>   // Don't forget this header for std::string!
+
+// Function to check if a string contains a specific character
+bool containsChar(const std::string& s, char targetChar) {
+    // We can loop through each character in the string
+    // This is a "range-based for loop" - super clean!
+    for (char ch : s) {
+        // If the current character 'ch' matches our 'targetChar'
+        if (ch == targetChar) {
+            return true; // We found it! No need to check further.
+        }
+    }
+    // If the loop finishes, it means we went through the whole string
+    // and didn't find the character.
+    return false;
+}
+
+int main() {
+    std::string myString = "programmingisfun";
+    char search1 = 'g';
+    char search2 = 'z';
+    char search3 = ' '; // A space character
+
+    std::cout << "String: \"" << myString << "\"" << std::endl;
+
+    // Test Case 1
+    std::cout << "Does it contain '" << search1 << "'? "
+              << (containsChar(myString, search1) ? "Yes" : "No") << std::endl;
+    // Expected output: Yes
+
+    // Test Case 2
+    std::cout << "Does it contain '" << search2 << "'? "
+              << (containsChar(myString, search2) ? "Yes" : "No") << std::endl;
+    // Expected output: No
+
+    // Test Case 3 (changing the string slightly for demonstration)
+    std::string anotherString = "hello world";
+    std::cout << "\nString: \"" << anotherString << "\"" << std::endl;
+    std::cout << "Does it contain '" << search3 << "'? "
+              << (containsChar(anotherString, search3) ? "Yes" : "No") << std::endl;
+    // Expected output: Yes
+
+    return 0;
+}
+```
+
+---
+
+**Key Takeaways from the Code:**
+
+*   **`#include <string>`:** Essential for using `std::string`.
+*   **`const std::string& s`:** We pass the string by `const` reference. This is efficient because it avoids copying the entire string, and `const` ensures our function doesn't accidentally change the original string.
+*   **`for (char ch : s)`:** This is a modern C++ way to iterate through each character (`ch`) in the string `s`. It's concise and easy to read!
+*   **`return true;`:** As soon as we find the character, we can stop and return `true`.
+*   **`return false;`:** If the loop finishes without finding the character, then it's not in the string, so we return `false`.
+
+That's it for the basics! You've just taken your first step into a world of text-based problem-solving. Keep exploring! ✨
+
+---
