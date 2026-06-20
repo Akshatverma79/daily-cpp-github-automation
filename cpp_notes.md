@@ -55927,3 +55927,148 @@ int main() {
 And there you have it! Two powerful ways to find patterns in text. KMP shines with its guaranteed optimal worst-case performance, while Rabin-Karp offers great average-case speed and flexibility, especially for multiple patterns. Keep exploring! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-06-20 15:25:40
+
+Alright, let's untangle Backtracking! It's like exploring a maze – trying a path, and if it's a dead end, you go back and try another.
+
+---
+
+## 🧭 Backtracking Basics
+
+### 1. What is Backtracking? (The Concept)
+
+Imagine you're trying to solve a puzzle by making a series of choices. Backtracking is an algorithmic technique that systematically tries to build a solution incrementally, one step at a time.
+
+*   **Try a choice:** Make a decision and move forward.
+*   **Check validity:** Is this choice leading to a valid (or potentially valid) solution?
+*   **If valid:** Keep going, make the next choice. (Recursion often comes into play here!)
+*   **If invalid (or a dead end):** "Backtrack"! Undo your last choice and try a different one. This "undo" is the core of backtracking.
+*   **Goal:** Find all possible solutions, or sometimes just one.
+
+Think of it as exploring a **decision tree**: you go down one branch, and if it doesn't work, you go back up to a "fork" and try another branch.
+
+### 2. Why Does It Matter? (Importance)
+
+Backtracking is super powerful for problems that involve:
+
+*   **Finding all permutations/combinations:** Like arranging items in all possible orders.
+*   **Solving puzzles:** Sudoku, N-Queens, mazes.
+*   **Decision-making processes:** Where you need to explore various paths to find an optimal or valid one.
+*   It's a foundational technique for many complex algorithmic problems in areas like AI, game theory, and constraint satisfaction.
+
+### 3. Example Problem: Permutations of an Array
+
+**Problem:** Given an array of unique numbers, return all possible permutations.
+
+**Input:** `[1, 2, 3]`
+
+**Expected Output:**
+`[[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]`
+
+**How Backtracking Helps:**
+We can build each permutation by picking numbers one by one.
+1.  Start with an empty permutation `[]`.
+2.  **Choice 1:** Pick `1`. Current: `[1]`.
+    *   **Choice 2:** Pick `2`. Current: `[1, 2]`.
+        *   **Choice 3:** Pick `3`. Current: `[1, 2, 3]`. Found a complete permutation! Add to result.
+        *   *Backtrack:* Remove `3`. Current: `[1, 2]`. No more choices for the 3rd spot.
+    *   *Backtrack:* Remove `2`. Current: `[1]`.
+    *   **Choice 2 (alternative):** Pick `3`. Current: `[1, 3]`.
+        *   **Choice 3:** Pick `2`. Current: `[1, 3, 2]`. Found a complete permutation! Add to result.
+        *   *Backtrack:* Remove `2`. Current: `[1, 3]`. No more choices.
+    *   *Backtrack:* Remove `3`. Current: `[1]`. No more choices for the 2nd spot.
+3.  *Backtrack:* Remove `1`. Current: `[]`.
+4.  **Choice 1 (alternative):** Pick `2`. Current: `[2]`. (And so on, repeating the process for 2 and 3 as the starting elements).
+
+### 4. Simple C++ Implementation (Permutations)
+
+Here's how you'd implement the permutation example using C++ with backtracking:
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::iota if needed, not strictly for this problem though
+
+// Recursive helper function for backtracking
+void findPermutations(
+    std::vector<int>& nums,                    // Original numbers
+    std::vector<std::vector<int>>& result,    // Stores all permutations found
+    std::vector<int>& current_permutation,     // The permutation being built
+    std::vector<bool>& used_indices           // Tracks which numbers from 'nums' are already in 'current_permutation'
+) {
+    // Base Case: If the current_permutation is complete (same length as original nums)
+    if (current_permutation.size() == nums.size()) {
+        result.push_back(current_permutation); // Add this complete permutation to our results
+        return; // We've found a solution down this path, no need to explore further
+    }
+
+    // Recursive Step: Try every number from 'nums' for the next spot
+    for (int i = 0; i < nums.size(); ++i) {
+        // If the number at index 'i' hasn't been used in the current_permutation yet
+        if (!used_indices[i]) {
+            // --- 1. Choose ---
+            current_permutation.push_back(nums[i]); // Add the number to our current path
+            used_indices[i] = true;                 // Mark it as used
+
+            // --- 2. Explore ---
+            // Recursively call to find the next number for the permutation
+            findPermutations(nums, result, current_permutation, used_indices);
+
+            // --- 3. Un-choose (Backtrack) ---
+            // After exploring all paths from this choice, undo it
+            // Remove the last added number to try other options
+            current_permutation.pop_back();
+            used_indices[i] = false; // Mark it as unused for other paths
+        }
+    }
+}
+
+// Main function to initiate the permutation process
+std::vector<std::vector<int>> permute(std::vector<int>& nums) {
+    std::vector<std::vector<int>> all_permutations;
+    std::vector<int> current_permutation;
+    std::vector<bool> used_indices(nums.size(), false); // Initialize all as not used
+
+    findPermutations(nums, all_permutations, current_permutation, used_indices);
+    return all_permutations;
+}
+
+// --- Main function for testing ---
+int main() {
+    std::vector<int> numbers = {1, 2, 3};
+    std::vector<std::vector<int>> permutations = permute(numbers);
+
+    std::cout << "All permutations of [1, 2, 3]:" << std::endl;
+    for (const auto& p : permutations) {
+        std::cout << "[ ";
+        for (int num : p) {
+            std::cout << num << " ";
+        }
+        std::cout << "]" << std::endl;
+    }
+
+    // Another example
+    std::vector<int> numbers2 = {5, 6};
+    std::vector<std::vector<int>> permutations2 = permute(numbers2);
+    std::cout << "\nAll permutations of [5, 6]:" << std::endl;
+    for (const auto& p : permutations2) {
+        std::cout << "[ ";
+        for (int num : p) {
+            std::cout << num << " ";
+        }
+        std::cout << "]" << std::endl;
+    }
+
+    return 0;
+}
+```
+
+---
+
+And that's your friendly intro to Backtracking! It's all about making choices, exploring, and knowing when to "undo" and try again. Happy coding!
+
+---
