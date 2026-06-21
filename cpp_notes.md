@@ -56244,3 +56244,139 @@ The core `Choose`, `Explore`, `Unchoose` mechanism remains exactly the same!
 That's it! Backtracking is a super versatile and fun technique once you get the hang of thinking recursively about choices and undoing them. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2026-06-21 15:31:04
+
+Alright, let's dive into Heaps and Priority Queues! They're super useful for keeping things organized based on "importance."
+
+---
+
+## 📚 Heaps & Priority Queues: Your Go-To for "Most Important" Stuff!
+
+### ✨ What's the Concept?
+
+**1. Heaps (The Data Structure)**
+
+*   **What it is:** Imagine a special type of binary tree! A heap is a **complete binary tree** (meaning all levels are full, except possibly the last, which is filled from left to right) that satisfies the **heap property**.
+    *   **Max-Heap:** For every node, its value is greater than or equal to the values of its children. The root is always the largest element.
+    *   **Min-Heap:** For every node, its value is less than or equal to the values of its children. The root is always the smallest element.
+*   **Key Idea:** It's designed so you can always quickly access the *most extreme* element (min or max) – that's the one at the root!
+
+**2. Priority Queues (The Abstract Data Type - ADT)**
+
+*   **What it is:** Think of it like a regular queue (first-in, first-out), but with a twist! Instead of elements leaving in the order they arrived, they leave based on their **priority**. The element with the highest (or lowest, depending on configuration) priority gets to "exit" first.
+*   **How it relates to Heaps:** Heaps are the **most common and efficient way** to implement a Priority Queue! A Max-Heap is used for a "highest priority first" PQ, and a Min-Heap for a "lowest priority first" PQ.
+
+### 💡 Why It Matters?
+
+Heaps and Priority Queues are incredibly powerful because they allow for:
+
+*   **Efficient "Most Important" Retrieval:** You can always get the highest or lowest priority element in `O(1)` time.
+*   **Efficient Updates:** Adding a new element or removing the top element takes `O(log N)` time (where N is the number of elements).
+*   **Real-world Use Cases:**
+    *   **Task Scheduling:** Run the highest priority task first.
+    *   **Event Simulation:** Process the earliest event next.
+    *   **Finding K-th Largest/Smallest:** Easily keep track of the top K items.
+    *   **Graph Algorithms:** Dijkstra's (shortest path), Prim's (minimum spanning tree) rely on PQs.
+    *   **Heap Sort:** An efficient sorting algorithm!
+
+### 🎯 Example Problem: Find the Highest Score
+
+Let's say you have a list of student exam scores, and you want to quickly find the absolute highest score.
+
+**Scores:** `[85, 92, 78, 95, 88, 90]`
+
+**Solution using a Priority Queue (Max-Heap):**
+
+1.  We'll use a Priority Queue that's configured as a Max-Heap (its default in C++ `std::priority_queue`).
+2.  Insert all the scores into the Priority Queue.
+3.  The highest score will automatically bubble up to the top.
+4.  Just peek at the top element!
+
+### 💻 Simple C++ Implementation
+
+C++'s Standard Template Library (STL) provides `std::priority_queue`, which is a fantastic ready-to-use implementation of a Priority Queue (by default, it's a Max-Heap!).
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue> // This header is for std::priority_queue
+#include <functional> // Needed for std::greater for min-heap
+
+int main() {
+    std::cout << "--- Priority Queue (Max-Heap) Example ---\n";
+
+    // Imagine these are our student scores
+    std::vector<int> scores = {85, 92, 78, 95, 88, 90};
+
+    // 1. Create a Max-Heap Priority Queue
+    // std::priority_queue<Type> defaults to a Max-Heap
+    // It's like saying: "The largest elements have the highest priority."
+    std::priority_queue<int> max_pq;
+
+    // 2. Insert all scores into the Priority Queue
+    std::cout << "Inserting scores: ";
+    for (int score : scores) {
+        max_pq.push(score); // Add score to the PQ
+        std::cout << score << " ";
+    }
+    std::cout << "\n";
+
+    // 3. The highest score is now at the top!
+    if (!max_pq.empty()) {
+        std::cout << "The highest score is: " << max_pq.top() << "\n"; // Peek at the top element
+    }
+
+    // You can also "pop" elements off, they'll come out in highest-to-lowest order
+    std::cout << "Scores from highest to lowest:\n";
+    while (!max_pq.empty()) {
+        std::cout << max_pq.top() << " "; // Peek
+        max_pq.pop();                      // Remove the top element
+    }
+    std::cout << "\n\n";
+
+    std::cout << "--- Priority Queue (Min-Heap) Example ---\n";
+    // To create a Min-Heap (smallest elements have highest priority):
+    // You need to specify the underlying container (std::vector<int>)
+    // and the custom comparator (std::greater<int>)
+    std::priority_queue<int, std::vector<int>, std::greater<int>> min_pq;
+
+    // Re-insert scores to demonstrate min-heap behavior
+    std::cout << "Inserting scores into Min-Heap: ";
+    for (int score : scores) {
+        min_pq.push(score);
+        std::cout << score << " ";
+    }
+    std::cout << "\n";
+
+    if (!min_pq.empty()) {
+        std::cout << "The lowest score is: " << min_pq.top() << "\n";
+    }
+
+    std::cout << "Scores from lowest to highest:\n";
+    while (!min_pq.empty()) {
+        std::cout << min_pq.top() << " ";
+        min_pq.pop();
+    }
+    std::cout << "\n";
+
+    return 0;
+}
+```
+
+**Key `std::priority_queue` methods:**
+
+*   `push(element)`: Adds an element. `O(log N)`
+*   `top()`: Returns (but doesn't remove) the highest/lowest priority element. `O(1)`
+*   `pop()`: Removes the highest/lowest priority element. `O(log N)`
+*   `empty()`: Checks if the queue is empty. `O(1)`
+*   `size()`: Returns the number of elements. `O(1)`
+
+---
+
+And that's your quick dive into Heaps and Priority Queues! They're fundamental for many efficient algorithms and a great tool to have in your DSA toolkit. Happy coding!
+
+---
