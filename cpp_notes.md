@@ -56577,3 +56577,160 @@ int main() {
 And there you have it! A clean and simple look at the Trie data structure. It's a powerful tool, especially when you're dealing with string manipulations and prefix-based operations. Keep practicing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-06-22 18:07:31
+
+👋 Let's Group Things Up: Disjoint Set Union (DSU)
+
+DSU is a super neat data structure that helps you keep track of elements partitioned into a number of **disjoint** (meaning "non-overlapping") sets. Think of it like organizing friends into different groups, where each friend belongs to *exactly one* group.
+
+---
+
+### 💡 What DSU Means
+
+Imagine you have a bunch of individual items. DSU lets you:
+
+1.  **Find:** Which group does a specific item belong to?
+2.  **Union:** Merge two groups into one larger group.
+
+Each group has a designated "representative" or "leader." When you ask which group an item belongs to, DSU tells you its leader.
+
+---
+
+### 🚀 Why DSU Matters
+
+DSU is incredibly powerful for problems involving connectivity and grouping, especially when connections are added dynamically.
+
+*   **Connectivity Checks:** Quickly tell if two items are in the same group (e.g., "Are two cities connected in a network?").
+*   **Counting Components:** Find out how many distinct groups exist (e.g., "How many separate islands are there?").
+*   **Graph Algorithms:** It's a cornerstone for algorithms like Kruskal's for Minimum Spanning Tree (MST).
+*   **Optimized Performance:** With clever optimizations, DSU operations are almost lightning-fast (near-constant time!).
+
+---
+
+### 🧩 Example Problem: Connecting Cities
+
+Let's say we have 5 cities (numbered 0 to 4) and we want to know if certain cities are connected. We start with each city in its own group.
+
+**Scenario:**
+
+1.  Initial: `{0}, {1}, {2}, {3}, {4}`
+2.  Connect city 0 and city 1: `unite(0, 1)`
+    *   Groups: `{0, 1}, {2}, {3}, {4}`
+3.  Connect city 3 and city 4: `unite(3, 4)`
+    *   Groups: `{0, 1}, {2}, {3, 4}`
+4.  Query: Is city 0 connected to city 2? `find(0) == find(2)`
+    *   Result: False (They are in different groups).
+5.  Connect city 1 and city 2: `unite(1, 2)`
+    *   Groups: `{0, 1, 2}, {3, 4}` (City 0, 1, and 2 are now all connected!)
+6.  Query: Is city 0 connected to city 2? `find(0) == find(2)`
+    *   Result: True!
+
+---
+
+### 💻 Simple C++ Implementation
+
+Here's a standard DSU implementation with the two crucial optimizations: **Path Compression** (for `find`) and **Union by Rank** (for `unite`). These make DSU incredibly efficient!
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota
+
+class DSU {
+private:
+    std::vector<int> parent;
+    std::vector<int> rank; // Used for Union by Rank optimization
+
+public:
+    // Constructor: Each element is initially in its own set
+    DSU(int n) {
+        parent.resize(n);
+        // Fill parent array such that parent[i] = i
+        // std::iota fills a range with sequentially increasing values
+        std::iota(parent.begin(), parent.end(), 0); 
+        
+        rank.assign(n, 0); // All ranks initially 0
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i) {
+            return i; // 'i' is the representative of its own set
+        }
+        // Path Compression: Make 'i' point directly to the root
+        return parent[i] = find(parent[i]); 
+    }
+
+    // Unite (Union) operation with Union by Rank
+    // Merges the sets containing 'i' and 'j'
+    // Returns true if a merge happened, false if they were already in the same set
+    bool unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+
+        if (root_i != root_j) { // If they are in different sets
+            // Union by Rank: Attach the smaller rank tree under the root of the larger rank tree
+            if (rank[root_i] < rank[root_j]) {
+                parent[root_i] = root_j;
+            } else if (rank[root_j] < rank[root_i]) {
+                parent[root_j] = root_i;
+            } else { // Ranks are equal, choose one as root and increment its rank
+                parent[root_j] = root_i;
+                rank[root_i]++;
+            }
+            return true; // A merge occurred
+        }
+        return false; // They were already in the same set
+    }
+
+    // Helper: Check if two elements are connected
+    bool isConnected(int i, int j) {
+        return find(i) == find(j);
+    }
+};
+
+/*
+// How to use it:
+#include <iostream>
+
+int main() {
+    DSU dsu(5); // 5 cities: 0, 1, 2, 3, 4
+
+    std::cout << "Are 0 and 1 connected initially? " << (dsu.isConnected(0, 1) ? "Yes" : "No") << std::endl; // No
+
+    dsu.unite(0, 1); // Connect 0 and 1
+    dsu.unite(3, 4); // Connect 3 and 4
+
+    std::cout << "Are 0 and 1 connected after uniting (0,1)? " << (dsu.isConnected(0, 1) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are 0 and 2 connected? " << (dsu.isConnected(0, 2) ? "Yes" : "No") << std::endl; // No
+
+    dsu.unite(1, 2); // Connect 1 and 2 (this also connects 0 and 2!)
+
+    std::cout << "Are 0 and 2 connected after uniting (1,2)? " << (dsu.isConnected(0, 2) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are 3 and 0 connected? " << (dsu.isConnected(3, 0) ? "Yes" : "No") << std::endl; // No
+
+    return 0;
+}
+*/
+```
+
+---
+
+### ✨ Key Optimizations Explained
+
+1.  **Path Compression (in `find`):** When `find` traverses up the tree to locate the root, it makes all nodes on that path point directly to the root. This "flattens" the tree, making future `find` operations for those nodes much faster.
+    *   `return parent[i] = find(parent[i]);` is the magic line!
+
+2.  **Union by Rank (in `unite`):** To avoid creating tall, unbalanced trees (which would make `find` slower), we always attach the root of the "smaller" tree to the root of the "larger" tree. "Rank" here is a heuristic representing the height or size of the tree. Keeping trees flat ensures `find` operations remain quick.
+
+These optimizations make DSU operations run in almost constant time, specifically $O(\alpha(N))$, where $\alpha$ is the inverse Ackermann function, which grows extremely slowly – so slow it's practically constant for all realistic input sizes!
+
+---
+
+DSU is a super elegant and efficient tool. Once you get the hang of `find` and `unite` with these optimizations, you'll see it pop up in many interesting problems! Happy coding!
+
+---
