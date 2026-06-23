@@ -56914,3 +56914,194 @@ Segment Trees are binary trees designed for fast range queries and point updates
 Keep practicing, and you'll master them in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Fenwick Trees (Binary Indexed Tree)  
+🕒 2026-06-23 16:15:37
+
+Okay, let's break down Fenwick Trees in a clean, friendly way!
+
+---
+
+## Fenwick Trees (Binary Indexed Tree - BIT): Your Speedy Prefix Sum Helper!
+
+Hey there, DSA learner! 👋 Let's dive into Fenwick Trees. They might sound fancy, but they're super clever and surprisingly simple once you get the core idea.
+
+### 🌟 What is a Fenwick Tree?
+
+Imagine you have a list of numbers (an array). You often need to do two things:
+1.  **Update** a single number in the list.
+2.  Find the **sum of all numbers up to a certain point** (a "prefix sum").
+
+*   A simple array:
+    *   Update: `O(1)` (super fast!)
+    *   Prefix Sum: `O(N)` (slow, you have to add everything up each time)
+*   A prefix sum array (where `P[i] = A[1] + ... + A[i]`):
+    *   Update: `O(N)` (if you change `A[i]`, all `P[j]` for `j >= i` need recalculating – slow!)
+    *   Prefix Sum: `O(1)` (super fast!)
+
+**A Fenwick Tree (BIT) is a data structure that does BOTH of these operations in `O(log N)` time!** It's like having the best of both worlds, but with a logarithmic trade-off.
+
+### 💡 Why Does It Matter?
+
+*   **Efficiency:** It makes problems involving frequent updates and prefix sum queries much, much faster. `log N` is tiny for large `N` (e.g., `log 10^5` is about `17`).
+*   **Space Efficient:** It only uses `O(N)` extra space, just like a simple array.
+*   **Versatile:** Beyond prefix sums, it can solve problems like counting inversions, range updates (with a slight modification), and more!
+*   **Competitive Programming Gold:** It's a fundamental tool you'll see a lot in contests.
+
+### 🧠 How Does It Work? (The Core Idea)
+
+Instead of storing individual element values or simple prefix sums, a Fenwick Tree (`bit` array) cleverly stores *partial sums* of specific ranges. These ranges are determined by the binary representation of the index.
+
+The magic revolves around the **`lowbit(i)`** function:
+*   `lowbit(i)` gives you the value of the least significant (rightmost) set bit in `i`.
+*   Mathematically, it's calculated as `i & (-i)`. (This works due to two's complement representation!)
+*   Example:
+    *   `i = 6` (binary `110`) -> `lowbit(6)` is `2` (binary `10`)
+    *   `i = 4` (binary `100`) -> `lowbit(4)` is `4` (binary `100`)
+    *   `i = 5` (binary `101`) -> `lowbit(5)` is `1` (binary `1`)
+
+**Operations:**
+
+1.  **`update(index, value_delta)`:**
+    *   When you change the value at `original_array[index]` by `value_delta`, you need to update all `bit` array cells that "cover" this `index`.
+    *   You do this by repeatedly adding `lowbit(index)` to `index` until you go past the end of the tree.
+    *   `index += lowbit(index)`
+    *   Think of it as climbing up the tree, updating all relevant parent nodes.
+
+2.  **`query(index)` (Get prefix sum up to `index`):**
+    *   To get the sum of `original_array[1]` through `original_array[index]`, you sum up the values in `bit` array cells that *directly contribute* to this prefix sum.
+    *   You do this by repeatedly subtracting `lowbit(index)` from `index` until `index` becomes 0.
+    *   `index -= lowbit(index)`
+    *   Think of it as walking down the tree, collecting partial sums.
+
+**Important Note:** Fenwick Trees are typically **1-indexed**. This simplifies the `lowbit` logic. If your problem has 0-indexed arrays, just shift the indices by 1 before using the Fenwick Tree.
+
+### 🧩 Example Problem
+
+Let's say we have an array (1-indexed for BIT use):
+`A = [_, 10, 20, 30, 40, 50]` (size `N=5`, `_` means index 0 is unused)
+
+1.  **Query `sum(A[1]...A[3])`**: (i.e., `10 + 20 + 30`)
+    *   Expected: `60`
+
+2.  **Update `A[2]` by `+5`**: (`A` becomes `[_, 10, 25, 30, 40, 50]`)
+
+3.  **Query `sum(A[1]...A[3])` again**: (i.e., `10 + 25 + 30`)
+    *   Expected: `65`
+
+A Fenwick Tree will handle these updates and queries efficiently.
+
+### 🚀 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate (not strictly needed for BIT logic itself)
+
+// Global or class member for simplicity
+std::vector<int> bit; // Fenwick Tree array
+int N;               // Size of the original array (1-indexed)
+
+// Helper function to get the least significant bit
+// i & (-i) works due to two's complement representation
+int lowbit(int i) {
+    return i & (-i);
+}
+
+// Function to update the value at 'idx' by 'delta'
+// Traverse upwards, adding delta to relevant ranges
+void update(int idx, int delta) {
+    // Fenwick Tree is 1-indexed, so idx must be > 0
+    for (; idx <= N; idx += lowbit(idx)) {
+        bit[idx] += delta;
+    }
+}
+
+// Function to get the prefix sum up to 'idx'
+// Traverse downwards, summing relevant ranges
+int query(int idx) {
+    int sum = 0;
+    // Fenwick Tree is 1-indexed, so idx must be > 0
+    for (; idx > 0; idx -= lowbit(idx)) {
+        sum += bit[idx];
+    }
+    return sum;
+}
+
+int main() {
+    // Original array (conceptually)
+    // For simplicity, we'll initialize the BIT directly from these values.
+    // Index 0 is often unused in 1-indexed Fenwick Trees.
+    std::vector<int> original_values = {0, 10, 20, 30, 40, 50}; // N=5 actual elements
+    N = original_values.size() - 1; // N is the effective size (5 in this case)
+
+    // Initialize the Fenwick Tree (bit array) with size N+1 (for 1-indexing)
+    bit.resize(N + 1, 0);
+
+    // Build the Fenwick Tree by updating each element
+    // Each element is added one by one to the tree
+    for (int i = 1; i <= N; ++i) {
+        update(i, original_values[i]);
+    }
+
+    std::cout << "--- Initial State ---" << std::endl;
+    std::cout << "Original array elements (conceptually): ";
+    for(int i = 1; i <= N; ++i) {
+        std::cout << original_values[i] << (i == N ? "" : ", ");
+    }
+    std::cout << std::endl;
+
+    // Example 1: Query sum up to index 3
+    // Expected: 10 + 20 + 30 = 60
+    int sum_upto_3 = query(3);
+    std::cout << "Sum up to index 3: " << sum_upto_3 << std::endl; // Output: 60
+
+    // Example 2: Update A[2] by +5
+    int update_idx = 2;
+    int delta_value = 5;
+    original_values[update_idx] += delta_value; // Update our conceptual array
+    update(update_idx, delta_value);            // Update the Fenwick Tree
+
+    std::cout << "\n--- After Update: A[2] += 5 ---" << std::endl;
+    std::cout << "Original array elements (conceptually): ";
+    for(int i = 1; i <= N; ++i) {
+        std::cout << original_values[i] << (i == N ? "" : ", ");
+    }
+    std::cout << std::endl;
+
+    // Example 3: Query sum up to index 3 again
+    // Expected: 10 + 25 + 30 = 65
+    sum_upto_3 = query(3);
+    std::cout << "Sum up to index 3 (after update): " << sum_upto_3 << std::endl; // Output: 65
+
+    // Query sum up to N (total sum)
+    std::cout << "Total sum of all elements: " << query(N) << std::endl; // Output: 10+25+30+40+50 = 155
+
+    return 0;
+}
+```
+
+### 📊 Time & Space Complexity
+
+*   **Time Complexity:**
+    *   `update()`: `O(log N)`
+    *   `query()`: `O(log N)`
+    *   Building the tree (if starting from an array): `O(N log N)` (by calling `update` `N` times)
+*   **Space Complexity:** `O(N)` (for the `bit` array)
+
+### ✨ When to Use It?
+
+Use a Fenwick Tree when your problem requires:
+*   **Point updates** (changing a single element's value)
+*   **Prefix sum queries** (sum of elements from the start up to an index)
+*   ... and both operations occur frequently.
+
+If you only need point updates and range sums (sum between any `i` and `j`), you can still use a Fenwick tree: `sum(i, j) = query(j) - query(i-1)`.
+
+---
+
+And that's it! Fenwick Trees are a beautiful example of how a clever use of binary representation can lead to highly efficient data structures. Keep practicing, and you'll master them in no time! Happy coding! 🚀
+
+---
