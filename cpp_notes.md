@@ -58555,3 +58555,129 @@ This matches our manual analysis! 🎉
 And there you have it! Bridges and Articulation Points are powerful tools for understanding the structure and resilience of graphs. Keep practicing, and you'll master them in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-06-28 08:52:11
+
+Hey there, future DSA pro! 👋 Let's unlock the magic of the **Longest Common Subsequence (LCS)**. It's a classic problem with cool applications!
+
+---
+
+### **Topic: Longest Common Subsequence (LCS)**
+
+#### **1. What is LCS? 🤔**
+
+Imagine you have two strings, say "ABCDE" and "ACE".
+*   A **subsequence** is a sequence that can be derived from another sequence by deleting zero or more elements without changing the order of the remaining elements.
+    *   "ACE" is a subsequence of "ABCDE" (delete B, D).
+    *   "ADE" is also a subsequence of "ABCDE".
+*   A **common subsequence** is a subsequence that appears in *both* strings.
+    *   For "ABCDE" and "AXBYC", "ABC" is a common subsequence.
+*   The **Longest Common Subsequence (LCS)** is, as the name suggests, the longest possible common subsequence between two strings.
+
+**In simple words:** It's finding the longest string you can form by picking characters from the *first* string in order, and also picking the *same* characters from the *second* string in order.
+
+#### **2. Why does it matter? 💡**
+
+LCS isn't just a theoretical puzzle; it's super practical!
+*   **Bioinformatics:** Comparing DNA or protein sequences to find similarities and evolutionary relationships.
+*   **Diff Utilities:** When you compare two versions of a file (like in Git!), `diff` tools use LCS to figure out what lines were added, deleted, or changed.
+*   **Plagiarism Detection:** Finding common phrases or structures between documents.
+*   **Spell Checkers & Auto-completion:** Can be used in algorithms to suggest corrections or completions.
+
+#### **3. Let's see an example! 🎯**
+
+**Problem:** Find the length of the Longest Common Subsequence (LCS) for two strings:
+*   `text1 = "AGGTAB"`
+*   `text2 = "GXTXAYB"`
+
+**Thinking it through:**
+*   Can we find a common 'A'? Yes.
+*   After 'A', can we find a common 'G'? Yes.
+*   After 'G', can we find a common 'T'? Yes.
+*   After 'T', can we find a common 'A'? Yes, but we already used the 'A' from `text1`. We need to be careful with character order.
+
+Let's try to build one:
+`G` is common.
+`T` is common (after 'G' in both).
+`A` is common (after 'T' in both).
+`B` is common (after 'A' in both).
+
+So, `GTAB` is a common subsequence. Is it the longest? Yes! Its length is 4.
+
+#### **4. Simple C++ Implementation (Dynamic Programming) 💻**
+
+LCS is typically solved efficiently using **Dynamic Programming (DP)**. We build a table (a 2D array) to store the lengths of LCS for all prefixes of the two strings.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length();
+    int n = text2.length();
+
+    // Create a 2D DP table.
+    // dp[i][j] will store the length of LCS of text1[0...i-1] and text2[0...j-1]
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the DP table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            // If characters match, it's 1 + LCS of the previous prefixes
+            if (text1[i - 1] == text2[j - 1]) {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                // If characters don't match, take the maximum of:
+                // 1. LCS of text1[0...i-2] and text2[0...j-1] (skip char in text1)
+                // 2. LCS of text1[0...i-1] and text2[0...j-2] (skip char in text2)
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the LCS length for the full strings
+    return dp[m][n];
+}
+
+int main() {
+    std::string text1 = "AGGTAB";
+    std::string text2 = "GXTXAYB";
+
+    int lcs_length = longestCommonSubsequence(text1, text2);
+    std::cout << "The length of LCS between \"" << text1 << "\" and \"" << text2 << "\" is: " << lcs_length << std::endl; // Expected: 4
+
+    std::string text3 = "ABC";
+    std::string text4 = "AC";
+    lcs_length = longestCommonSubsequence(text3, text4);
+    std::cout << "The length of LCS between \"" << text3 << "\" and \"" << text4 << "\" is: " << lcs_length << std::endl; // Expected: 2 ("AC")
+
+    std::string text5 = "ABCD";
+    std::string text6 = "EFGH";
+    lcs_length = longestCommonSubsequence(text5, text6);
+    std::cout << "The length of LCS between \"" << text5 << "\" and \"" << text6 << "\" is: " << lcs_length << std::endl; // Expected: 0
+
+    return 0;
+}
+```
+
+**How the DP works (briefly):**
+1.  **`dp` Table:** We create a table `dp` of size `(m+1) x (n+1)`. The extra row/column handle the base cases where one of the strings is empty (LCS length is 0).
+2.  **Iteration:** We fill this table row by row, column by column.
+3.  **Matching Characters:** If `text1[i-1]` (current char in `text1`) and `text2[j-1]` (current char in `text2`) are the same, it means we found one more character for our common subsequence! So, `dp[i][j]` becomes `1` (for the current match) plus `dp[i-1][j-1]` (the LCS of the strings *before* these matching characters).
+4.  **Non-Matching Characters:** If they don't match, we have two choices:
+    *   Pretend we skipped `text1[i-1]` and find the LCS of `text1[0...i-2]` and `text2[0...j-1]` (which is `dp[i-1][j]`).
+    *   Pretend we skipped `text2[j-1]` and find the LCS of `text1[0...i-1]` and `text2[0...j-2]` (which is `dp[i][j-1]`).
+    We take the `std::max` of these two options because we want the *longest* common subsequence.
+5.  **Result:** After filling the entire table, `dp[m][n]` will hold the length of the LCS for the complete `text1` and `text2`.
+
+---
+
+That's LCS in a nutshell! It's a fundamental DP problem that opens doors to understanding many other sequence-related algorithms. Keep practicing! 💪
+
+---
