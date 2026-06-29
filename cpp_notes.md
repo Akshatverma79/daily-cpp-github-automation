@@ -59004,3 +59004,167 @@ int main() {
 Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Trees  
+🕒 2026-06-29 16:47:05
+
+Hey there, future DSA master! Let's break down "DP on Trees" into bite-sized pieces.
+
+---
+
+### 🌳 DP on Trees: The Concept
+
+**What it means:**
+Imagine a tree structure (like a family tree!). "DP on Trees" is a technique where you solve problems on trees by combining the power of **Dynamic Programming** (breaking problems into smaller, overlapping subproblems and storing results) with **tree traversals** (usually Depth-First Search or DFS).
+
+The core idea is:
+1.  Solve a subproblem for each node based on the solutions of its children.
+2.  Store or return these results.
+3.  Combine these child results to solve the problem for the parent node.
+
+Think of it as computing some property for a subtree, then using that property to help compute the same property for a larger subtree that contains it.
+
+**Why it matters:**
+*   **Efficiency:** It prevents recalculating the same information multiple times, especially in recursive solutions. This turns exponential or high-polynomial time complexities into linear time (O(N) for N nodes) for many tree problems.
+*   **Common Pattern:** A huge number of tree problems can be solved this way, like finding the diameter of a tree, maximum path sum, minimum vertex cover, counting nodes, etc.
+*   **Natural Fit:** Trees are inherently recursive structures, making them a perfect candidate for recursive solutions that can be optimized with DP.
+
+---
+
+### 💡 How it Works (General Idea)
+
+1.  **DFS Traversal:** You usually perform a DFS starting from the root.
+2.  **Post-order Processing:** For each node `u`, you first recursively call the DP function for all its children `v`.
+3.  **Combine Results:** Once you have the DP results from all children, you use these results to calculate the DP value for the current node `u`.
+4.  **Base Case:** Leaf nodes are your base cases; their DP value is often trivial.
+
+---
+
+### 📝 Example Problem: Max Path Sum from Root to Leaf
+
+**Problem:** Given a binary tree where each node has an integer value, find the maximum possible sum of node values along any path starting from the root and ending at a leaf.
+
+**Small Example:**
+Consider this tree with node values:
+```
+       10 (Node 1 - Root)
+      /  \
+     2    -5 (Node 2, Node 3)
+    / \
+   4   1  (Node 4, Node 5)
+```
+
+Paths from root to leaf:
+*   `10 -> 2 -> 4`: Sum = `10 + 2 + 4 = 16`
+*   `10 -> 2 -> 1`: Sum = `10 + 2 + 1 = 13`
+*   `10 -> -5`: Sum = `10 + (-5) = 5`
+
+The maximum path sum from root to a leaf is **16**.
+
+**DP Approach:**
+For any node `u`, the maximum path sum from `u` to a leaf in its subtree is `node_value[u]` plus the maximum path sum from one of its children to a leaf. If `u` is a leaf, the sum is just `node_value[u]`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+Let's represent our tree using an adjacency list and a separate vector for node values. We'll use a `dfs` function that computes and returns the max path sum from the current node down to a leaf in its subtree.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+// Adjacency list to represent the tree (undirected for now, root specified in DFS)
+std::vector<std::vector<int>> adj;
+// Store node values (using 1-based indexing for convenience)
+std::vector<int> node_values;
+
+// dp_dfs function:
+//   u: The current node we are visiting
+//   parent: The parent of 'u' (to avoid going back up the tree)
+//
+// Returns: The maximum path sum from node 'u' to any leaf within its subtree.
+int dp_dfs(int u, int parent) {
+    // If 'u' is a leaf node (it has no children other than its parent)
+    // For our specific problem, even if it's not a leaf, its own value is part of the sum.
+    // The max_child_path_sum handles the "leaf" case naturally if it has no children.
+
+    int max_child_path_sum = 0; // Stores the max path sum from one of its children
+
+    // Iterate through all neighbors of 'u'
+    for (int v : adj[u]) {
+        // Skip the parent to ensure we only traverse downwards
+        if (v == parent) {
+            continue;
+        }
+        // Recursively call for the child 'v' to get its max path sum to a leaf
+        int current_child_path_sum = dp_dfs(v, u);
+
+        // We want to pick the child that gives us the overall maximum sum.
+        // For a root-to-leaf path, we must extend through one child if available.
+        // If a child path yields a very small (e.g., negative) sum, we still take the best one.
+        max_child_path_sum = std::max(max_child_path_sum, current_child_path_sum);
+    }
+
+    // The maximum path sum starting at 'u' and ending at a leaf in its subtree
+    // is its own value plus the maximum path sum found among its children.
+    return node_values[u] + max_child_path_sum;
+}
+
+int main() {
+    // Example Tree:
+    //       1 (value 10) - Root
+    //      / \
+    //    2 (value 2)  3 (value -5)
+    //   / \
+    // 4 (value 4) 5 (value 1)
+    //
+    // Expected Max Path Sum from Root to Leaf: 16 (10 -> 2 -> 4)
+
+    int num_nodes = 5;
+    adj.resize(num_nodes + 1); // Using 1-based indexing for nodes 1 to 5
+    node_values.resize(num_nodes + 1);
+
+    // Assign node values (index 0 is unused)
+    node_values = {0, 10, 2, -5, 4, 1};
+
+    // Define edges (bidirectional for an undirected tree)
+    adj[1].push_back(2); adj[2].push_back(1);
+    adj[1].push_back(3); adj[3].push_back(1);
+    adj[2].push_back(4); adj[4].push_back(2);
+    adj[2].push_back(5); adj[5].push_back(2);
+
+    int root_node = 1; // Our root is node 1
+    // Call the DFS, passing 0 as a dummy parent for the root
+    int max_sum = dp_dfs(root_node, 0);
+
+    std::cout << "Maximum path sum from root to any leaf: " << max_sum << std::endl; // Output: 16
+
+    // --- Another example ---
+    // Linear tree: 1(5) -> 2(-1) -> 3(10)
+    // Paths: 5 -> -1 -> 10 = 14
+    // Expected: 14
+    num_nodes = 3;
+    adj.assign(num_nodes + 1, std::vector<int>()); // Clear previous tree and resize
+    node_values.assign(num_nodes + 1, 0);
+
+    node_values = {0, 5, -1, 10};
+    adj[1].push_back(2); adj[2].push_back(1);
+    adj[2].push_back(3); adj[3].push_back(2);
+
+    root_node = 1;
+    max_sum = dp_dfs(root_node, 0);
+    std::cout << "Maximum path sum for linear tree: " << max_sum << std::endl; // Output: 14
+
+    return 0;
+}
+```
+
+---
+
+Hope this makes "DP on Trees" a bit clearer! Keep practicing, and you'll get the hang of it quickly. Happy coding!
+
+---
