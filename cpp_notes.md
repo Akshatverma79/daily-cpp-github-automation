@@ -59320,3 +59320,104 @@ int main() {
 DP on Bitmasks is your friend when you need to track subsets of a small number of items. It turns seemingly exponential problems into ones that are solvable within reasonable time limits by cleverly using integer bits to represent complex states. Keep `N` small, and you're golden!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-06-30 16:11:19
+
+Hey there, future coding wizard! 👋 Let's dive into the fascinating world of **Bit Manipulation**.
+
+---
+
+### DSA Notes: Bit Manipulation Basics
+
+**What's the concept?**
+
+Imagine numbers aren't just values like `5` or `10`, but secret codes made of tiny `0`s and `1`s (binary digits). Bit manipulation is all about directly working with these individual `0`s and `1`s within a number. It's like looking under the hood of how your computer stores and processes integers!
+
+*   `5` in binary is `...00101`
+*   `10` in binary is `...01010`
+
+We use special "bitwise" operators to peek at, change, or combine these bits.
+
+**Why does it matter?**
+
+1.  **Speed & Efficiency:** Bitwise operations are super fast! They're native to the CPU, making them quicker than regular arithmetic for certain tasks.
+2.  **Memory Saving:** You can store multiple true/false (boolean) flags in a single integer, saving space.
+3.  **Clever Solutions:** Many elegant and optimized algorithms for problems often involve bit manipulation (e.g., in competitive programming!).
+4.  **Hardware Interaction:** Closer to how hardware works, useful in low-level programming.
+
+**Your main tools (Bitwise Operators):**
+
+*   `&` (AND)
+*   `|` (OR)
+*   `^` (XOR)
+*   `~` (NOT)
+*   `<<` (Left Shift)
+*   `>>` (Right Shift)
+
+---
+
+### Example Problem: Is a Number Even or Odd?
+
+**Problem:** Given an integer, determine if it's even or odd using bit manipulation.
+
+**Why this is cool for bits:**
+
+Normally, you'd use the modulo operator (`% 2 == 0`). But with bits, it's even simpler!
+
+*   An **even** number always has its *last bit* (Least Significant Bit - LSB) as `0`.
+*   An **odd** number always has its *last bit* (LSB) as `1`.
+
+So, we just need to check that very last bit! How? By using the `&` (AND) operator with `1`.
+
+*   `1` in binary is `...0001`.
+*   When you `AND` any number with `1`, all bits except the last one become `0`, and the last bit remains whatever it was in the original number.
+
+    *   If `number` is `...X Y Z 0` (even), then `number & 1` will be `...0 0 0 0` (which is `0`).
+    *   If `number` is `...X Y Z 1` (odd), then `number & 1` will be `...0 0 0 1` (which is `1`).
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to check if a number is even or odd using bit manipulation
+bool isEvenBitwise(int n) {
+    // If the last bit of n is 0, it's even.
+    // (n & 1) will be 0 for even numbers, and 1 for odd numbers.
+    return (n & 1) == 0; 
+}
+
+int main() {
+    int num1 = 4; // Binary: ...0100
+    int num2 = 7; // Binary: ...0111
+    int num3 = 0; // Binary: ...0000
+    int num4 = -3; // Binary (example with 2's complement): ...1101
+
+    std::cout << "Is " << num1 << " even? " << (isEvenBitwise(num1) ? "Yes" : "No") << std::endl;
+    std::cout << "Is " << num2 << " even? " << (isEvenBitwise(num2) ? "Yes" : "No") << std::endl;
+    std::cout << "Is " << num3 << " even? " << (isEvenBitwise(num3) ? "Yes" : "No") << std::endl;
+    std::cout << "Is " << num4 << " even? " << (isEvenBitwise(num4) ? "Yes" : "No") << std::endl; // Works for negative numbers too!
+
+    return 0;
+}
+```
+
+**Output:**
+
+```
+Is 4 even? Yes
+Is 7 even? No
+Is 0 even? Yes
+Is -3 even? No
+```
+
+---
+
+That's a quick peek into Bit Manipulation basics! It opens up a lot of doors for creative and efficient problem-solving. Keep exploring! ✨
+
+---
