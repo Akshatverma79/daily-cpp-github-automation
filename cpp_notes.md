@@ -59545,3 +59545,150 @@ int main() {
 And there you have it! GCD and Primes are fundamental tools in your DSA toolkit. Understanding them well will make a lot of other problems feel much more approachable. Keep practicing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-07-01 16:12:43
+
+Hey there, future game master! 👋 Let's dive into the fascinating world of Game Theory in DSA!
+
+---
+
+### What is Game Theory in DSA?
+
+Imagine a game where two players take turns, making optimal moves to win. Game Theory in DSA is all about analyzing such games to predict outcomes or determine if the first player (or any player) has a winning strategy.
+
+**The core idea:** You classify game states as either **Winning (W)** or **Losing (L)** for the player whose turn it is.
+*   A state is **W** if you can make *at least one* move to a state that is **L** for the *next* player.
+*   A state is **L** if *all* possible moves lead to states that are **W** for the *next* player.
+
+Players are assumed to play perfectly (optimally) to win.
+
+---
+
+### Why Does It Matter?
+
+1.  **Competitive Programming Power-Up:** Many problems (especially "Nim-like" games or simple stone-removal games) are directly solvable using game theory principles.
+2.  **Strategic Thinking:** It sharpens your ability to break down complex problems into smaller states and analyze consequences of actions.
+3.  **AI & Decision Making:** It's fundamental to building AI that can play games (like chess or Go) and for understanding optimal strategies in various scenarios.
+
+---
+
+### Let's Play a Game! (Example Problem)
+
+**Problem: The Stone Game**
+
+You have a pile of `N` stones. Two players, Alice and Bob, take turns. On each turn, a player can remove either **1, 2, or 3 stones**. The player who takes the last stone wins. Alice goes first. Can Alice win?
+
+**Example:**
+*   If `N = 1`: Alice takes 1, wins. (Alice W)
+*   If `N = 2`: Alice takes 2, wins. (Alice W)
+*   If `N = 3`: Alice takes 3, wins. (Alice W)
+*   If `N = 4`:
+    *   Alice can take 1 (leaves 3 stones). Bob takes 3, wins.
+    *   Alice can take 2 (leaves 2 stones). Bob takes 2, wins.
+    *   Alice can take 3 (leaves 1 stone). Bob takes 1, wins.
+    *   No matter what Alice does, Bob wins. (Alice L)
+
+---
+
+### Simple C++ Implementation (Dynamic Programming Approach)
+
+We can use Dynamic Programming (DP) to solve this. Let `dp[i]` be `true` if the current player can win when there are `i` stones, and `false` otherwise.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::iota if needed, not directly for this problem
+
+// Function to determine if the first player can win with 'n' stones
+bool canFirstPlayerWin(int n) {
+    // dp[i] will be true if the current player can win with i stones
+    // and false otherwise.
+    std::vector<bool> dp(n + 1);
+
+    // Base cases:
+    // With 0 stones, the current player cannot make a move, so they lose.
+    dp[0] = false; 
+
+    // With 1, 2, or 3 stones, the current player can take all of them and win.
+    if (n >= 1) dp[1] = true;
+    if (n >= 2) dp[2] = true;
+    if (n >= 3) dp[3] = true;
+
+    // Fill the DP table for i > 3
+    for (int i = 4; i <= n; ++i) {
+        // A player wins from state 'i' if they can make a move
+        // to a state 'j' where the *next* player loses (dp[j] is false).
+        //
+        // If the player takes 1 stone, they move to state (i-1).
+        // If the player takes 2 stones, they move to state (i-2).
+        // If the player takes 3 stones, they move to state (i-3).
+        //
+        // So, dp[i] is true if:
+        // (Taking 1 stone leads to a losing state for the next player) OR
+        // (Taking 2 stones leads to a losing state for the next player) OR
+        // (Taking 3 stones leads to a losing state for the next player)
+        dp[i] = (!dp[i - 1]) || (!dp[i - 2]) || (!dp[i - 3]);
+    }
+
+    // Alice is the first player, so we return dp[n]
+    return dp[n];
+}
+
+int main() {
+    std::cout << "--- Stone Game Analyzer ---" << std::endl;
+
+    int num_stones;
+    std::cout << "Enter the initial number of stones (N): ";
+    std::cin >> num_stones;
+
+    if (num_stones < 0) {
+        std::cout << "Number of stones cannot be negative." << std::endl;
+        return 1;
+    }
+
+    if (canFirstPlayerWin(num_stones)) {
+        std::cout << "Alice (first player) CAN win with " << num_stones << " stones." << std::endl;
+    } else {
+        std::cout << "Alice (first player) CANNOT win with " << num_stones << " stones. Bob will win if playing optimally." << std::endl;
+    }
+
+    // Let's test a few values quickly
+    std::cout << "\nQuick tests:" << std::endl;
+    for (int i = 0; i <= 10; ++i) {
+        std::cout << "N = " << i << ": Alice " << (canFirstPlayerWin(i) ? "WINS" : "LOSES") << std::endl;
+    }
+
+    return 0;
+}
+```
+
+**Output for N=10:**
+```
+--- Stone Game Analyzer ---
+Enter the initial number of stones (N): 10
+Alice (first player) CAN win with 10 stones.
+
+Quick tests:
+N = 0: Alice LOSES
+N = 1: Alice WINS
+N = 2: Alice WINS
+N = 3: Alice WINS
+N = 4: Alice LOSES
+N = 5: Alice WINS
+N = 6: Alice WINS
+N = 7: Alice WINS
+N = 8: Alice LOSES
+N = 9: Alice WINS
+N = 10: Alice WINS
+```
+
+---
+
+**Key Takeaway:** Notice the pattern in the quick tests: W, W, W, L, W, W, W, L... This game has a period of 4! `dp[i]` is true if `i % 4 != 0`. Many simple impartial games exhibit such patterns, but the DP approach is a general way to discover them or solve more complex variants.
+
+Happy gaming and coding! ✨
+
+---
