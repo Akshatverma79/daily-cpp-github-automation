@@ -60355,3 +60355,151 @@ int main() {
 And there you have it! The very basics of Linked Lists. This concept is a cornerstone for understanding many other complex data structures and algorithms. Keep exploring!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-07-05 15:03:09
+
+Hey there, future DSA pro! Let's talk about **Doubly Linked Lists**. Think of them as a super flexible way to organize your data.
+
+---
+
+### Doubly Linked List: Your Two-Way Street for Data! 🛣️
+
+#### 1. What's the Big Idea? (The Concept)
+
+Imagine a chain of paper clips, but each clip not only knows who's *next* in line, but also who was *before* it! That's essentially a Doubly Linked List.
+
+*   Each piece of data (called a **node**) stores three things:
+    *   The **actual data** itself.
+    *   A pointer to the **next node** in the sequence (`next`).
+    *   A pointer to the **previous node** in the sequence (`prev`).
+
+This means you can go forward *and* backward through your data with ease! Pretty neat, huh?
+
+```
+[data|prev|next] <-> [data|prev|next] <-> [data|prev|next]
+   ^                                           ^
+   |                                           |
+  Head (start)                                Tail (end)
+```
+
+#### 2. Why Does It Matter? (Its Superpowers!)
+
+"Okay, but why would I need to go backwards?" Great question! Doubly Linked Lists are awesome because:
+
+*   **Two-Way Travel:** You can traverse the list in both directions, making certain operations much easier and faster than a Singly Linked List.
+*   **Easier Deletion:** If you want to remove a specific node, you don't need to hunt for the node *before* it; it already knows its previous friend! This simplifies many deletion scenarios.
+*   **Real-World Uses:** Think browser history (back/forward buttons!), undo/redo features in software, or even managing a music playlist where you can skip to the next or previous song.
+
+#### 3. Let's Solve a Little Problem!
+
+**Problem:** Add a new number to the end of our Doubly Linked List.
+
+This is a classic operation! We'll need to update the `next` pointer of the current last node and the `prev` pointer of our new node, plus update the list's `tail` to point to the new node.
+
+#### 4. Your First C++ Implementation!
+
+Here's how you can set up a basic Doubly Linked List in C++ and implement the "add to end" functionality. We'll also add methods to print the list both forwards and backwards to show off its two-way power!
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;
+    Node* next;
+    Node* prev;
+
+    // Constructor to make creating nodes easy
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// 2. Define the Doubly Linked List class
+class DoublyLinkedList {
+private:
+    Node* head; // Points to the first node
+    Node* tail; // Points to the last node
+
+public:
+    // Constructor: Initializes an empty list
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // Destructor: Cleans up all nodes to prevent memory leaks
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next; // Store next node before deleting current
+            delete current; // Free memory for the current node
+            current = nextNode; // Move to the next node
+        }
+        head = nullptr; // Ensure head is null after deletion
+        tail = nullptr; // Ensure tail is null after deletion
+        std::cout << "Doubly Linked List destroyed and memory freed.\n";
+    }
+
+    // Method to insert a new node at the end of the list
+    void insertAtEnd(int val) {
+        Node* newNode = new Node(val); // Create the new node
+
+        // Case 1: If the list is empty
+        if (head == nullptr) {
+            head = newNode; // New node is both the head
+            tail = newNode; // and the tail
+        } 
+        // Case 2: If the list is not empty
+        else {
+            tail->next = newNode;  // Current tail points forward to the new node
+            newNode->prev = tail;  // New node points backward to the old tail
+            tail = newNode;        // The new node becomes the new tail
+        }
+        std::cout << "Inserted " << val << " at the end.\n";
+    }
+
+    // Method to print the list forwards (from head to tail)
+    void printForward() const {
+        std::cout << "List (Forward): ";
+        Node* current = head; // Start from the beginning
+        while (current != nullptr) {
+            std::cout << current->data << " -> ";
+            current = current->next; // Move to the next node
+        }
+        std::cout << "nullptr\n"; // Mark the end of the list
+    }
+
+    // Method to print the list backwards (from tail to head)
+    void printBackward() const {
+        std::cout << "List (Backward): ";
+        Node* current = tail; // Start from the end
+        while (current != nullptr) {
+            std::cout << current->data << " -> ";
+            current = current->prev; // Move to the previous node using 'prev'
+        }
+        std::cout << "nullptr\n"; // Mark the beginning of the list
+    }
+};
+
+// Let's test it out in our main function!
+int main() {
+    DoublyLinkedList myList; // Create an empty Doubly Linked List
+
+    myList.insertAtEnd(10); // Add 10
+    myList.insertAtEnd(20); // Add 20
+    myList.insertAtEnd(30); // Add 30
+
+    myList.printForward();  // Output: List (Forward): 10 -> 20 -> 30 -> nullptr
+    myList.printBackward(); // Output: List (Backward): 30 -> 20 -> 10 -> nullptr
+
+    // The destructor will automatically be called when myList goes out of scope,
+    // freeing up all the allocated memory.
+
+    return 0;
+}
+```
+
+---
+
+There you have it! A Doubly Linked List lets you navigate your data with ultimate flexibility. Keep practicing, and you'll master it in no time! Happy coding! ✨
+
+---
