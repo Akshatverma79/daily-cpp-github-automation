@@ -60238,3 +60238,120 @@ Always, always, **ALWAYS** think about your **base case** first when designing a
 Happy coding, and keep exploring!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-07-05 08:52:55
+
+Hey there, future coding rockstar! Let's dive into the fascinating world of Linked Lists.
+
+---
+
+## 🔗 Linked List Basics (C++)
+
+A Linked List is a super cool and fundamental data structure that's like a chain of pearls, where each pearl knows who its neighbor is!
+
+### 🎯 What is a Linked List?
+
+Imagine you have a bunch of sticky notes, each with a piece of information, and each note also has an arrow pointing to the *next* sticky note. That's essentially a Linked List!
+
+*   It's a **linear** data structure, meaning elements are arranged in a sequence.
+*   Unlike arrays, elements are **not stored in contiguous memory locations**. Instead, they're scattered around memory.
+*   It's made up of individual blocks called **Nodes**.
+*   Each **Node** typically contains:
+    1.  **Data**: The actual value (like an `int`, `string`, etc.).
+    2.  **Pointer (or Link)**: A reference to the next node in the sequence.
+*   The first node is called the **Head**.
+*   The last node's pointer points to `nullptr` (or `NULL` in older C++), signifying the end of the list.
+
+### 💡 Why Does It Matter?
+
+Linked Lists are incredibly useful because of their flexibility:
+
+1.  **Dynamic Size**: Unlike arrays which have a fixed size, linked lists can grow or shrink as needed during runtime. No need to pre-allocate a huge block of memory!
+2.  **Efficient Insertions/Deletions**: Adding or removing elements is generally very fast (O(1) if you know the position) because you only need to change a few pointers, not shift a whole bunch of elements (which arrays require, taking O(N) time).
+3.  **Memory Efficiency**: You only allocate memory for nodes as they're needed.
+
+### ✍️ Example Problem: Creating and Printing a Simple Linked List
+
+Let's say we want to create a linked list `10 -> 20 -> 30 -> nullptr` and then print all its elements.
+
+### 🚀 Simple C++ Implementation
+
+First, we need to define what a `Node` looks like:
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;     // The data stored in this node
+    Node* next;   // Pointer to the next node in the list
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// 2. Define a simple LinkedList class (optional, but good practice)
+class LinkedList {
+private:
+    Node* head; // Pointer to the first node in the list
+
+public:
+    // Constructor to initialize an empty list
+    LinkedList() : head(nullptr) {}
+
+    // Method to add a new node to the beginning of the list
+    void insertAtBeginning(int val) {
+        Node* newNode = new Node(val); // Create a new node
+        newNode->next = head;         // New node points to the current head
+        head = newNode;               // Update head to be the new node
+        std::cout << "Inserted " << val << " at the beginning." << std::endl;
+    }
+
+    // Method to print all elements in the list
+    void printList() {
+        Node* current = head; // Start from the head
+        std::cout << "List: ";
+        while (current != nullptr) { // Traverse until we reach the end
+            std::cout << current->data << " -> ";
+            current = current->next; // Move to the next node
+        }
+        std::cout << "nullptr" << std::endl; // Indicate the end of the list
+    }
+
+    // IMPORTANT: In real applications, you'd also need a destructor
+    // to free the memory allocated for nodes to prevent memory leaks!
+    // For simplicity, we omit it here in this basic example.
+    ~LinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current; // Free the memory for the current node
+            current = nextNode;
+        }
+        head = nullptr; // Ensure head is null after deletion
+    }
+};
+
+int main() {
+    LinkedList myList; // Create an empty linked list
+
+    // Insert elements
+    myList.insertAtBeginning(30); // List: 30 -> nullptr
+    myList.insertAtBeginning(20); // List: 20 -> 30 -> nullptr
+    myList.insertAtBeginning(10); // List: 10 -> 20 -> 30 -> nullptr
+
+    // Print the list
+    myList.printList(); // Expected Output: List: 10 -> 20 -> 30 -> nullptr
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! The very basics of Linked Lists. This concept is a cornerstone for understanding many other complex data structures and algorithms. Keep exploring!
+
+---
