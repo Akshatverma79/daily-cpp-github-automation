@@ -60503,3 +60503,236 @@ int main() {
 There you have it! A Doubly Linked List lets you navigate your data with ultimate flexibility. Keep practicing, and you'll master it in no time! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Stacks Implementation  
+🕒 2026-07-06 10:22:31
+
+Hey there, future DSA pro! 👋 Let's dive into Stacks – a super useful and fundamental data structure.
+
+---
+
+## Stacks: Your Go-To for Orderly Data!
+
+### 1. What is a Stack? (Concept)
+
+Imagine a stack of plates 🍽️. When you add a new plate, you put it on top. When you want a plate, you take the top one off. You can't just grab one from the middle!
+
+That's exactly how a Stack works in computer science: it follows the **LIFO** principle:
+*   **L**ast **I**n, **F**irst **O**ut.
+
+The last item added to the stack is always the first one to be removed.
+
+**Key Operations:**
+*   **`push(item)`**: Adds an item to the top of the stack.
+*   **`pop()`**: Removes and returns the item from the top of the stack.
+*   **`peek()`** (or `top()`): Looks at the item on top of the stack without removing it.
+*   **`isEmpty()`**: Checks if the stack has any items.
+*   **`size()`**: Returns the number of items in the stack.
+
+### 2. Why Does It Matter? (Importance)
+
+Stacks are incredibly powerful because they naturally model scenarios where order of operations is crucial.
+
+**Real-world examples where stacks shine:**
+*   **Browser History:** When you click the "back" button, it takes you to the *last* page you visited. (LIFO!)
+*   **Undo/Redo Functionality:** The last action you performed is the first one to be undone.
+*   **Function Call Stack:** When a program calls functions, they're pushed onto a stack. When a function finishes, it's popped off. This manages execution flow!
+*   **Expression Evaluation:** Used to convert infix expressions to postfix/prefix and then evaluate them.
+*   **Parenthesis Matching:** Ensuring `([]{})` is valid but `([)]` is not.
+
+It's simple, intuitive, and efficient for these specific use cases!
+
+### 3. Example Problem: Browser Back Button Simulation
+
+Let's simulate a very basic browser history where you can visit pages and go back.
+
+**Problem:** Simulate a user visiting pages: `Home` -> `Products` -> `Details`. Then, the user clicks the "back" button twice. What page are they on?
+
+**Solution Walkthrough:**
+
+1.  **Visit `Home`**: `push("Home")`
+    *   Stack: `["Home"]`
+2.  **Visit `Products`**: `push("Products")`
+    *   Stack: `["Home", "Products"]`
+3.  **Visit `Details`**: `push("Details")`
+    *   Stack: `["Home", "Products", "Details"]`
+    *   Current Page: `Details` (top of stack)
+4.  **Click Back (1st time)**: `pop()`
+    *   `"Details"` is removed.
+    *   Stack: `["Home", "Products"]`
+    *   Current Page: `Products` (new top of stack)
+5.  **Click Back (2nd time)**: `pop()`
+    *   `"Products"` is removed.
+    *   Stack: `["Home"]`
+    *   Current Page: `Home` (new top of stack)
+
+**Result:** After clicking back twice, the user is on the `Home` page.
+
+### 4. Simple C++ Implementation
+
+C++ offers a built-in `std::stack` (part of the Standard Template Library, STL) which is super convenient. Under the hood, it can use other containers like `std::deque` (default) or `std::vector`.
+
+But to understand *how* it works, let's also peek at a simple array-based implementation from scratch!
+
+#### A. Using `std::stack` (The Easy Way)
+
+```cpp
+#include <iostream>
+#include <stack> // Don't forget this header!
+#include <string>
+
+void simulateBrowserHistory() {
+    std::stack<std::string> history; // A stack to store visited pages
+
+    std::cout << "--- Browser Simulation ---" << std::endl;
+
+    // Visit pages (push onto stack)
+    std::cout << "Visiting: Home Page" << std::endl;
+    history.push("Home Page");
+
+    std::cout << "Visiting: Products Listing" << std::endl;
+    history.push("Products Listing");
+
+    std::cout << "Visiting: Item Details" << std::endl;
+    history.push("Item Details");
+
+    std::cout << "\nCurrently on: " << history.top() << std::endl; // Item Details
+
+    // Click back button (pop from stack)
+    std::cout << "\nClicking 'Back' button..." << std::endl;
+    if (!history.empty()) {
+        history.pop(); // Go back from Item Details
+        std::cout << "Now on: " << history.top() << std::endl; // Products Listing
+    }
+
+    std::cout << "Clicking 'Back' button again..." << std::endl;
+    if (!history.empty()) {
+        history.pop(); // Go back from Products Listing
+        std::cout << "Now on: " << history.top() << std::endl; // Home Page
+    }
+
+    std::cout << "\nStack size: " << history.size() << std::endl; // Should be 1 (Home Page)
+    if (history.empty()) {
+        std::cout << "History is empty." << std::endl;
+    } else {
+        std::cout << "Last page in history: " << history.top() << std::endl;
+    }
+}
+
+int main() {
+    simulateBrowserHistory();
+    return 0;
+}
+```
+
+#### B. Custom Array-Based Stack (How it Works Under the Hood)
+
+This shows the fundamental logic of `push`, `pop`, `peek`, and `isEmpty` using a simple array.
+
+```cpp
+#include <iostream>
+#include <stdexcept> // For std::overflow_error, std::underflow_error
+
+const int MAX_SIZE = 5; // Define a maximum capacity for our stack
+
+template <typename T> // We can make our stack work with any data type!
+class MyStack {
+private:
+    T arr[MAX_SIZE]; // Our array to store stack elements
+    int topIndex;    // Index of the top element. -1 means empty.
+
+public:
+    MyStack() : topIndex(-1) {} // Constructor: initialize topIndex to -1
+
+    // Add an element to the top
+    void push(T val) {
+        if (topIndex >= MAX_SIZE - 1) {
+            throw std::overflow_error("Stack Overflow! Cannot push onto a full stack.");
+        }
+        arr[++topIndex] = val; // Increment topIndex, then assign value
+        std::cout << "Pushed: " << val << std::endl;
+    }
+
+    // Remove and return the top element
+    T pop() {
+        if (isEmpty()) {
+            throw std::underflow_error("Stack Underflow! Cannot pop from an empty stack.");
+        }
+        T poppedVal = arr[topIndex--]; // Get value, then decrement topIndex
+        return poppedVal;
+    }
+
+    // Return the top element without removing it
+    T peek() const {
+        if (isEmpty()) {
+            throw std::underflow_error("Stack is Empty! No top element.");
+        }
+        return arr[topIndex];
+    }
+
+    // Check if the stack is empty
+    bool isEmpty() const {
+        return topIndex == -1;
+    }
+
+    // Get the number of elements in the stack
+    int size() const {
+        return topIndex + 1;
+    }
+
+    // Check if the stack is full
+    bool isFull() const {
+        return topIndex == MAX_SIZE - 1;
+    }
+};
+
+int main() {
+    MyStack<int> s; // Create a stack of integers
+
+    std::cout << "Is stack empty? " << (s.isEmpty() ? "Yes" : "No") << std::endl;
+
+    s.push(10);
+    s.push(20);
+    s.push(30);
+
+    std::cout << "Top element is: " << s.peek() << std::endl; // Should be 30
+    std::cout << "Stack size: " << s.size() << std::endl; // Should be 3
+
+    std::cout << "Popped: " << s.pop() << std::endl; // Should pop 30
+    std::cout << "New top element is: " << s.peek() << std::endl; // Should be 20
+
+    s.push(40);
+    s.push(50);
+    s.push(60); // This will cause an overflow since MAX_SIZE is 5
+
+    try {
+        s.push(70); // Try to push one more
+    } catch (const std::overflow_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    
+    std::cout << "Final stack size: " << s.size() << std::endl;
+    
+    // Pop all elements
+    while(!s.isEmpty()){
+        std::cout << "Popped: " << s.pop() << std::endl;
+    }
+
+    try {
+        s.pop(); // Try to pop from an empty stack
+    } catch (const std::underflow_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
+
+```
+
+---
+
+And there you have it! Stacks are a fantastic entry point into data structures, offering a clear logic and wide range of applications. Keep practicing, and you'll master them in no time! 😊
+
+---
