@@ -60736,3 +60736,124 @@ int main() {
 And there you have it! Stacks are a fantastic entry point into data structures, offering a clear logic and wide range of applications. Keep practicing, and you'll master them in no time! 😊
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-07-06 16:45:40
+
+Okay, let's dive into Queues! Think of it like a polite line where everyone waits their turn.
+
+---
+
+## DSA Learning Note: Queues Implementation (C++)
+
+### 📦 What is a Queue?
+
+Imagine a line of people waiting for coffee. The first person in line is the first one to get their coffee, and new people join at the very end of the line.
+
+That's exactly how a **Queue** works in computer science! It's a collection of items that follows the **F**irst **I**n, **F**irst **O**ut (**FIFO**) principle.
+
+*   **Enqueue (Push):** Adding an item to the **back (rear)** of the queue.
+*   **Dequeue (Pop):** Removing an item from the **front** of the queue.
+*   **Front (Peek):** Looking at the item at the front without removing it.
+*   **IsEmpty:** Checks if the queue has any items.
+*   **Size:** Returns the number of items in the queue.
+
+### ✨ Why Does it Matter?
+
+Queues are super useful for managing tasks or data that need to be processed strictly in the order they arrived.
+
+*   **Real-world:**
+    *   **Printer Queues:** Documents are printed in the order they were sent.
+    *   **Customer Service Lines:** Calls are answered in the sequence they were received.
+    *   **Operating Systems:** Scheduling tasks to be executed.
+*   **Algorithms:**
+    *   **Breadth-First Search (BFS):** Exploring a graph or tree level by level.
+    *   **Caching:** Implementing policies like LRU (Least Recently Used) often involves queues.
+
+### 📝 Example Problem: Processing Customer Orders
+
+You have a list of customer orders and need to process them strictly in the order they were received.
+
+**Orders:** `[Order A, Order B, Order C]`
+
+**Goal:** Process `Order A`, then `Order B`, then `Order C`.
+
+### 🚀 C++ Implementation using `std::queue`
+
+C++ Standard Template Library (STL) provides a `std::queue` container adapter, which makes using queues incredibly easy. It's usually implemented using `std::deque` (double-ended queue) under the hood.
+
+```cpp
+#include <iostream> // For input/output
+#include <queue>    // For std::queue
+#include <string>   // For std::string
+
+int main() {
+    // 1. Create a queue of strings to hold customer orders
+    std::queue<std::string> customerOrders;
+
+    std::cout << "--- Initializing Customer Orders Queue ---" << std::endl;
+
+    // 2. Enqueue (add) orders to the back of the queue
+    customerOrders.push("Order A - Laptop");
+    std::cout << "Added: Order A - Laptop" << std::endl;
+
+    customerOrders.push("Order B - Monitor");
+    std::cout << "Added: Order B - Monitor" << std::endl;
+
+    customerOrders.push("Order C - Keyboard");
+    std::cout << "Added: Order C - Keyboard" << std::endl;
+
+    std::cout << "\nQueue size: " << customerOrders.size() << std::endl;
+    std::cout << "Is queue empty? " << (customerOrders.empty() ? "Yes" : "No") << std::endl;
+
+    std::cout << "\n--- Processing Orders ---" << std::endl;
+
+    // 3. Process orders while the queue is not empty
+    while (!customerOrders.empty()) {
+        // Look at the order at the front (peek)
+        std::string currentOrder = customerOrders.front();
+        std::cout << "Processing: " << currentOrder << std::endl;
+
+        // Remove the order from the front (dequeue)
+        customerOrders.pop();
+        
+        std::cout << "Remaining orders in queue: " << customerOrders.size() << std::endl;
+    }
+
+    std::cout << "\n--- All Orders Processed ---" << std::endl;
+    std::cout << "Is queue empty? " << (customerOrders.empty() ? "Yes" : "No") << std::endl;
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+
+```
+--- Initializing Customer Orders Queue ---
+Added: Order A - Laptop
+Added: Order B - Monitor
+Added: Order C - Keyboard
+
+Queue size: 3
+Is queue empty? No
+
+--- Processing Orders ---
+Processing: Order A - Laptop
+Remaining orders in queue: 2
+Processing: Order B - Monitor
+Remaining orders in queue: 1
+Processing: Order C - Keyboard
+Remaining orders in queue: 0
+
+--- All Orders Processed ---
+Is queue empty? Yes
+```
+
+---
+
+Simple, right? `std::queue` makes it super easy to use this fundamental data structure. Happy coding!
+
+---
