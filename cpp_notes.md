@@ -62134,3 +62134,127 @@ int main() {
 That's your friendly intro to Knapsack Problems! Keep packing smart and coding efficiently! Happy learning! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Greedy Algorithms  
+🕒 2026-07-10 16:08:55
+
+Hey there, future coder! 👋 Let's dive into Greedy Algorithms – a super useful and often intuitive approach to problem-solving.
+
+---
+
+### 🤩 Greedy Algorithms: A Quick Dive
+
+#### What's the Concept Mean?
+
+Imagine you're facing a series of choices, and you want to reach the best possible outcome. A **Greedy Algorithm** is like someone who says, "I'll just pick the best option *right now*, at this exact moment, and hope it leads me to the overall best solution."
+
+*   **Local Optimal Choice:** At each step, it makes the decision that seems most beneficial *at that particular instant*, without worrying about future consequences or looking too far ahead.
+*   **Hope for Global Optimal:** The big idea is that a sequence of these locally optimal choices will ultimately lead to a globally optimal (best overall) solution.
+*   **Short-sighted but hopeful!**
+
+**Think of it like this:** You're trying to pack the most important items in a backpack. A greedy approach might be to always pick the item that gives you the *most value per unit of weight* until your backpack is full.
+
+#### Why It Matters?
+
+1.  **Efficiency:** When a greedy approach works, it's usually super fast! Often much more efficient (e.g., O(N log N) or O(N)) than other techniques like Dynamic Programming or brute force, because it doesn't explore many possibilities.
+2.  **Simplicity:** Greedy solutions are often easier to understand and implement compared to more complex algorithms.
+3.  **Powerful Tool:** Many real-world problems can be solved optimally using greedy strategies (e.g., coin change for standard denominations, activity selection, Huffman coding, Dijkstra's algorithm, Prim's/Kruskal's for MST).
+4.  **Foundation:** It's a fundamental algorithmic paradigm and a great contrast to Dynamic Programming, helping you understand when to use which.
+
+---
+
+### 🛍️ Example Problem: Toy Shopping
+
+Let's say you have a fixed budget and a list of toys with different prices. You want to buy **as many toys as possible**.
+
+**Problem:** Given a `budget` and a `vector` of `prices`, find the maximum number of toys you can buy.
+
+**Greedy Insight:**
+To buy the *maximum number* of toys, what's the smartest choice at each step?
+*   Always buy the **cheapest available toy** first!
+*   Why? Because buying a cheap toy leaves you with more budget for other toys, maximizing your chances of buying more.
+
+**Example Walkthrough:**
+
+*   **Budget:** `10`
+*   **Toy Prices:** `{1, 12, 5, 2, 7}`
+
+1.  **Sort the prices (greedy first step!):** `{1, 2, 5, 7, 12}`
+2.  **Buy toy 1 (price 1):**
+    *   Budget: `10 - 1 = 9`
+    *   Toys bought: `1`
+3.  **Buy toy 2 (price 2):**
+    *   Budget: `9 - 2 = 7`
+    *   Toys bought: `2`
+4.  **Buy toy 3 (price 5):**
+    *   Budget: `7 - 5 = 2`
+    *   Toys bought: `3`
+5.  **Try to buy toy 4 (price 7):**
+    *   Budget `2` is less than `7`. Cannot afford.
+    *   Since prices are sorted, we can't afford any subsequent toys either. Stop.
+
+**Result:** You can buy `3` toys.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>   // For input/output (like std::cout)
+#include <vector>     // For std::vector
+#include <algorithm>  // For std::sort
+
+// Function to find the maximum number of toys you can buy
+int maxToys(std::vector<int>& prices, int budget) {
+    // Step 1: The Greedy move - sort the prices in ascending order.
+    // This ensures we always consider the cheapest toy first.
+    std::sort(prices.begin(), prices.end());
+
+    int toysBought = 0; // Counter for the toys we've bought
+
+    // Step 2: Iterate through the sorted prices and buy as many as possible
+    for (int price : prices) {
+        if (budget >= price) { // Can we afford this toy?
+            budget -= price;   // Yes! Subtract its cost from our budget
+            toysBought++;      // Increment the count of toys bought
+        } else {
+            // No, we can't afford this toy.
+            // Since the prices are sorted, we won't be able to afford
+            // any subsequent (more expensive) toys either. So, we stop.
+            break;
+        }
+    }
+
+    return toysBought; // Return the total count of toys bought
+}
+
+// --- Main function to test our greedy algorithm ---
+int main() {
+    std::vector<int> toyPrices = {1, 12, 5, 2, 7};
+    int availableBudget = 10;
+
+    std::cout << "Toy prices: {1, 12, 5, 2, 7}" << std::endl;
+    std::cout << "Available budget: " << availableBudget << std::endl;
+
+    int result = maxToys(toyPrices, availableBudget);
+    std::cout << "Maximum toys bought: " << result << std::endl; // Expected output: 3
+
+    std::cout << "\n--- Another Test Case ---" << std::endl;
+    std::vector<int> toyPrices2 = {30, 10, 20, 5, 15};
+    int availableBudget2 = 40;
+    std::cout << "Toy prices: {30, 10, 20, 5, 15}" << std::endl;
+    std::cout << "Available budget: " << availableBudget2 << std::endl;
+    result = maxToys(toyPrices2, availableBudget2);
+    std::cout << "Maximum toys bought: " << result << std::endl; // Expected output: 3 (5+10+15 = 30; remaining budget 10, can't buy 20)
+
+    return 0;
+}
+```
+
+---
+
+That's it for a quick introduction to Greedy Algorithms! Remember, the trick is identifying when those "local best choices" truly lead to the "global best solution." Happy coding! ✨
+
+---
