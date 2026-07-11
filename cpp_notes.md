@@ -62419,3 +62419,139 @@ int main() {
 Keep practicing, and you'll find Sliding Window everywhere! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Two Pointer Technique  
+🕒 2026-07-11 14:41:20
+
+Hey there, future coding wizard! 👋
+
+Let's dive into a super common and effective technique in DSA: the **Two Pointer Technique**. It's a real problem-solver!
+
+---
+
+## DSA Notes: Two Pointer Technique (C++) - Your Shortcut to Efficiency!
+
+### 🎯 What it means
+
+Imagine you have an array or a list, and you need to look at elements from different positions simultaneously. The Two Pointer technique does exactly that! You use two 'pointers' (which are just variables storing indices) to traverse the data structure.
+
+These pointers can:
+1.  **Move towards each other:** Starting from opposite ends (e.g., `left` at start, `right` at end).
+2.  **Move in the same direction:** Both starting at the beginning, sometimes at different speeds (e.g., `slow` and `fast` pointers).
+
+### 🚀 Why it matters
+
+It's super efficient! It often helps solve problems in a single pass (O(N) time complexity) where a brute-force approach might take O(N^2). Plus, it usually uses minimal extra space (O(1)), making your solutions lean and fast. Think of it as avoiding nested loops wherever possible!
+
+---
+
+### 💡 Example Problem: Sum of Two Numbers
+
+**Problem:** Given a **sorted** array of integers `nums` and a `target` integer, find two numbers in the array that add up to `target`. Return these two numbers. Assume there's exactly one solution.
+
+**Example:**
+`nums = [1, 3, 4, 5, 7, 10, 11]`
+`target = 9`
+
+**Explanation using Two Pointers:**
+
+1.  Initialize `left` pointer at the beginning (`index 0`) and `right` pointer at the end (`last index`).
+    *   `left` points to `1`
+    *   `right` points to `11`
+
+2.  Calculate the sum of numbers at `left` and `right`: `1 + 11 = 12`.
+
+3.  Compare `current_sum` with `target`:
+    *   If `current_sum == target`: You found your pair!
+    *   If `current_sum < target`: You need a larger sum. To get it, move `left` pointer one step to the right (hoping to find a larger number).
+    *   If `current_sum > target`: You need a smaller sum. To get it, move `right` pointer one step to the left (hoping to find a smaller number).
+
+**Let's trace the example `nums = [1, 3, 4, 5, 7, 10, 11]`, `target = 9`:**
+
+*   **Start:** `left = 0` (value 1), `right = 6` (value 11)
+*   **Iteration 1:**
+    *   `sum = nums[0] + nums[6] = 1 + 11 = 12`
+    *   `12 > 9`, so move `right` left: `right = 5` (value 10)
+*   **Iteration 2:**
+    *   `sum = nums[0] + nums[5] = 1 + 10 = 11`
+    *   `11 > 9`, so move `right` left: `right = 4` (value 7)
+*   **Iteration 3:**
+    *   `sum = nums[0] + nums[4] = 1 + 7 = 8`
+    *   `8 < 9`, so move `left` right: `left = 1` (value 3)
+*   **Iteration 4:**
+    *   `sum = nums[1] + nums[4] = 3 + 7 = 10`
+    *   `10 > 9`, so move `right` left: `right = 3` (value 5)
+*   **Iteration 5:**
+    *   `sum = nums[1] + nums[3] = 3 + 5 = 8`
+    *   `8 < 9`, so move `left` right: `left = 2` (value 4)
+*   **Iteration 6:**
+    *   `sum = nums[2] + nums[3] = 4 + 5 = 9`
+    *   `9 == 9`, **FOUND IT!** Return `[4, 5]`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector
+#include <utility>  // For std::pair
+
+// Function to find two numbers that sum up to the target in a sorted array
+std::pair<int, int> findSumPair(const std::vector<int>& nums, int target) {
+    int left = 0; // Pointer starting from the beginning
+    int right = nums.size() - 1; // Pointer starting from the end
+
+    // Loop until the pointers cross each other
+    while (left < right) {
+        int currentSum = nums[left] + nums[right];
+
+        if (currentSum == target) {
+            // Found the pair!
+            return {nums[left], nums[right]};
+        } else if (currentSum < target) {
+            // Sum is too small, need a larger number from the left side
+            left++; 
+        } else { // currentSum > target
+            // Sum is too large, need a smaller number from the right side
+            right--;
+        }
+    }
+
+    // If no pair is found (though problem statement assumes one exists)
+    return {-1, -1}; // Or throw an exception, depending on requirements
+}
+
+int main() {
+    std::vector<int> nums = {1, 3, 4, 5, 7, 10, 11};
+    int target = 9;
+
+    std::pair<int, int> result = findSumPair(nums, target);
+
+    if (result.first != -1) {
+        std::cout << "Numbers that sum to " << target << " are: " 
+                  << result.first << " and " << result.second << std::endl; // Output: 4 and 5
+    } else {
+        std::cout << "No pair found." << std::endl;
+    }
+
+    // Another test case
+    std::vector<int> nums2 = {2, 7, 11, 15};
+    int target2 = 9;
+    std::pair<int, int> result2 = findSumPair(nums2, target2);
+    if (result2.first != -1) {
+        std::cout << "Numbers that sum to " << target2 << " are: " 
+                  << result2.first << " and " << result2.second << std::endl; // Output: 2 and 7
+    }
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! The Two Pointer technique is a fundamental tool for solving many array-based problems efficiently. Keep practicing, and you'll master it in no time! Happy coding! ✨
+
+---
