@@ -63632,3 +63632,136 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-07-15 08:10:17
+
+Hey there, aspiring coder! Let's unravel the magic of Backtracking together. It's a super cool technique for exploring possibilities.
+
+---
+
+## Backtracking Basics ✨
+
+### What is Backtracking? (The Concept)
+
+Imagine you're in a maze. You go down one path. If it leads to a dead end, you **backtrack** (go back) to the last decision point and try another path.
+
+That's essentially Backtracking in programming! It's a **trial-and-error** algorithm for finding solutions to problems by **exploring all potential paths** (decision branches) incrementally.
+
+Here's the gist:
+1.  **Make a choice:** Take a step (e.g., add an element, place a queen).
+2.  **Explore:** See if that choice leads to a valid solution by recursively continuing.
+3.  **Undo (Backtrack!):** If the choice leads to a dead end or you've explored all possibilities from that choice, *undo* it and try a different one. This "undoing" is the crucial part that distinguishes it from simple recursion.
+
+### Why Does It Matter? (Its Importance)
+
+Backtracking is powerful for problems that involve:
+*   **Finding all possible solutions:** Like generating all permutations, combinations, or subsets.
+*   **Decision-making with constraints:** Where you need to build a solution step-by-step and discard invalid paths early.
+*   **Combinatorial problems:** Games like Sudoku solvers, N-Queens puzzle, finding paths in a grid.
+
+It helps you systematically explore a "search space" without getting lost and ensures you don't miss any potential solutions (or find one if it exists).
+
+### Example Problem: Generate All Subsets
+
+Let's say you have a set of numbers, `[1, 2, 3]`. We want to find *all* possible subsets (including the empty set).
+
+**Decision at each step:** For each number, we have two choices:
+1.  **Include** it in the current subset.
+2.  **Exclude** it from the current subset.
+
+We'll explore both choices, then backtrack.
+
+**Desired Output:**
+`[]`
+`[1]`
+`[2]`
+`[3]`
+`[1, 2]`
+`[1, 3]`
+`[2, 3]`
+`[1, 2, 3]`
+
+### Simple C++ Implementation: Generating Subsets
+
+This C++ code uses a recursive helper function to build subsets.
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For using std::vector
+
+// Recursive helper function for backtracking
+void generateSubsetsHelper(const std::vector<int>& nums, // Original set of numbers
+                           int index,                     // Current number we're considering
+                           std::vector<int>& currentSubset, // The subset we're currently building
+                           std::vector<std::vector<int>>& result) { // To store all found subsets
+
+    // 1. Base Case: If we've considered all numbers
+    if (index == nums.size()) {
+        result.push_back(currentSubset); // Add the complete subset to our results
+        return; // Stop this path
+    }
+
+    // 2. Recursive Step 1: INCLUDE the current number
+    currentSubset.push_back(nums[index]); // MAKE a choice: Add nums[index]
+    generateSubsetsHelper(nums, index + 1, currentSubset, result); // EXPLORE this path
+    currentSubset.pop_back();              // UNMAKE the choice (BACKTRACK): Remove nums[index]
+                                           // This allows us to try other paths without nums[index]
+                                           // and keeps currentSubset clean for future branches.
+
+    // 3. Recursive Step 2: EXCLUDE the current number
+    // (No need to modify currentSubset before this call, as we just backtracked the previous choice)
+    generateSubsetsHelper(nums, index + 1, currentSubset, result); // EXPLORE the path without nums[index]
+}
+
+// Wrapper function to start the process
+std::vector<std::vector<int>> generateSubsets(const std::vector<int>& nums) {
+    std::vector<std::vector<int>> result; // Stores all subsets
+    std::vector<int> currentSubset;      // Stores the subset being built in the current path
+
+    generateSubsetsHelper(nums, 0, currentSubset, result); // Start from index 0
+    return result;
+}
+
+// --- Main function to test ---
+int main() {
+    std::vector<int> nums = {1, 2, 3};
+    std::vector<std::vector<int>> allSubsets = generateSubsets(nums);
+
+    std::cout << "All subsets of [1, 2, 3]:" << std::endl;
+    for (const auto& subset : allSubsets) {
+        std::cout << "[";
+        for (size_t i = 0; i < subset.size(); ++i) {
+            std::cout << subset[i];
+            if (i < subset.size() - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+    }
+    return 0;
+}
+```
+
+**Output of the above code:**
+```
+All subsets of [1, 2, 3]:
+[]
+[3]
+[2]
+[2, 3]
+[1]
+[1, 3]
+[1, 2]
+[1, 2, 3]
+```
+
+Notice how `pop_back()` is used. That's the **backtracking** magic! It reverts the `currentSubset` to its state *before* the current decision was made, allowing the algorithm to explore other branches from that same decision point.
+
+---
+
+Keep practicing, and you'll master backtracking in no time! Happy coding!
+
+---
