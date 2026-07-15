@@ -63765,3 +63765,262 @@ Notice how `pop_back()` is used. That's the **backtracking** magic! It reverts t
 Keep practicing, and you'll master backtracking in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: N-Queens & Sudoku Solver  
+🕒 2026-07-15 15:13:20
+
+Hey there, aspiring DSA pro! 👋 Let's dive into two classic puzzles that are perfect examples of a powerful technique called **Backtracking**.
+
+---
+
+### **N-Queens & Sudoku Solver: The Backtracking Buddies**
+
+#### **What the Concept Means**
+
+Imagine you're solving a maze. You go down one path. If it's a dead end, you smartly go back to the last crossroads and try another path. That's essentially **Backtracking**!
+
+For problems like N-Queens and Sudoku, it means:
+1.  **Make a choice:** Try placing a queen or a number.
+2.  **Check validity:** Is this choice allowed by the rules *so far*?
+3.  **Explore:** If valid, recursively try to solve the *rest* of the problem with this choice made.
+4.  **Undo (Backtrack):** If the current choice leads to a dead end (no solution found down this path), undo it and try a different choice. You "backtrack" to the previous state.
+
+It's a methodical **trial-and-error** approach, often implemented recursively.
+
+#### **Why it Matters**
+
+Backtracking is super important because:
+*   **Problem-solving:** It's a fundamental technique for problems where you need to find *a* solution (or *all* solutions) by exploring different configurations under specific constraints.
+*   **Understanding Recursion:** It's a fantastic way to grasp how powerful recursive thinking can be, especially when dealing with states and undoing actions.
+*   **Foundation for AI/Gaming:** Many game AI algorithms, puzzle solvers, and even constraint satisfaction problems use backtracking at their core.
+
+---
+
+### **1. N-Queens Problem**
+
+#### **Concept & Example**
+
+**Goal:** Place N non-attacking queens on an N×N chessboard. "Non-attacking" means no two queens share the same row, column, or diagonal.
+
+**Example (N=4):**
+You're trying to place 4 queens on a 4x4 board.
+
+1.  Start at Row 0. Try placing a queen in Col 0. (Valid)
+    `Q . . .`
+    `. . . .`
+    `. . . .`
+    `. . . .`
+2.  Move to Row 1. Try placing a queen in Col 0 (attacks!), Col 1 (attacks!), Col 2. (Valid)
+    `Q . . .`
+    `. . Q .`
+    `. . . .`
+    `. . . .`
+3.  Move to Row 2. Try placing queens... oops! No valid spot in Row 2 if queens are at (0,0) and (1,2).
+4.  **BACKTRACK!** Go back to Row 1. Remove the queen at (1,2). Try Col 3. (Valid)
+    `Q . . .`
+    `. . . Q`
+    `. . . .`
+    `. . . .`
+5.  Now try Row 2 again with the new configuration... and so on, until you find a solution or exhaust all possibilities.
+
+#### **Simple C++ Implementation (for N=4, finding one solution)**
+
+```cpp
+#include <vector>
+#include <string>
+#include <iostream>
+
+class NQueensSolver {
+public:
+    std::vector<std::vector<std::string>> solveNQueens(int n) {
+        std::vector<std::vector<std::string>> solutions;
+        std::vector<std::string> board(n, std::string(n, '.')); // Initialize empty board
+
+        // Start placing queens from the first row (row 0)
+        solve(0, n, board, solutions); 
+        return solutions;
+    }
+
+private:
+    bool isValid(int row, int col, int n, const std::vector<std::string>& board) {
+        // Check this column upwards
+        for (int i = 0; i < row; ++i) {
+            if (board[i][col] == 'Q') {
+                return false;
+            }
+        }
+
+        // Check upper-left diagonal
+        for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; --i, --j) {
+            if (board[i][j] == 'Q') {
+                return false;
+            }
+        }
+
+        // Check upper-right diagonal
+        for (int i = row - 1, j = col + 1; i >= 0 && j < n; --i, --j) {
+            if (board[i][j] == 'Q') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Recursive function to place queens
+    void solve(int row, int n, std::vector<std::string>& board, 
+               std::vector<std::vector<std::string>>& solutions) {
+        
+        // Base case: If all queens are placed (we've filled all rows)
+        if (row == n) {
+            solutions.push_back(board); // Found a solution! Add it.
+            return; // We could return here if we only want one solution.
+        }
+
+        // Try placing a queen in each column of the current row
+        for (int col = 0; col < n; ++col) {
+            if (isValid(row, col, n, board)) {
+                board[row][col] = 'Q'; // Place queen
+                solve(row + 1, n, board, solutions); // Recurse for the next row
+                board[row][col] = '.'; // BACKTRACK: Remove queen (undo the choice)
+            }
+        }
+    }
+};
+
+/*
+// Example Usage
+int main() {
+    NQueensSolver solver;
+    int n = 4; // For N=4, there are 2 solutions
+
+    std::vector<std::vector<std::string>> solutions = solver.solveNQueens(n);
+
+    for (const auto& sol : solutions) {
+        for (const auto& row_str : sol) {
+            std::cout << row_str << std::endl;
+        }
+        std::cout << "------------------" << std::endl;
+    }
+    return 0;
+}
+*/
+```
+
+---
+
+### **2. Sudoku Solver**
+
+#### **Concept & Example**
+
+**Goal:** Fill a 9x9 grid so that each row, each column, and each of the nine 3x3 subgrids contains all of the digits from 1 to 9 exactly once.
+
+**Example (Partial Grid):**
+Imagine a Sudoku board with some numbers filled and some empty cells (represented by '.').
+
+`5 3 . . 7 . . . .`
+`6 . . 1 9 5 . . .`
+`. 9 8 . . . . 6 .`
+`...`
+
+1.  **Find an empty cell:** Let's say (0, 2) is the first empty cell.
+2.  **Try numbers:** Try placing '1' in (0, 2). Is it valid? (Check row 0, col 2, and the top-left 3x3 box for conflicts).
+3.  If '1' is valid, place it, and then recursively try to solve the *rest* of the board from the *next* empty cell.
+4.  If placing '1' leads to a dead end (no solution can be found later), **BACKTRACK!** Remove '1' from (0, 2) and try '2'.
+5.  Continue this until all cells are filled, or you've tried all possibilities and determined no solution exists.
+
+#### **Simple C++ Implementation**
+
+```cpp
+#include <vector>
+#include <string>
+#include <iostream>
+
+class SudokuSolver {
+public:
+    void solveSudoku(std::vector<std::vector<char>>& board) {
+        // The solve function will modify the board in place if a solution is found
+        solve(board);
+    }
+
+private:
+    bool isValid(int row, int col, char num, const std::vector<std::vector<char>>& board) {
+        // Check row
+        for (int j = 0; j < 9; ++j) {
+            if (board[row][j] == num) return false;
+        }
+
+        // Check column
+        for (int i = 0; i < 9; ++i) {
+            if (board[i][col] == num) return false;
+        }
+
+        // Check 3x3 box
+        int startRow = (row / 3) * 3;
+        int startCol = (col / 3) * 3;
+        for (int i = 0; i < 3; ++i) {
+            for (int j = 0; j < 3; ++j) {
+                if (board[startRow + i][startCol + j] == num) return false;
+            }
+        }
+        return true;
+    }
+
+    // Recursive function to solve Sudoku
+    bool solve(std::vector<std::vector<char>>& board) {
+        for (int r = 0; r < 9; ++r) {
+            for (int c = 0; c < 9; ++c) {
+                if (board[r][c] == '.') { // Found an empty cell
+                    for (char num = '1'; num <= '9'; ++num) { // Try numbers 1-9
+                        if (isValid(r, c, num, board)) {
+                            board[r][c] = num; // Place number
+                            if (solve(board)) { // Recurse: try to solve the rest
+                                return true; // If true, solution found down this path!
+                            }
+                            board[r][c] = '.'; // BACKTRACK: Remove number (undo choice)
+                        }
+                    }
+                    return false; // No number worked for this cell, current path is invalid
+                }
+            }
+        }
+        return true; // All cells filled, board is solved!
+    }
+};
+
+/*
+// Example Usage
+int main() {
+    SudokuSolver solver;
+    std::vector<std::vector<char>> board = {
+        {'5','3','.','.','7','.','.','.','.'},
+        {'6','.','.','1','9','5','.','.','.'},
+        {'.','9','8','.','.','.','.','6','.'},
+        {'8','.','.','.','6','.','.','.','3'},
+        {'4','.','.','8','.','3','.','.','1'},
+        {'7','.','.','.','2','.','.','.','6'},
+        {'.','6','.','.','.','.','2','8','.'},
+        {'.','.','.','4','1','9','.','.','5'},
+        {'.','.','.','.','8','.','.','7','9'}
+    };
+
+    solver.solveSudoku(board);
+
+    // Print the solved board
+    for (const auto& row : board) {
+        for (char c : row) {
+            std::cout << c << " ";
+        }
+        std::cout << std::endl;
+    }
+    return 0;
+}
+*/
+```
+
+---
+
+There you have it! N-Queens and Sudoku Solver are fantastic problems to practice your backtracking skills. Remember, the core idea is to *try*, *explore*, and if it doesn't work out, *undo* and *try again*. Happy coding! ✨
+
+---
