@@ -64348,3 +64348,132 @@ int main() {
 And that's your quick dive into Tries! They're powerful tools for string manipulation, so keep them in mind for problems involving prefixes, dictionaries, and auto-completion. Happy coding! 💻
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-07-17 08:09:45
+
+Hey there, aspiring DSA pro! Let's unravel the magic of Disjoint Set Union (DSU) – it's simpler than it sounds! ✨
+
+---
+
+### **Disjoint Set Union (DSU)**
+
+#### **1. What the concept means**
+
+Imagine you have a bunch of individual items (like people, nodes in a graph, or countries). DSU is a data structure that helps you keep track of which items are grouped together into "sets," with one crucial rule: **no item can belong to more than one set at a time** (that's the "disjoint" part!).
+
+It provides two main operations, usually super fast:
+
+*   **`find(i)`**: Tells you which "set" or "group" item `i` belongs to. It does this by finding a "representative" (often called the "root") for that set. If two items have the same representative, they're in the same set.
+*   **`union(i, j)`**: Merges the sets containing item `i` and item `j` into a single, larger set. If `i` and `j` were already in the same set, nothing changes.
+
+Think of it like managing social circles: everyone starts in their own group. When two people become friends, their entire social circles merge!
+
+#### **2. Why it matters (It's super useful!)**
+
+DSU is incredibly efficient for problems involving dynamic connectivity or grouping.
+
+*   **Tracking Connectivity:** Need to know if two points in a graph are connected? DSU can tell you instantly after merging paths.
+*   **Kruskal's Algorithm:** It's a cornerstone of Kruskal's algorithm for finding the Minimum Spanning Tree (MST) in a graph.
+*   **Network Analysis:** Grouping connected components in networks (like social networks or computer networks).
+*   **Image Processing:** Segmenting connected regions.
+
+Its efficiency comes from two key optimizations:
+1.  **Path Compression:** When `find(i)` is called, it flattens the tree by making every node on the path point directly to the root.
+2.  **Union by Rank/Size:** When merging two sets, always attach the smaller tree under the root of the larger tree (either by "rank" or "size") to keep the trees flat and shallow, preventing worst-case scenarios.
+
+#### **3. Example Problem: Social Network Connectivity**
+
+**Problem:** You have `N` people, initially all strangers. You receive `M` "friendship requests." Each request tells you that person `A` and person `B` are now friends. After all requests, you want to know: Are person `X` and person `Y` in the same friend group?
+
+**How DSU Helps:**
+1.  Initialize: Each person `i` is in their own set ` {i} `.
+2.  Friendship Request `(A, B)`: Call `union(A, B)`. This merges the friend groups of `A` and `B` (and everyone they're already connected to).
+3.  Query `(X, Y)`: Call `find(X)` and `find(Y)`. If `find(X) == find(Y)`, then `X` and `Y` are in the same friend group! Easy peasy.
+
+#### **4. Simple C++ Implementation**
+
+Here's a lean and clean C++ DSU implementation using path compression and union by size (sometimes called union by rank).
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota
+
+class DSU {
+private:
+    std::vector<int> parent;
+    std::vector<int> sz; // 'sz' for size of the component
+
+public:
+    // Constructor: Initializes DSU with 'n' elements
+    DSU(int n) {
+        parent.resize(n);
+        // Each element is initially its own parent
+        std::iota(parent.begin(), parent.end(), 0); 
+        
+        sz.assign(n, 1); // Each component initially has size 1
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i) {
+            return i; // 'i' is the root of its own set
+        }
+        // Path compression: make 'i' point directly to the root
+        return parent[i] = find(parent[i]); 
+    }
+
+    // Union operation with Union by Size
+    // Merges the sets containing 'i' and 'j'
+    // Returns true if a merge happened, false if they were already in the same set
+    bool unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+
+        if (root_i != root_j) {
+            // Union by Size: Attach smaller tree to the root of the larger tree
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i points to the larger tree
+            }
+            parent[root_j] = root_i; // Attach root_j's tree under root_i
+            sz[root_i] += sz[root_j]; // Update size of the new combined tree
+            return true; // Merge successful
+        }
+        return false; // Already in the same set
+    }
+};
+
+/*
+// --- How to use it ---
+#include <iostream>
+
+int main() {
+    int n_people = 5;
+    DSU social_network(n_people);
+
+    std::cout << "Initially:" << std::endl;
+    std::cout << "Are 0 and 1 in the same group? " << (social_network.find(0) == social_network.find(1) ? "Yes" : "No") << std::endl; // No
+
+    social_network.unite(0, 1); // 0 and 1 become friends
+    social_network.unite(3, 4); // 3 and 4 become friends
+
+    std::cout << "\nAfter (0,1) and (3,4) become friends:" << std::endl;
+    std::cout << "Are 0 and 1 in the same group? " << (social_network.find(0) == social_network.find(1) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are 0 and 2 in the same group? " << (social_network.find(0) == social_network.find(2) ? "Yes" : "No") << std::endl; // No
+    std::cout << "Are 3 and 4 in the same group? " << (social_network.find(3) == social_network.find(4) ? "Yes" : "No") << std::endl; // Yes
+
+    social_network.unite(1, 4); // 1 and 4 become friends (indirectly connects 0,1,3,4)
+
+    std::cout << "\nAfter (1,4) become friends:" << std::endl;
+    std::cout << "Are 0 and 3 in the same group? " << (social_network.find(0) == social_network.find(3) ? "Yes" : "No") << std::endl; // Yes (0-1, 1-4, 4-3 implies 0-3)
+    std::cout << "Are 0 and 2 in the same group? " << (social_network.find(0) == social_network.find(2) ? "Yes" : "No") << std::endl; // No
+
+    return 0;
+}
+*/
+```
+
+---
