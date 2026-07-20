@@ -65393,3 +65393,233 @@ int main() {
 And there you have it! The Floyd-Warshall algorithm in a nutshell. It's a powerful tool for finding all-pairs shortest paths, especially handy for smaller graphs or when negative weights are involved. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Minimum Spanning Tree (Prim's & Kruskal's)  
+🕒 2026-07-20 15:40:16
+
+Hey there, aspiring coder! 👋 Let's dive into one of the coolest graph algorithms: **Minimum Spanning Tree (MST)**.
+
+---
+
+## 🌳 Minimum Spanning Tree (MST): The Leanest Network
+
+### 💡 What is it?
+
+Imagine you have a bunch of cities (vertices) and potential roads between them (edges), each with a cost (weight). Your goal is to connect *all* cities with roads such that:
+
+1.  **All cities are connected:** You can travel from any city to any other city.
+2.  **No unnecessary detours (cycles):** It forms a tree structure (no loops).
+3.  **Minimum total cost:** The sum of the costs of the chosen roads is as small as possible.
+
+That "minimum cost, cycle-free, all-connected" network is your **Minimum Spanning Tree**!
+
+**In short:** For a **connected, undirected, weighted graph**, an MST is a subgraph that is a tree, connects all the vertices, and has the minimum possible total edge weight.
+
+### 🌟 Why does it matter?
+
+MST algorithms are super practical! Think about:
+
+*   **Network Design:** Laying down fiber optic cables, power lines, or water pipes to connect homes or cities with minimum material cost.
+*   **Cluster Analysis:** Grouping similar data points in machine learning.
+*   **Circuit Design:** Designing efficient electronic circuits.
+*   **Road Network Planning:** Finding the most economical way to connect towns.
+
+It's all about finding the most efficient and cost-effective way to connect things!
+
+---
+
+## 🛠️ How to find an MST? (Prim's vs. Kruskal's)
+
+There are two rockstar algorithms for finding an MST:
+
+1.  ### Prim's Algorithm (The "Growing Tree" Approach)
+    *   **Intuition:** It's like growing a tree from a single starting vertex. At each step, it adds the cheapest edge that connects a vertex *inside* the current tree to a vertex *outside* the current tree.
+    *   **Analogy:** You start building a road network from one city. Every time, you pick the cheapest new road that connects *any* city you've already connected to a *new* city you haven't connected yet.
+    *   **Data Structure:** Often uses a Min-Priority Queue to efficiently find the cheapest edge.
+
+2.  ### Kruskal's Algorithm (The "Connect the Cheapest" Approach)
+    *   **Intuition:** It looks at all edges in the graph, sorts them by weight (cheapest first), and then adds edges one by one *if* adding that edge doesn't create a cycle with the edges already picked.
+    *   **Analogy:** You list all possible road segments between cities, sorted by cost. You go down the list, adding a road if it connects two previously unconnected groups of cities. If it connects two cities *already* connected by previous roads, you skip it (because it would create a loop!).
+    *   **Data Structure:** Uses a Disjoint Set Union (DSU) data structure to efficiently detect cycles.
+
+---
+
+## 📝 Example Problem: Connecting Cities
+
+Let's find the MST for these cities and potential road costs:
+
+**Vertices:** A, B, C, D
+**Edges (City1, City2, Cost):**
+*   (A, B, 1)
+*   (A, C, 3)
+*   (B, C, 2)
+*   (B, D, 4)
+*   (C, D, 5)
+
+**Let's use Kruskal's Algorithm for this one:**
+
+1.  **Sort all edges by weight:**
+    *   (A, B, 1)
+    *   (B, C, 2)
+    *   (A, C, 3)
+    *   (B, D, 4)
+    *   (C, D, 5)
+
+2.  **Initialize Disjoint Sets:** Each city is in its own set: `{A}, {B}, {C}, {D}`
+
+3.  **Process edges:**
+    *   **Edge (A, B, 1):** A and B are in different sets. Add edge. Union A and B.
+        *   MST Edges: `{(A, B)}`
+        *   Total Weight: `1`
+        *   Sets: `{A, B}, {C}, {D}`
+    *   **Edge (B, C, 2):** B and C are in different sets. Add edge. Union B and C.
+        *   MST Edges: `{(A, B), (B, C)}`
+        *   Total Weight: `1 + 2 = 3`
+        *   Sets: `{A, B, C}, {D}`
+    *   **Edge (A, C, 3):** A and C are in the *same* set ({A, B, C}). **Skip** (would create a cycle).
+    *   **Edge (B, D, 4):** B and D are in different sets. Add edge. Union B and D.
+        *   MST Edges: `{(A, B), (B, C), (B, D)}`
+        *   Total Weight: `3 + 4 = 7`
+        *   Sets: `{A, B, C, D}`
+    *   **Edge (C, D, 5):** C and D are in the *same* set ({A, B, C, D}). **Skip** (would create a cycle).
+
+**Result:** The MST edges are (A, B), (B, C), (B, D) with a total weight of **7**.
+
+---
+
+## 💻 Simple C++ Implementation (Kruskal's)
+
+We'll implement Kruskal's algorithm using a `DisjointSetUnion` (DSU) data structure, which is perfect for efficiently checking and merging sets.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::sort
+#include <numeric>   // For std::iota
+
+// --- 1. Edge Structure ---
+// Represents an edge in our graph
+struct Edge {
+    int u, v, weight;
+
+    // Custom comparison for sorting edges by weight
+    bool operator<(const Edge& other) const {
+        return weight < other.weight;
+    }
+};
+
+// --- 2. Disjoint Set Union (DSU) Structure ---
+// Helps detect cycles and merge components
+struct DisjointSetUnion {
+    std::vector<int> parent;
+    std::vector<int> sz; // To keep track of component size for optimization
+
+    DisjointSetUnion(int n) {
+        parent.resize(n + 1);
+        std::iota(parent.begin(), parent.end(), 0); // Each element is its own parent initially (0 to n)
+        sz.assign(n + 1, 1); // Each set has size 1 initially
+    }
+
+    // Find the representative (root) of the set containing 'i'
+    // with path compression optimization
+    int find(int i) {
+        if (parent[i] == i)
+            return i;
+        return parent[i] = find(parent[i]);
+    }
+
+    // Unite the sets containing 'i' and 'j'
+    // with union by size optimization
+    void unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+
+        if (root_i != root_j) {
+            // Attach smaller tree under root of larger tree
+            if (sz[root_i] < sz[root_j])
+                std::swap(root_i, root_j);
+            
+            parent[root_j] = root_i;
+            sz[root_i] += sz[root_j];
+        }
+    }
+};
+
+// --- 3. Kruskal's MST Algorithm ---
+int kruskalMST(int num_vertices, std::vector<Edge>& edges) {
+    // 1. Sort all edges by their weight in ascending order
+    std::sort(edges.begin(), edges.end());
+
+    // 2. Initialize DSU for num_vertices
+    DisjointSetUnion dsu(num_vertices);
+
+    int min_cost = 0;
+    int edges_in_mst = 0; // To count how many edges we've added to the MST
+
+    // An MST for V vertices will have V-1 edges.
+    // We can stop early if we've found enough edges.
+    // (Or iterate through all edges and it implicitly stops if no more can be added without cycles)
+
+    // 3. Iterate through sorted edges
+    for (const auto& edge : edges) {
+        // If adding this edge does not form a cycle (i.e., u and v are in different components)
+        if (dsu.find(edge.u) != dsu.find(edge.v)) {
+            dsu.unite(edge.u, edge.v); // Add the edge to MST (merge components)
+            min_cost += edge.weight;   // Add its weight to total cost
+            edges_in_mst++;
+
+            // Optimization: If we've added V-1 edges, we've found the MST
+            if (edges_in_mst == num_vertices - 1) {
+                break; 
+            }
+        }
+    }
+
+    // A check if the graph was disconnected (not strictly needed if guaranteed connected)
+    // If edges_in_mst is less than num_vertices - 1, the graph wasn't connected,
+    // and a spanning tree doesn't exist for all vertices.
+    if (edges_in_mst < num_vertices - 1 && num_vertices > 1) {
+        std::cout << "Warning: Graph is disconnected. A full spanning tree does not exist.\n";
+        return -1; // Or throw an error
+    }
+
+    return min_cost;
+}
+
+// --- Main function to test ---
+int main() {
+    int num_vertices = 4; // Cities A, B, C, D (represented as 0, 1, 2, 3)
+
+    std::vector<Edge> edges = {
+        {0, 1, 1}, // (A, B, 1)
+        {0, 2, 3}, // (A, C, 3)
+        {1, 2, 2}, // (B, C, 2)
+        {1, 3, 4}, // (B, D, 4)
+        {2, 3, 5}  // (C, D, 5)
+    };
+
+    int mst_cost = kruskalMST(num_vertices, edges);
+
+    if (mst_cost != -1) {
+        std::cout << "Minimum Spanning Tree Cost: " << mst_cost << std::endl;
+    } else {
+        std::cout << "Failed to find MST for a disconnected graph.\n";
+    }
+
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+Minimum Spanning Tree Cost: 7
+```
+This matches our manual calculation! 🎉
+
+---
+
+And there you have it! A quick tour of Minimum Spanning Trees, why they matter, and a practical Kruskal's implementation. Keep building those algorithms!
+
+---
