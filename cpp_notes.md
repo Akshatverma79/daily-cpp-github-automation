@@ -65839,3 +65839,190 @@ int main() {
 And that's a wrap on Topological Sort with Kahn's Algorithm! It's a fundamental graph algorithm with lots of real-world applications. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Strongly Connected Components  
+🕒 2026-07-21 15:26:12
+
+Hey there, aspiring DSA wizard! 👋 Let's break down Strongly Connected Components (SCCs) in a friendly way.
+
+---
+
+## 🚀 Strongly Connected Components (SCCs)
+
+### What on Earth is an SCC? (The Concept)
+
+Imagine a **directed graph** (where edges have a direction, like one-way streets). An SCC is like a "club" within this graph where **every member can reach every other member by following the directed paths**, and it's the biggest possible club with that property.
+
+Formally: A **Strongly Connected Component** is a maximal subgraph where for every pair of vertices `(u, v)` in the subgraph, there is a path from `u` to `v` AND a path from `v` to `u`. "Maximal" means you can't add any more vertices or edges to it and still maintain the strongly connected property.
+
+Think of it as a tightly-knit group where communication flows both ways among all its members.
+
+### Why Should I Even Care? (Why it Matters)
+
+SCCs are super useful because they help us simplify and understand complex directed graphs.
+
+1.  **Simplification:** Once you find all SCCs, you can shrink each SCC into a single "super-node." The original graph then transforms into a **Directed Acyclic Graph (DAG)** of these super-nodes! This makes many problems on complex graphs much easier to solve (e.g., topological sort on the SCC graph).
+2.  **Cycle Detection:** Any SCC with more than one vertex (or a single vertex with a self-loop) inherently contains a cycle. Identifying SCCs helps pinpoint cyclic dependencies.
+3.  **Real-world Applications:**
+    *   **Dependency Management:** Finding circular dependencies in software modules or tasks.
+    *   **Network Analysis:** Identifying clusters in communication networks where information can flow freely among members.
+    *   **2-SAT Problem:** SCCs are fundamental to solving 2-Satisfiability problems.
+
+---
+
+### 💡 Example Problem: Finding Friend Circles
+
+Imagine a social network where `A -> B` means "A considers B a friend." If `A -> B` and `B -> A`, they have a mutual friendship. We want to find groups of people where everyone considers everyone else a friend (directly or indirectly).
+
+**Graph:**
+```
+1 <-> 2  (1 considers 2 a friend, 2 considers 1 a friend)
+2 --> 3  (2 considers 3 a friend)
+3 --> 4  (3 considers 4 a friend)
+4 --> 3  (4 considers 3 a friend)
+5 --> 4  (5 considers 4 a friend)
+```
+
+**Let's draw it:**
+```
+      +---+
+      | 1 | <---> | 2 |
+      +---+       +---+
+                    |
+                    v
+                  +---+
+                  | 3 | <---> | 4 |
+                  +---+       +---+
+                    ^           ^
+                    |           |
+                  +---+       +---+
+                  | 5 | ----> |   | (no outgoing from 5 in this example, only 5->4 shown)
+                  +---+
+```
+
+**What are the SCCs?**
+
+1.  `{1, 2}`: 1 can reach 2, 2 can reach 1. This is a strongly connected group.
+2.  `{3, 4}`: 3 can reach 4, 4 can reach 3. This is another.
+3.  `{5}`: 5 can reach 4, but 4 cannot reach 5. So, 5 is an SCC by itself.
+
+Notice how 2 can reach 3, and 5 can reach 4. These are connections *between* SCCs, creating a DAG of SCCs.
+
+---
+
+### 💻 Simple C++ Implementation (Kosaraju's Algorithm)
+
+Kosaraju's algorithm is a classic way to find SCCs. It's quite intuitive:
+1.  Do a DFS on the original graph, recording the finishing times of nodes.
+2.  Create a "transpose" graph (reverse all edges).
+3.  Do another DFS on the transpose graph, but visit nodes in decreasing order of finishing times from step 1. Each tree in this second DFS is an SCC!
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::reverse
+
+// --- Step 1: DFS on the original graph to get finishing order ---
+void dfs1(int u, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited, std::vector<int>& order) {
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            dfs1(v, adj, visited, order);
+        }
+    }
+    order.push_back(u); // Add to order *after* visiting all descendants
+}
+
+// --- Step 2: DFS on the transpose graph to find SCCs ---
+void dfs2(int u, const std::vector<std::vector<int>>& rev_adj, std::vector<bool>& visited, std::vector<int>& current_scc) {
+    visited[u] = true;
+    current_scc.push_back(u);
+    for (int v : rev_adj[u]) {
+        if (!visited[v]) {
+            dfs2(v, rev_adj, visited, current_scc);
+        }
+    }
+}
+
+int main() {
+    int N, M; // N: number of nodes, M: number of edges
+    std::cout << "Enter number of nodes and edges: ";
+    std::cin >> N >> M;
+
+    // Adjacency list for original graph
+    std::vector<std::vector<int>> adj(N + 1);
+    // Adjacency list for transpose graph (reversed edges)
+    std::vector<std::vector<int>> rev_adj(N + 1);
+
+    std::cout << "Enter edges (u v):" << std::endl;
+    for (int i = 0; i < M; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        adj[u].push_back(v);
+        rev_adj[v].push_back(u); // Add reverse edge for transpose graph
+    }
+
+    std::vector<bool> visited(N + 1, false);
+    std::vector<int> order; // Stores nodes in order of finishing times
+
+    // --- First DFS pass: Fill the 'order' vector ---
+    for (int i = 1; i <= N; ++i) {
+        if (!visited[i]) {
+            dfs1(i, adj, visited, order);
+        }
+    }
+
+    // Prepare for second DFS
+    std::fill(visited.begin(), visited.end(), false); // Reset visited array
+    std::reverse(order.begin(), order.end());        // Process nodes in decreasing order of finishing times
+
+    std::cout << "\nStrongly Connected Components:" << std::endl;
+    int scc_count = 0;
+    // --- Second DFS pass: Find SCCs ---
+    for (int u : order) {
+        if (!visited[u]) {
+            std::vector<int> current_scc;
+            dfs2(u, rev_adj, visited, current_scc);
+            
+            std::cout << "SCC " << ++scc_count << ": { ";
+            for (int node : current_scc) {
+                std::cout << node << " ";
+            }
+            std::cout << "}" << std::endl;
+        }
+    }
+
+    return 0;
+}
+```
+
+**How to Test the Code (with the example):**
+
+Input:
+```
+Enter number of nodes and edges: 5 6
+Enter edges (u v):
+1 2
+2 1
+2 3
+3 4
+4 3
+5 4
+```
+
+Output:
+```
+Strongly Connected Components:
+SCC 1: { 5 }
+SCC 2: { 4 3 }
+SCC 3: { 2 1 }
+```
+*(Note: The order of SCCs might vary, but the components themselves will be the same.)*
+
+---
+
+And that's your quick dive into Strongly Connected Components! They're a super handy tool for dealing with directed graphs. Keep practicing! 💪
+
+---
