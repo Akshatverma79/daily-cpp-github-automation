@@ -66398,3 +66398,103 @@ int main() {
 And that's LCS! A powerful technique that helps us find commonalities between sequences. Keep practicing, and you'll master Dynamic Programming in no time! Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Increasing Subsequence (LIS)  
+🕒 2026-07-23 08:30:13
+
+Hey there, future DSA pro! 👋 Let's break down Longest Increasing Subsequence (LIS) in a super friendly way.
+
+---
+
+## Longest Increasing Subsequence (LIS): Your Quick Guide!
+
+### What is LIS? 🤔
+
+Imagine you have a list of numbers. An **Increasing Subsequence** is a sequence you can get by deleting zero or more elements from the original list, but keeping the remaining elements in their *original order*, such that each chosen number is strictly greater than the one before it.
+
+The **Longest Increasing Subsequence (LIS)** is simply the longest possible version of such a subsequence!
+
+**Example:**
+If your list is `[1, 5, 2, 6, 3]`
+*   `[1, 2, 3]` is an increasing subsequence.
+*   `[1, 5, 6]` is also an increasing subsequence.
+*   `[1, 5, 2]` is NOT increasing (`5` is not less than `2`).
+*   The **LIS** here has a length of 3 (e.g., `[1, 2, 3]` or `[1, 5, 6]`).
+
+### Why Does It Matter? 🚀
+
+LIS is a classic problem in **Dynamic Programming (DP)**. It's a fantastic way to grasp the core idea of breaking down a problem into smaller, overlapping subproblems. It also pops up in various real-world scenarios, like:
+*   **Bioinformatics:** Analyzing DNA sequences.
+*   **Data Analysis:** Finding trends in data.
+*   **Optimization:** In resource allocation or scheduling problems.
+
+### Example Problem (Small & Sweet)
+
+**Problem:** Find the length of the LIS for the array `nums = [3, 1, 4, 1, 5, 9, 2, 6]`
+
+**Thinking It Through:**
+*   `[3, 4, 5, 9]` is an increasing subsequence of length 4.
+*   `[1, 4, 5, 9]` is also an increasing subsequence of length 4.
+*   `[1, 2, 6]` is increasing, but only length 3.
+
+The **LIS length** for this array is **4**.
+
+### Simple C++ Implementation (O(N^2) DP)
+
+This is the most intuitive DP approach. The core idea is: for each number `nums[i]`, what's the longest increasing subsequence that *ends* with `nums[i]`?
+
+```cpp
+#include <vector>
+#include <algorithm> // For std::max
+
+// Function to find the length of the LIS
+int lengthOfLIS(const std::vector<int>& nums) {
+    // If the input array is empty, there's no LIS, so its length is 0.
+    if (nums.empty()) {
+        return 0;
+    }
+
+    int n = nums.size();
+    
+    // dp[i] will store the length of the longest increasing subsequence
+    // ending at index i.
+    // Initialize all dp values to 1, because each number itself is an LIS of length 1.
+    std::vector<int> dp(n, 1); 
+
+    // overallMaxLen will keep track of the maximum LIS length found so far
+    // across all elements. Initialize to 1 since a non-empty array always has at least an LIS of length 1.
+    int overallMaxLen = 1; 
+
+    // Iterate through the array starting from the second element
+    // (the first element's LIS ending at itself is already 1, handled by initialization).
+    for (int i = 1; i < n; ++i) {
+        // For each nums[i], we look at all elements before it (nums[j] where j < i).
+        for (int j = 0; j < i; ++j) {
+            // If nums[i] is greater than nums[j], it means nums[i] can extend
+            // an increasing subsequence that ends at nums[j].
+            if (nums[i] > nums[j]) {
+                // We update dp[i] to be the maximum of its current value
+                // and (the LIS length ending at nums[j] + 1).
+                // +1 because we are appending nums[i] to that subsequence.
+                dp[i] = std::max(dp[i], dp[j] + 1);
+            }
+        }
+        // After checking all previous elements for nums[i],
+        // update the overall maximum LIS length found so far.
+        overallMaxLen = std::max(overallMaxLen, dp[i]);
+    }
+
+    // Return the maximum LIS length found across the entire array.
+    return overallMaxLen;
+}
+```
+
+---
+
+### Quick Takeaway ✨
+
+LIS is a core Dynamic Programming concept! The O(N^2) approach is an excellent way to grasp how to build solutions by looking at smaller subproblems (the LIS ending at previous elements). Keep practicing!
+
+---
