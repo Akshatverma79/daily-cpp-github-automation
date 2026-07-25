@@ -66929,3 +66929,123 @@ Minimum cost to assign all jobs: 23
 Hope this makes DP on Bitmasks clearer! It's a powerful tool once you get the hang of representing states with bits. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-07-25 08:06:13
+
+Hey there, future coding wizard! 👋 Let's demystify Bit Manipulation.
+
+---
+
+### **Bit Manipulation Basics: A Tiny Peek!**
+
+#### **What is Bit Manipulation?**
+
+Imagine every number you use (like `5`, `10`, `42`) isn't just a single value, but a sequence of tiny `0`s and `1`s (its binary representation). Bit manipulation is just a fancy way of saying: **directly working with these individual `0`s and `1`s (bits) of a number.**
+
+Think of it as peeking "under the hood" of how numbers are stored and getting really granular with your operations!
+
+#### **Why Does It Matter? (Why is it cool?)**
+
+1.  **🚀 Super Fast:** CPUs are designed to perform bitwise operations incredibly quickly. Often, these are much faster than traditional arithmetic operations (like multiplication or division) for certain tasks.
+2.  **💾 Memory Efficient:** You can store multiple boolean (true/false) flags or small pieces of information in a single integer, saving memory.
+3.  **💡 Elegant Solutions:** Many clever algorithms and data structures rely on bit manipulation for elegant and efficient solutions (e.g., hash functions, error detection, competitive programming problems).
+4.  **⚡ Low-Level Control:** It gives you fine-grained control, which is crucial in areas like embedded systems, graphics, and network programming.
+
+#### **Key Bitwise Operators (The Tools in Your Belt):**
+
+*   `&` (AND)
+*   `|` (OR)
+*   `^` (XOR)
+*   `~` (NOT)
+*   `<<` (Left Shift)
+*   `>>` (Right Shift)
+
+---
+
+#### **Example Problem: Checking a Specific Bit**
+
+**Problem:** Given an integer `n` and a bit position `k` (0-indexed, meaning the rightmost bit is position 0), determine if the `k`-th bit of `n` is set (i.e., it's a `1`).
+
+**Example:**
+*   `n = 13` (binary `...00001101`)
+*   `k = 2` (the 3rd bit from the right)
+*   Is the 2nd bit of `13` a `1`? Yes!
+
+**How to approach it:**
+
+1.  **Create a "mask":** We need a number that has *only* the `k`-th bit set to `1`, and all other bits `0`. We can get this by taking `1` (binary `...00000001`) and shifting it `k` positions to the left: `(1 << k)`.
+    *   If `k=0`, mask is `0001`
+    *   If `k=1`, mask is `0010`
+    *   If `k=2`, mask is `0100`
+
+2.  **Use `AND` (`&`):** Perform a bitwise `AND` operation between the original number `n` and our `mask`.
+    *   `1 & 1` results in `1`
+    *   `1 & 0` results in `0`
+    *   `0 & 1` results in `0`
+    *   `0 & 0` results in `0`
+
+    If the `k`-th bit of `n` was `1`, then `(n & mask)` will result in the `mask` itself (a non-zero value).
+    If the `k`-th bit of `n` was `0`, then `(n & mask)` will result in `0`.
+
+3.  **Check the result:** If `(n & mask)` is non-zero, the `k`-th bit was set!
+
+---
+
+#### **C++ Implementation:**
+
+```cpp
+#include <iostream>
+#include <bitset> // Handy for printing binary representations!
+
+// Function to check if the k-th bit of a number n is set
+bool isKthBitSet(int n, int k) {
+    // 1. Create a mask with only the k-th bit set to 1.
+    //    Example: If k=2, (1 << 2) becomes binary ...00000100 (which is 4 in decimal)
+    int mask = (1 << k);
+
+    // 2. Perform a bitwise AND operation between n and the mask.
+    //    If the k-th bit of n is 1, the result will be non-zero (equal to the mask).
+    //    If the k-th bit of n is 0, the result will be zero.
+    return (n & mask) != 0; // Returns true if the result is non-zero, false otherwise.
+}
+
+int main() {
+    int num = 13; // Binary representation: ...00001101
+    int position = 2; // We want to check the 2nd bit (0-indexed)
+
+    std::cout << "Number: " << num << std::endl;
+    std::cout << "Binary: " << std::bitset<8>(num) << " (8 bits for clear visualization)" << std::endl; // For printing 8 bits
+    std::cout << "Checking if " << position << "-th bit is set..." << std::endl;
+
+    if (isKthBitSet(num, position)) {
+        std::cout << "✅ Yes, the " << position << "-th bit of " << num << " IS SET (1)." << std::endl;
+    } else {
+        std::cout << "❌ No, the " << position << "-th bit of " << num << " IS NOT SET (0)." << std::endl;
+    }
+
+    std::cout << "\n--- Another Example ---" << std::endl;
+    num = 8; // Binary representation: ...00001000
+    position = 1; // Check the 1st bit (0-indexed)
+
+    std::cout << "Number: " << num << std::endl;
+    std::cout << "Binary: " << std::bitset<8>(num) << std::endl;
+    std::cout << "Checking if " << position << "-th bit is set..." << std::endl;
+
+    if (isKthBitSet(num, position)) {
+        std::cout << "✅ Yes, the " << position << "-th bit of " << num << " IS SET (1)." << std::endl;
+    } else {
+        std::cout << "❌ No, the " << position << "-th bit of " << num << " IS NOT SET (0)." << std::endl;
+    }
+
+    return 0;
+}
+```
+
+---
+
+That's your first step into the awesome world of Bit Manipulation! Keep experimenting with the other operators, and you'll find it's a powerful tool in your DSA toolkit. Happy coding! ✨
+
+---
