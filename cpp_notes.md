@@ -67185,3 +67185,141 @@ int main() {
 That's a quick tour of GCD and Primes! Keep these in your toolkit – they'll be incredibly useful as you tackle more complex DSA problems. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-07-26 08:25:59
+
+Let's dive into Game Theory basics – it's like learning to think several steps ahead in a strategic game!
+
+---
+
+## Game Theory Basics: Playing Smart!
+
+### 💡 What the Concept Means
+
+Game Theory is all about analyzing strategic interactions between rational players. Imagine a chessboard: players take turns, each trying to win, and they know the full state of the board.
+
+In competitive programming, we usually focus on:
+*   **Two Players:** Typically "Alice" and "Bob".
+*   **Perfect Information:** Everyone knows everything about the game state (no hidden cards!).
+*   **Zero-Sum:** One player's gain is the other's loss (no cooperation, purely competitive).
+*   **Optimal Play:** Each player always makes the best possible move to maximize their own outcome, assuming the *other player will also play optimally* to counter them.
+
+The core idea is to figure out if the first player has a winning strategy, or if the second player can always force a win, given optimal play from both sides.
+
+### 🚀 Why it Matters
+
+Many competitive programming problems are secretly disguised games! Understanding game theory helps you:
+*   **Determine Winning/Losing Strategies:** Figure out which player has an advantage from a given game state.
+*   **Predict Outcomes:** Foresee who will win if both play perfectly.
+*   **Solve with DP/Recursion:** These problems often naturally lead to recursive solutions with memoization (Dynamic Programming) to store the win/loss status of different game states.
+*   **Build Foundation:** It's the groundwork for more advanced topics like Nim games, Grundy numbers, and minimax algorithms.
+
+### 🎲 Example Problem: Simple Stone Game
+
+**Problem:** You have a pile of `N` stones. Two players, Alice and Bob, take turns. In each turn, a player can remove either `1` or `2` stones. The player who takes the *last* stone wins. Alice goes first. Can Alice win if both play optimally?
+
+**Let's think step-by-step (Optimal Play):**
+
+*   **`N = 0`:** Alice can't make a move. Alice loses. (Bob wins)
+*   **`N = 1`:** Alice takes 1 stone. Alice wins!
+*   **`N = 2`:** Alice takes 2 stones. Alice wins!
+*   **`N = 3`:**
+    *   Alice takes 1: Leaves 2 stones. Now Bob faces `N=2`. Bob takes 2, Bob wins.
+    *   Alice takes 2: Leaves 1 stone. Now Bob faces `N=1`. Bob takes 1, Bob wins.
+    *   Since **all** of Alice's moves lead to Bob winning, Alice loses for `N=3`.
+*   **`N = 4`:**
+    *   Alice takes 1: Leaves 3 stones. Bob faces `N=3`. We know from above that the player whose turn it is for `N=3` **loses**. So, if Alice leaves 3 stones, Bob will lose. This means Alice wins!
+    *   Alice has a winning move! So Alice wins for `N=4`.
+
+**Key Observation:** A player wins from a state `S` if they can make *any* move that leads to a state `S'` from which the *other player loses*. Conversely, a player loses from state `S` if *all* possible moves lead to states `S''` from which the *other player wins*.
+
+### 💻 Simple C++ Implementation
+
+This kind of recursive analysis with memoization is a classic application of Dynamic Programming to Game Theory. We'll use a `map` or `vector` (if `N` is bounded) to store whether `canWin(N)` is true or false.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <map> // Using std::map for memoization as N can be arbitrary,
+               // for bounded N, std::vector<bool> is often faster.
+
+// Memoization table: stores if the current player can win from 'n' stones
+std::map<int, bool> memo;
+
+// Function to determine if the current player can win with 'n' stones
+// Returns true if current player wins, false otherwise.
+bool canWin(int n) {
+    // --- Base Cases ---
+    // If no stones left, the current player cannot make a move and loses.
+    if (n == 0) {
+        return false;
+    }
+    // If 1 or 2 stones left, the current player can take them all and win.
+    if (n == 1 || n == 2) {
+        return true;
+    }
+
+    // --- Memoization Check ---
+    // If we've already calculated this state, return the stored result.
+    if (memo.count(n)) {
+        return memo[n];
+    }
+
+    // --- Recursive Step (Optimal Play / Minimax Principle) ---
+    // The current player wins if they can make *any* move
+    // such that the *next* player (opponent) loses from the resulting state.
+
+    // Try taking 1 stone:
+    // If taking 1 stone leads to a state (n-1) where the *opponent loses* (i.e., !canWin(n-1)),
+    // then the current player wins!
+    if (!canWin(n - 1)) {
+        return memo[n] = true; // Store and return true
+    }
+
+    // Try taking 2 stones:
+    // (Only if n >= 2, which is true here for n > 2 as per base cases)
+    // If taking 2 stones leads to a state (n-2) where the *opponent loses* (i.e., !canWin(n-2)),
+    // then the current player wins!
+    if (!canWin(n - 2)) {
+        return memo[n] = true; // Store and return true
+    }
+
+    // If neither taking 1 nor taking 2 stones leads to a state where the opponent loses,
+    // then no matter what the current player does, the opponent will win.
+    // Therefore, the current player loses from this state.
+    return memo[n] = false; // Store and return false
+}
+
+int main() {
+    int N_stones;
+    std::cout << "Enter number of stones (N): ";
+    std::cin >> N_stones;
+
+    // Clear memoization table before calculation
+    memo.clear(); 
+
+    if (canWin(N_stones)) {
+        std::cout << "Alice (first player) CAN win with " << N_stones << " stones." << std::endl;
+    } else {
+        std::cout << "Alice (first player) CANNOT win with " << N_stones << " stones." << std::endl;
+    }
+
+    std::cout << "\n--- Quick Test Cases ---" << std::endl;
+    memo.clear(); std::cout << "N=0: " << (canWin(0) ? "Win" : "Lose") << std::endl; // Expected: Lose
+    memo.clear(); std::cout << "N=1: " << (canWin(1) ? "Win" : "Lose") << std::endl; // Expected: Win
+    memo.clear(); std::cout << "N=2: " << (canWin(2) ? "Win" : "Lose") << std::endl; // Expected: Win
+    memo.clear(); std::cout << "N=3: " << (canWin(3) ? "Win" : "Lose") << std::endl; // Expected: Lose
+    memo.clear(); std::cout << "N=4: " << (canWin(4) ? "Win" : "Lose") << std::endl; // Expected: Win
+    memo.clear(); std::cout << "N=5: " << (canWin(5) ? "Win" : "Lose") << std::endl; // Expected: Win (Alice takes 2, leaves 3, Bob loses)
+    memo.clear(); std::cout << "N=6: " << (canWin(6) ? "Win" : "Lose") << std::endl; // Expected: Lose (Alice leaves 5 or 4, both are Bob win states)
+
+    return 0;
+}
+```
+
+This simple stone game demonstrates the fundamental idea of optimal play and how to approach such problems with recursion and memoization in DSA! Keep practicing, and you'll spot these "hidden games" in no time!
+
+---
