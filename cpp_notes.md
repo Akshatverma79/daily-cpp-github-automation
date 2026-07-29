@@ -67956,3 +67956,121 @@ int main() {
 Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-07-29 15:41:58
+
+Hey there, aspiring coder! 👋 Let's dive into the fascinating world of Linked Lists.
+
+---
+
+### 🔗 Linked List Basics
+
+**What is a Linked List?**
+
+Imagine you have a treasure hunt where each clue tells you exactly where to find the *next* clue. That's pretty much a Linked List!
+
+It's a linear data structure where elements (called **nodes**) are not stored at contiguous memory locations (unlike arrays). Instead, each **node** contains:
+1.  The actual **data** (your treasure clue).
+2.  A **pointer** (or reference) to the next node in the sequence (where to find the *next* clue).
+
+The first node is called the **head** (the starting point of your hunt), and the last node's pointer points to `nullptr` (signifying the end of the list, or the final treasure!).
+
+**Why Does It Matter?**
+
+Linked Lists are super cool because of their flexibility:
+
+*   **Dynamic Size:** Unlike arrays, Linked Lists can grow or shrink in size during runtime. You don't need to declare their maximum size beforehand.
+*   **Easy Insertions & Deletions:** Adding or removing elements is very efficient if you know where you want to make the change. You just update a few pointers, no need to shift a whole bunch of elements (like in arrays).
+*   **Building Block:** They are fundamental for understanding and building more complex data structures like Stacks, Queues, Graphs, etc.
+
+**The Catch:**
+*   **No Random Access:** You can't just jump to the 5th element like `myArray[4]`. You have to start from the `head` and traverse node by node.
+
+---
+
+### 📝 Example Problem: Creating and Printing a Simple List
+
+**Problem:** Create a simple linked list with three numbers (10, 20, 30) and then print all its elements.
+
+**How we'll do it:**
+1.  Define what a `Node` looks like.
+2.  Create three `Node` objects.
+3.  Link them up.
+4.  Write a function to traverse and print the list.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+
+// 1. Define what a Node looks like
+struct Node {
+    int data;       // The value this node holds
+    Node* next;     // Pointer to the next node in the list
+
+    // Constructor to make creating nodes easier
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// Function to print the linked list
+void printList(Node* head) {
+    Node* current = head; // Start from the head of the list
+    while (current != nullptr) { // Loop until we reach the end (nullptr)
+        std::cout << current->data << " -> "; // Print current node's data
+        current = current->next;             // Move to the next node
+    }
+    std::cout << "nullptr" << std::endl; // Indicate the end of the list
+}
+
+// Function to free up memory (important in C++!)
+void deleteList(Node* head) {
+    Node* current = head;
+    while (current != nullptr) {
+        Node* nextNode = current->next; // Store next node before deleting current
+        delete current;                 // Delete the current node
+        current = nextNode;             // Move to the next node
+    }
+}
+
+int main() {
+    // 2. Create three Node objects & 3. Link them up
+
+    // Create the first node (head)
+    Node* head = new Node(10); 
+
+    // Create the second node and link it to the first
+    head->next = new Node(20); 
+
+    // Create the third node and link it to the second
+    head->next->next = new Node(30); 
+
+    // Now our list looks like: 10 -> 20 -> 30 -> nullptr
+
+    std::cout << "Our simple Linked List: " << std::endl;
+    // 4. Print all elements of the list
+    printList(head); // Call our print function
+
+    // Don't forget to clean up the memory when you're done!
+    deleteList(head);
+
+    return 0;
+}
+```
+
+**Output:**
+
+```
+Our simple Linked List: 
+10 -> 20 -> 30 -> nullptr
+```
+
+---
+
+And there you have it! A quick and friendly intro to Linked List basics. You've just created and traversed your very first linked list. Awesome work! Keep exploring! 🚀
+
+---
