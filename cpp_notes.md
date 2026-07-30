@@ -68074,3 +68074,170 @@ Our simple Linked List:
 And there you have it! A quick and friendly intro to Linked List basics. You've just created and traversed your very first linked list. Awesome work! Keep exploring! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-07-30 08:26:36
+
+Hey there, aspiring coder! Let's dive into Doubly Linked Lists – they're like regular linked lists, but with a cool upgrade!
+
+---
+
+## Doubly Linked List (DLL) - Your Super-Powered List!
+
+### 1. What is a Doubly Linked List (DLL)? 🤔
+
+Imagine a train. In a **Singly Linked List**, each car only knows which car is *ahead* of it. So, you can only move forward.
+
+A **Doubly Linked List** is like a train where each car knows both the car *ahead* of it AND the car *behind* it!
+
+*   **Concept:** Each element (called a "node") in the list has:
+    1.  `data`: The actual value it stores.
+    2.  `next` pointer: Points to the *next* node in the sequence.
+    3.  `prev` pointer: Points to the *previous* node in the sequence. (This is the "super-power"!)
+
+*   **Visual:**
+    `NULL <- [Data|Prev|Next] <-> [Data|Prev|Next] <-> [Data|Prev|Next] -> NULL`
+
+### 2. Why Does It Matter? (The Super-Power Explained!) 💪
+
+DLLs are awesome because they give you **bidirectional traversal**. This means you can:
+
+*   **Move forward:** Start from the beginning (`head`) and go `next`.
+*   **Move backward:** Start from the end (`tail`) and go `prev`.
+
+This bidirectional capability makes many operations much easier and more efficient:
+
+*   **Easier Deletion:** If you want to delete a specific node, you don't need to traverse from the beginning to find its *previous* node. The node itself already knows its `prev`!
+*   **Easier Insertion:** Inserting a node *before* a given node is straightforward because you can directly access the `prev` node.
+*   **Real-world uses:** Think browser "back" and "forward" buttons, undo/redo functionalities, or certain cache implementations.
+
+### 3. Let's Solve a Tiny Problem! (Deleting a Node) 🎯
+
+**Problem:** Given a pointer to a specific node in a Doubly Linked List, delete that node.
+
+**Scenario:** We have a list `A <-> B <-> C`. We want to delete node `B`.
+
+**How a DLL makes it easy:**
+
+1.  **Node B's previous friend is A (`B->prev` points to `A`).**
+2.  **Node B's next friend is C (`B->next` points to `C`).**
+
+To delete `B`, we just need to make `A` and `C` friends directly:
+*   Make `A`'s `next` pointer point to `C`: `A->next = C;`
+*   Make `C`'s `prev` pointer point to `A`: `C->prev = A;`
+
+Then, you can free `B`'s memory. Voila! Deletion in constant time (O(1)) once you have the node pointer!
+
+### 4. How Do We Build It in C++? (A Simple Implementation) 🛠️
+
+Let's create a basic Doubly Linked List with a `Node` structure and functions to add elements and print them in both directions.
+
+```cpp
+#include <iostream>
+
+// 1. The Node Structure: This is the building block!
+struct Node {
+    int data;     // The value this node holds
+    Node* next;   // Pointer to the next node
+    Node* prev;   // Pointer to the previous node (the DLL magic!)
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// 2. The Doubly Linked List Class
+class DoublyLinkedList {
+private:
+    Node* head; // Points to the first node
+    Node* tail; // Points to the last node (super helpful for DLLs!)
+
+public:
+    // Constructor for an empty list
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // Function to add a new node to the end of the list
+    void insertAtEnd(int data) {
+        Node* newNode = new Node(data); // Create our new friend
+
+        if (head == nullptr) { // If the list is empty
+            head = newNode;
+            tail = newNode;
+        } else { // If the list has elements
+            tail->next = newNode; // Link current tail to new node
+            newNode->prev = tail; // Link new node back to current tail
+            tail = newNode;       // Update tail to be the new node
+        }
+        std::cout << "Inserted " << data << std::endl;
+    }
+
+    // Function to print the list from head to tail (forward)
+    void printForward() {
+        if (head == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+        Node* current = head;
+        std::cout << "List (Forward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->next;
+        }
+        std::cout << "NULL" << std::endl;
+    }
+
+    // Function to print the list from tail to head (backward)
+    void printBackward() {
+        if (tail == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+        Node* current = tail;
+        std::cout << "List (Backward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->prev; // Traversing backward using 'prev'!
+        }
+        std::cout << "NULL" << std::endl;
+    }
+
+    // Destructor to free memory when the list is destroyed
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = nullptr;
+        tail = nullptr;
+        std::cout << "List destroyed, memory freed." << std::endl;
+    }
+};
+
+// Let's see it in action!
+int main() {
+    DoublyLinkedList myList;
+
+    myList.insertAtEnd(10);
+    myList.insertAtEnd(20);
+    myList.insertAtEnd(30);
+
+    myList.printForward();  // Expected: 10 <-> 20 <-> 30 <-> NULL
+    myList.printBackward(); // Expected: 30 <-> 20 <-> 10 <-> NULL
+
+    myList.insertAtEnd(40);
+    myList.printForward();
+    myList.printBackward();
+
+    // The destructor will be called automatically when myList goes out of scope
+    return 0;
+}
+```
+
+---
+
+And there you have it! Doubly Linked Lists are incredibly versatile and powerful, especially when you need to navigate your data in both directions. Keep practicing, and you'll master them in no time! Happy coding!
+
+---
