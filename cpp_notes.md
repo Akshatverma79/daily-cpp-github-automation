@@ -68415,3 +68415,110 @@ int main() {
 You've just learned the core of Stacks! Keep practicing, and you'll master these fundamental building blocks of computer science. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-07-31 15:48:59
+
+Hey there, future coding wizard! Let's dive into Queues – a fundamental concept in Data Structures.
+
+---
+
+## DSA Notes: Queues (C++)
+
+### 1. What is a Queue? (The Concept)
+
+Imagine a real-life line, like at a supermarket checkout or waiting for a roller coaster. That's exactly what a Queue is in the programming world!
+
+*   **Definition:** A Queue is a linear data structure that follows the **First-In, First-Out (FIFO)** principle.
+*   **FIFO:** The element that was added first will always be the first one to be removed.
+*   **Ends:**
+    *   **Enqueue (Add):** Elements are added to the **rear** (or "back") of the queue.
+    *   **Dequeue (Remove):** Elements are removed from the **front** of the queue.
+
+Think of it like this: The person who gets in line first is the first person to be served!
+
+### 2. Why Queues Matter (The "Why")
+
+Queues are super handy for managing things that need to be processed in a specific, sequential order.
+
+*   **Orderly Processing:** Guarantees that tasks are handled in the exact order they arrive.
+*   **Real-world Applications:**
+    *   **Printer Queues:** Print jobs are processed one by one, in the order they were sent.
+    *   **CPU Scheduling:** Operating systems use queues to manage processes waiting for CPU time.
+    *   **Buffering Data:** In streaming or network communication, data often gets buffered in a queue.
+    *   **Breadth-First Search (BFS):** A fundamental algorithm for traversing trees and graphs extensively uses queues.
+
+### 3. Example Problem: Simple Task Scheduler
+
+**Problem:** You have a list of tasks that need to be executed by a single processor. The processor must always execute the tasks in the order they were received.
+**Input:** Tasks "A", "B", "C", "D" arrive in that sequence.
+**Goal:** Simulate the execution order.
+
+**Expected Output:**
+Task A executed.
+Task B executed.
+Task C executed.
+Task D executed.
+
+This perfectly illustrates the FIFO principle where "A" (first in) is "A" (first out).
+
+### 4. Simple C++ Implementation (`std::queue`)
+
+C++'s Standard Library provides a ready-to-use `std::queue` template class, making implementation super straightforward. It's a "container adapter," meaning it uses other sequence containers (like `std::deque` by default) internally to provide the queue functionality.
+
+```cpp
+#include <iostream> // For input/output operations
+#include <queue>    // For using the std::queue container
+
+int main() {
+    // 1. Declare a queue of integers
+    std::queue<std::string> taskQueue; // We'll store task names (strings)
+
+    std::cout << "--- Simulating a Task Scheduler ---\n";
+
+    // 2. Enqueue (Add) tasks to the queue
+    std::cout << "Adding tasks to the queue...\n";
+    taskQueue.push("Task A"); // Add "Task A"
+    taskQueue.push("Task B"); // Add "Task B"
+    taskQueue.push("Task C"); // Add "Task C"
+    taskQueue.push("Task D"); // Add "Task D"
+    std::cout << "Current queue size: " << taskQueue.size() << "\n";
+
+    // 3. Check the front task without removing it
+    if (!taskQueue.empty()) {
+        std::cout << "Next task to execute: " << taskQueue.front() << "\n";
+    }
+
+    // 4. Dequeue (Process/Remove) tasks from the queue
+    std::cout << "\nExecuting tasks (Dequeueing)...\n";
+    while (!taskQueue.empty()) {
+        std::string currentTask = taskQueue.front(); // Get the front task
+        taskQueue.pop();                             // Remove the front task
+        std::cout << currentTask << " executed.\n";
+        // Optionally, check size after each pop
+        // std::cout << "Queue size after execution: " << taskQueue.size() << "\n";
+    }
+
+    // 5. Check if the queue is empty
+    std::cout << "\nAll tasks executed. Is queue empty? "
+              << (taskQueue.empty() ? "Yes" : "No") << "\n";
+
+    return 0;
+}
+```
+
+**Key `std::queue` Operations:**
+
+*   `q.push(element)`: Adds `element` to the rear of the queue (enqueue).
+*   `q.front()`: Returns a reference to the element at the front of the queue (peek). **Does NOT remove it.** Make sure the queue is not empty before calling this!
+*   `q.pop()`: Removes the element from the front of the queue (dequeue). **Does NOT return the element.**
+*   `q.empty()`: Returns `true` if the queue is empty, `false` otherwise.
+*   `q.size()`: Returns the number of elements in the queue.
+
+---
+
+That's your quick and simple guide to Queues in C++! Keep coding!
+
+---
