@@ -69410,3 +69410,130 @@ int main() {
 And there you have it! BFS and DFS are powerful tools for navigating graphs, each with its unique strengths. Practice them to truly get comfortable!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Dynamic Programming Intro  
+🕒 2026-08-03 16:10:19
+
+Hey there, future algorithm master! 👋
+
+Let's dive into **Dynamic Programming (DP)**, a super cool technique to solve complex problems efficiently.
+
+---
+
+### Dynamic Programming Intro: Smart Ways to Solve Problems!
+
+**What does it mean? 🤔**
+
+Imagine you're solving a big puzzle. If you find a solution to a small part of that puzzle, you write it down. If you encounter that *exact same small part* again later, you don't re-solve it; you just look at your notes!
+
+That's DP in a nutshell:
+1.  **Break down problems** into smaller, overlapping subproblems.
+2.  **Solve each subproblem once.**
+3.  **Store its solution** (often in an array or map).
+4.  **Reuse the stored solutions** whenever you need them again, avoiding redundant computations.
+
+The two key ingredients for a problem to be solvable with DP are:
+*   **Optimal Substructure:** The optimal solution of the problem can be constructed from optimal solutions of its subproblems.
+*   **Overlapping Subproblems:** The same subproblems are encountered again and again.
+
+**Why does it matter? ⚡**
+
+It's all about **efficiency**! DP takes problems that might make your computer groan (think painfully slow, exponential time) and often turns them into something much faster (like polynomial time). It saves a *ton* of time and computational power by not doing the same work repeatedly. Many real-world problems (pathfinding, resource allocation, bioinformatics) use DP.
+
+---
+
+**The Classic Example: Fibonacci Sequence**
+
+Let's look at the classic DP starter: the Fibonacci sequence.
+
+**Problem:** Calculate the `n`-th Fibonacci number.
+The sequence starts: `0, 1, 1, 2, 3, 5, 8, 13, ...`
+Rule: `F(0) = 0`, `F(1) = 1`, `F(n) = F(n-1) + F(n-2)` for `n > 1`.
+
+**The Naive Recursive Problem:**
+If you try to calculate `fib(5)` using pure recursion, here's what happens:
+
+```
+          fib(5)
+         /      \
+       fib(4)   fib(3)  <-- Hey, fib(3) will be calculated again!
+      /    \    /    \
+    fib(3) fib(2) fib(2) fib(1)
+   /    \
+ fib(2) fib(1)
+```
+
+Notice `fib(3)`, `fib(2)`, etc., are computed multiple times. For `fib(100)`, this re-computation explodes exponentially! This is where DP shines.
+
+---
+
+**DP Solution: Bottom-Up (Tabulation)**
+
+Instead of going top-down and repeating work, let's build our answers from the bottom up! We'll create an array (our "memo pad") and fill it with the answers to smaller problems first.
+
+**C++ Implementation:**
+
+```cpp
+#include <iostream>
+#include <vector> // We'll use std::vector for our memo pad
+
+// Function to calculate the n-th Fibonacci number using Dynamic Programming (Tabulation)
+int fibonacciDP(int n) {
+    // Edge cases for the first two Fibonacci numbers
+    if (n <= 0) return 0;
+    if (n == 1) return 1;
+
+    // Create a vector (our memo pad) to store the results of subproblems.
+    // Size n+1 because we need to store up to F(n).
+    std::vector<int> dp(n + 1);
+
+    // Base cases: Fill in the values for F(0) and F(1)
+    dp[0] = 0;
+    dp[1] = 1;
+
+    // Build up the solution from bottom to top
+    // For each i from 2 up to n, calculate F(i) using the previously stored values
+    for (int i = 2; i <= n; ++i) {
+        dp[i] = dp[i-1] + dp[i-2];
+    }
+
+    // The answer to F(n) is now stored in dp[n]
+    return dp[n];
+}
+
+int main() {
+    int n = 10;
+    std::cout << "The " << n << "-th Fibonacci number is: " << fibonacciDP(n) << std::endl; // Expected: 55
+
+    n = 0;
+    std::cout << "The " << n << "-th Fibonacci number is: " << fibonacciDP(n) << std::endl; // Expected: 0
+
+    n = 1;
+    std::cout << "The " << n << "-th Fibonacci number is: " << fibonacciDP(n) << std::endl; // Expected: 1
+    
+    n = 5;
+    std::cout << "The " << n << "-th Fibonacci number is: " << fibonacciDP(n) << std::endl; // Expected: 5
+
+    return 0;
+}
+```
+
+**How this DP code works:**
+1.  We create a `dp` array (or `std::vector`) to store our calculated Fibonacci numbers.
+2.  We initialize `dp[0] = 0` and `dp[1] = 1` (our base cases).
+3.  Then, we loop from `i = 2` up to `n`. In each step, we calculate `dp[i]` by simply adding the two previous values already stored in our `dp` array: `dp[i-1]` and `dp[i-2]`.
+4.  Finally, `dp[n]` holds the answer for the `n`-th Fibonacci number, having computed each subproblem (`dp[i]`) only once!
+
+This approach transforms an exponential time complexity (for naive recursion) into a much faster **linear time complexity (O(n))**!
+
+---
+
+**Key Takeaway:**
+
+Dynamic Programming is about identifying subproblems, solving each one *once*, storing the results, and then cleverly using those stored results to solve larger problems. It's a powerful technique for optimizing recursive structures!
+
+Keep practicing, and you'll soon see DP patterns everywhere! ✨
+
+---
