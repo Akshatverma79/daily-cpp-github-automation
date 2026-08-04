@@ -69537,3 +69537,148 @@ Dynamic Programming is about identifying subproblems, solving each one *once*, s
 Keep practicing, and you'll soon see DP patterns everywhere! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-08-04 08:36:14
+
+Hey there, future problem-solver! 👋 Let's crack open the world of **Knapsack Problems** – a super common and important topic in DSA.
+
+---
+
+### Knapsack Problems: A Simple Guide
+
+#### 🎒 What's the Concept?
+
+Imagine you have a **knapsack (backpack)** with a limited weight capacity. You're presented with a bunch of items, each with its own **weight** and a **value**. Your mission? To choose items to put into your knapsack such that:
+
+1.  The total weight of the chosen items does **not exceed** the knapsack's capacity.
+2.  The total **value** of the chosen items is **maximized**.
+
+It's essentially a classic resource allocation puzzle!
+
+There are a few flavors, but the most common one you'll encounter first is the **0/1 Knapsack Problem**:
+*   For each item, you can either **take it (1)** or **leave it (0)**. You can't take a fraction of an item, and you can't take an item more than once.
+
+#### ✨ Why Does It Matter?
+
+Knapsack problems are super important because:
+
+*   **Core Dynamic Programming (DP) Pattern:** They are a fundamental example of how to use dynamic programming to solve optimization problems. Mastering knapsack helps you understand DP deeply.
+*   **Real-world Applications:** Think resource allocation (which projects to fund given a budget?), cutting stock (how to cut materials to minimize waste?), cargo loading (what to load on a ship?), and even investment decisions.
+*   **Interview Favorite:** It's a very common question in technical interviews to test your DP skills.
+
+---
+
+#### 📦 Example Problem: The "Best Loot" Scenario
+
+Let's say you're an adventurer with a knapsack that can hold a maximum of **5 kg**. You find some treasure:
+
+*   **Item A:** Weight = 2 kg, Value = $60
+*   **Item B:** Weight = 3 kg, Value = $100
+*   **Item C:** Weight = 4 kg, Value = $120
+
+What's the maximum value of treasure you can carry?
+
+**Let's think:**
+
+*   If you take **Item C** (4kg, $120), you only have 1kg left, and no other item fits. Total value: $120.
+*   If you take **Item A** (2kg, $60) and **Item B** (3kg, $100), total weight is 5kg, total value: $60 + $100 = $160. This looks better!
+*   If you take just **Item A** and **Item B** together, you maximize your loot!
+
+This simple example highlights that a "greedy" approach (always picking the item with the best value-to-weight ratio first) might not always work. This is where Dynamic Programming shines!
+
+---
+
+#### 💻 Simple C++ Implementation (0/1 Knapsack)
+
+We'll use a 2D array (DP table) to solve this. `dp[i][w]` will store the maximum value we can get using the first `i` items with a knapsack capacity of `w`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+// Function to solve the 0/1 Knapsack problem
+int knapsack(int W, const std::vector<int>& weights, const std::vector<int>& values) {
+    int n = weights.size(); // Number of items
+
+    // Create a 2D DP table
+    // dp[i][w] will store the maximum value achievable with
+    // the first 'i' items and a capacity of 'w'.
+    // We add 1 to dimensions because we use 1-based indexing for items and capacity
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(W + 1, 0));
+
+    // Build the DP table
+    // Iterate through items
+    for (int i = 1; i <= n; ++i) {
+        // Iterate through capacities
+        for (int w = 1; w <= W; ++w) {
+            // Get current item's weight and value (adjusting for 0-based vector indexing)
+            int currentWeight = weights[i - 1];
+            int currentValue = values[i - 1];
+
+            // Option 1: Don't take the current item
+            // The max value is whatever we got with the previous (i-1) items
+            // and the same capacity 'w'.
+            dp[i][w] = dp[i - 1][w];
+
+            // Option 2: Take the current item (if it fits)
+            if (currentWeight <= w) {
+                // If we take it, the value is currentValue
+                // PLUS the max value we could get from previous (i-1) items
+                // with the remaining capacity (w - currentWeight).
+                int valueIfTaken = currentValue + dp[i - 1][w - currentWeight];
+
+                // Choose the maximum between not taking it and taking it
+                dp[i][w] = std::max(dp[i][w], valueIfTaken);
+            }
+        }
+    }
+
+    // The result is in the bottom-right corner of our DP table:
+    // max value using all 'n' items with full capacity 'W'.
+    return dp[n][W];
+}
+
+int main() {
+    int W = 5; // Knapsack capacity
+    
+    // Item weights and values (corresponds to our example)
+    // Item A: w=2, v=60
+    // Item B: w=3, v=100
+    // Item C: w=4, v=120
+    std::vector<int> weights = {2, 3, 4};
+    std::vector<int> values = {60, 100, 120};
+
+    int max_value = knapsack(W, weights, values);
+
+    std::cout << "Knapsack Capacity: " << W << " kg" << std::endl;
+    std::cout << "Items:" << std::endl;
+    for (size_t i = 0; i < weights.size(); ++i) {
+        std::cout << "- Item " << static_cast<char>('A' + i) 
+                  << ": Weight=" << weights[i] << "kg, Value=$" << values[i] << std::endl;
+    }
+    std::cout << "\nMaximum value that can be carried: $" << max_value << std::endl; // Expected: $160
+
+    return 0;
+}
+```
+
+**How the DP Table Fills Up (Mentally):**
+
+| `dp[i][w]` | Cap 0 | Cap 1 | Cap 2 | Cap 3 | Cap 4 | Cap 5 |
+| :--------- | :---- | :---- | :---- | :---- | :---- | :---- |
+| **0 items** | 0     | 0     | 0     | 0     | 0     | 0     |
+| **1 item (A:w=2,v=60)** | 0     | 0     | **60**    | 60    | 60    | 60    |
+| **2 items (A,B:w=3,v=100)** | 0     | 0     | 60    | **100**   | 100   | **160**   |
+| **3 items (A,B,C:w=4,v=120)** | 0     | 0     | 60    | 100   | **120**   | 160   |
+
+The final answer (160) is at `dp[3][5]`.
+
+---
+
+That's Knapsack Problems in a nutshell! It's a fantastic problem to solidify your understanding of Dynamic Programming. Keep practicing! 💪
+
+---
