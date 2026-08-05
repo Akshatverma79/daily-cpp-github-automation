@@ -69993,3 +69993,142 @@ int main() {
 **Voila!** You've just grasped the core of the Sliding Window Technique. Keep practicing, and you'll find it applies to many different problems! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Two Pointer Technique  
+🕒 2026-08-05 15:50:58
+
+Hey there, future DSA whiz! 👋 Let's unlock a super handy technique today: **The Two Pointer Technique**.
+
+---
+
+### 📌 DSA Notes: Two Pointer Technique
+
+#### What is it? 🤔
+
+The Two Pointer Technique is a clever approach that uses two pointers (which are just variables storing array/string indices) to efficiently traverse and manipulate data. Think of it like having two markers on your data structure, helping you track elements or a specific range.
+
+#### Why it's cool (Why it matters!) ✨
+
+*   **Efficiency!** It often helps reduce time complexity from a brute-force `O(N^2)` (think nested loops) down to a much faster `O(N)`. This is a huge win for larger datasets!
+*   **Space-Saving!** It typically uses `O(1)` extra space, as you're only storing a couple of index variables.
+*   **Versatility!** Great for problems involving sorted arrays, finding pairs, sub-arrays, reversing sequences, and more.
+
+#### How it generally works 💡
+
+There are two main patterns:
+
+1.  **Pointers moving towards each other:** One pointer starts at the beginning (index 0), and the other starts at the end (last index). They move inwards until they meet or cross. (Perfect for sorted arrays!)
+2.  **Pointers moving in the same direction:** Both pointers start at the beginning, but one might move faster than the other, or they move conditionally.
+
+---
+
+### 🚀 Example Problem: Sorted Array Pair Sum
+
+Let's look at a classic problem where two pointers shine!
+
+**Problem:** Given a **sorted** array of integers and a `target` sum, determine if there exist two numbers in the array that add up to the `target`.
+
+**Example:**
+`arr = [1, 2, 3, 4, 5]`, `target = 7`
+Should return `true` (because `2 + 5 = 7` or `3 + 4 = 7`)
+
+`arr = [1, 2, 3, 4, 5]`, `target = 10`
+Should return `false`
+
+#### Thinking it through with Two Pointers 🤔
+
+Since the array is **sorted**, we can use the "pointers moving towards each other" pattern.
+
+1.  Initialize `left` pointer to the first element (index 0).
+2.  Initialize `right` pointer to the last element (index `arr.size() - 1`).
+3.  While `left` is less than `right`:
+    *   Calculate the `currentSum = arr[left] + arr[right]`.
+    *   If `currentSum == target`: We found our pair! Return `true`.
+    *   If `currentSum < target`: The sum is too small. To increase the sum, we need a larger number from the left side. So, increment `left` (`left++`).
+    *   If `currentSum > target`: The sum is too large. To decrease the sum, we need a smaller number from the right side. So, decrement `right` (`right--`).
+4.  If the loop finishes and we haven't found a pair, return `false`.
+
+---
+
+### 💻 C++ Code Time!
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate (not strictly needed for problem, but good for sum)
+
+// Function to check if a pair with target sum exists in a sorted array
+bool hasPairWithSum(const std::vector<int>& arr, int target) {
+    // Edge case: empty or single-element array
+    if (arr.size() < 2) {
+        return false;
+    }
+
+    int left = 0;                     // Pointer at the beginning
+    int right = arr.size() - 1;       // Pointer at the end
+
+    // Loop until the pointers meet or cross
+    while (left < right) {
+        int currentSum = arr[left] + arr[right];
+
+        if (currentSum == target) {
+            // Found a pair!
+            std::cout << "Found pair: " << arr[left] << " + " << arr[right] << " = " << target << std::endl;
+            return true;
+        } else if (currentSum < target) {
+            // Sum is too small, need to increase it.
+            // Move 'left' pointer forward to a potentially larger number.
+            left++;
+        } else { // currentSum > target
+            // Sum is too large, need to decrease it.
+            // Move 'right' pointer backward to a potentially smaller number.
+            right--;
+        }
+    }
+
+    // No pair found after checking all possibilities
+    return false;
+}
+
+int main() {
+    std::vector<int> arr1 = {1, 2, 3, 4, 5};
+    int target1 = 7;
+    std::cout << "Array: [1, 2, 3, 4, 5], Target: 7 -> "
+              << (hasPairWithSum(arr1, target1) ? "True" : "False") << std::endl; // Expected: True
+
+    std::vector<int> arr2 = {1, 2, 3, 4, 5};
+    int target2 = 10;
+    std::cout << "Array: [1, 2, 3, 4, 5], Target: 10 -> "
+              << (hasPairWithSum(arr2, target2) ? "True" : "False") << std::endl; // Expected: False
+
+    std::vector<int> arr3 = {5, 8, 10, 15, 20};
+    int target3 = 25;
+    std::cout << "Array: [5, 8, 10, 15, 20], Target: 25 -> "
+              << (hasPairWithSum(arr3, target3) ? "True" : "False") << std::endl; // Expected: True
+
+    std::vector<int> arr4 = {1};
+    int target4 = 5;
+    std::cout << "Array: [1], Target: 5 -> "
+              << (hasPairWithSum(arr4, target4) ? "True" : "False") << std::endl; // Expected: False (due to size < 2)
+
+    return 0;
+}
+
+```
+**Output of the C++ code:**
+```
+Found pair: 2 + 5 = 7
+Array: [1, 2, 3, 4, 5], Target: 7 -> True
+Array: [1, 2, 3, 4, 5], Target: 10 -> False
+Found pair: 5 + 20 = 25
+Array: [5, 8, 10, 15, 20], Target: 25 -> True
+Array: [1], Target: 5 -> False
+```
+
+---
+
+That's the Two Pointer Technique in a nutshell! It's a fundamental pattern, so understanding it well will help you solve many problems more efficiently. Keep practicing, and you'll master it in no time! Happy coding! 🚀
+
+---
