@@ -70764,3 +70764,89 @@ The character 'g' appears 2 times.
 Happy Hashing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Manipulation Basics  
+🕒 2026-08-08 14:19:00
+
+Hey there, future coder! 👋 Let's dive into the fascinating world of **String Manipulation Basics**!
+
+---
+
+## 📝 String Manipulation Basics (C++)
+
+### 1. What is String Manipulation?
+
+Imagine strings as sequences of characters (like words, sentences, or even code!). **String manipulation** is simply performing operations on these sequences. Think of it as playing with text: changing its order, extracting parts, combining pieces, or finding specific patterns.
+
+In C++, we primarily use `std::string` for handling strings, which offers a powerful and flexible way to work with text data.
+
+### 2. Why Does It Matter?
+
+Almost all real-world data involves text! From parsing user input (like names or addresses) to reading from files, validating email formats, building search engines, or processing web URLs, string skills are vital. It's a foundational skill for interacting with, understanding, and transforming human-readable information in almost any program.
+
+### 3. Example Problem: Reverse a String
+
+**Problem:** Given a string, reverse its characters in-place.
+
+**Example:**
+*   **Input:** `"hello"`
+*   **Output:** `"olleh"`
+
+**Explanation:** We want to swap the first character with the last, the second with the second-to-last, and so on, until we reach the middle.
+
+### 4. Simple C++ Implementation
+
+This solution uses a classic **two-pointer approach** to reverse the string directly (in-place).
+
+```cpp
+#include <iostream> // For input/output operations (like std::cout)
+#include <string>   // For using std::string
+#include <algorithm> // For std::swap (a handy utility to swap two values)
+
+// Function to reverse a string in-place
+// 's' is passed by reference ('&') so we modify the original string
+void reverseString(std::string& s) {
+    int left = 0;                 // Pointer starting from the beginning
+    int right = s.length() - 1;   // Pointer starting from the end
+
+    // Loop as long as the left pointer is before the right pointer
+    while (left < right) {
+        // Swap the characters at the left and right positions
+        std::swap(s[left], s[right]);
+
+        // Move pointers towards the center
+        left++;
+        right--;
+    }
+}
+
+int main() {
+    std::string myString = "cppisawesome";
+    std::cout << "Original string:  " << myString << std::endl;
+
+    reverseString(myString); // Call our reverse function
+
+    std::cout << "Reversed string:  " << myString << std::endl;
+
+    std::string anotherString = "level"; // A palindrome!
+    std::cout << "\nOriginal string:  " << anotherString << std::endl;
+    reverseString(anotherString);
+    std::cout << "Reversed string:  " << anotherString << std::endl;
+
+    return 0;
+}
+```
+
+**How it works:**
+1.  We set `left` to the first character's index (0) and `right` to the last character's index.
+2.  In each step, we `swap` the characters at `left` and `right`.
+3.  Then, we move `left` one step to the right and `right` one step to the left.
+4.  This continues until `left` meets or crosses `right`, meaning the entire string has been reversed.
+
+---
+
+That's a basic but powerful start to string manipulation! Keep practicing, and you'll be a text-twisting wizard in no time! ✨
+
+---
