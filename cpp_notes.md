@@ -71763,3 +71763,160 @@ int main() {
 And there you have it! A foundational understanding of Tries. They might seem a bit complex at first, but their power for string-related problems makes them a truly valuable tool in your DSA toolkit. Keep practicing! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-08-11 14:45:53
+
+Hey there, future DSA wizard! Let's dive into Disjoint Set Union (DSU) – it's a clever little data structure that's super handy.
+
+---
+
+## Disjoint Set Union (DSU): Connect & Conquer!
+
+### What's the Big Idea? (The Concept)
+
+Imagine you have a bunch of individual items. DSU is like a fancy organizer that helps you keep track of groups these items belong to.
+
+*   **Disjoint Sets:** Means no item belongs to more than one group. Each item is in *exactly one* set.
+*   **Union:** You can merge two groups into one larger group.
+*   **Find:** You can quickly ask, "Which group does this item belong to?" (By finding its "representative" or "root" item).
+*   **Check Connectivity:** Once you can find the root, you can instantly tell if two items are in the same group by checking if their roots are the same.
+
+**Think of it like this:** You have several islands. DSU helps you connect islands with bridges (union) and figure out if two islands are now part of the same landmass (find).
+
+### Why Does It Matter? (Its Superpower)
+
+DSU is incredibly efficient for problems that involve:
+
+1.  **Grouping Elements:** When you need to dynamically form groups and query their relationships.
+2.  **Connectivity:** Figuring out if two elements are connected (e.g., in a graph, social network).
+3.  **Cycle Detection:** Especially in graphs (like Kruskal's algorithm for Minimum Spanning Tree).
+
+It performs these operations almost in constant time on average (specifically, nearly O(1) amortized time thanks to some clever optimizations!), which is a huge deal for large datasets.
+
+### How it Works (The Magic Ingredients)
+
+DSU primarily relies on two operations, usually implemented with an array called `parent` and sometimes another called `rank` (or `size`):
+
+1.  **`find(i)`:**
+    *   **Goal:** Return the "representative" (root) of the set `i` belongs to.
+    *   **Mechanism:** It walks up the `parent` array until it finds an element that is its own parent (that's the root!).
+    *   **Optimization: Path Compression:** While finding the root, it makes all visited nodes point directly to the root. This "flattens" the tree for faster future lookups!
+
+2.  **`unite(i, j)` (often called `union` but renamed to avoid C++ keyword clash):**
+    *   **Goal:** Merge the sets containing `i` and `j`.
+    *   **Mechanism:** Find the roots of `i` and `j`. If they are different, make one root the parent of the other.
+    *   **Optimization: Union by Rank/Size:** Always attach the smaller tree (based on "rank" or "size") under the root of the larger tree. This keeps the trees flatter and balanced, preventing them from becoming long chains, which degrades performance.
+
+### Example Problem: Connecting Cities
+
+Imagine you have 5 cities (numbered 0 to 4). Initially, each city is isolated. We want to connect them and check if certain cities are connected.
+
+1.  **Initial State:** `{0}, {1}, {2}, {3}, {4}` (each city is its own set)
+2.  **`unite(0, 1)`:** Connect city 0 and city 1.
+    *   Sets now: `{0, 1}, {2}, {3}, {4}`
+3.  **`unite(2, 3)`:** Connect city 2 and city 3.
+    *   Sets now: `{0, 1}, {2, 3}, {4}`
+4.  **`unite(0, 2)`:** Connect city 0 and city 2. This effectively merges the group `{0,1}` with `{2,3}`.
+    *   Sets now: `{0, 1, 2, 3}, {4}`
+5.  **`find(1)`:** Which group is city 1 in? Returns the root of `{0, 1, 2, 3}` (let's say it's `0`).
+6.  **`find(3)`:** Which group is city 3 in? Returns the root of `{0, 1, 2, 3}` (also `0`).
+7.  **`find(1) == find(3)`:** `true`! Cities 1 and 3 are connected.
+8.  **`find(4)`:** Which group is city 4 in? Returns `4`.
+9.  **`find(1) == find(4)`:** `false`! Cities 1 and 4 are not connected.
+
+---
+
+### Simple C++ Implementation
+
+Here's a straightforward C++ implementation for our DSU structure, including both path compression and union by rank.
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota
+#include <iostream>
+
+// DSU structure
+class DSU {
+private:
+    std::vector<int> parent;
+    std::vector<int> rank; // Used for union by rank optimization
+
+public:
+    // Constructor: Initializes N disjoint sets, each with itself as parent and rank 0
+    DSU(int n) {
+        parent.resize(n);
+        std::iota(parent.begin(), parent.end(), 0); // parent[i] = i
+        rank.assign(n, 0); // rank[i] = 0
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing element i
+    int find(int i) {
+        if (parent[i] == i) {
+            return i; // i is the root of its set
+        }
+        // Path compression: set parent[i] directly to the root
+        return parent[i] = find(parent[i]);
+    }
+
+    // Unite operation with Union by Rank
+    // Merges the sets containing elements i and j
+    void unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+
+        if (root_i != root_j) { // If they are not already in the same set
+            // Union by Rank: Attach smaller rank tree under root of larger rank tree
+            if (rank[root_i] < rank[root_j]) {
+                parent[root_i] = root_j;
+            } else if (rank[root_j] < rank[root_i]) {
+                parent[root_j] = root_i;
+            } else { // Ranks are equal, pick one and increment its rank
+                parent[root_j] = root_i;
+                rank[root_i]++;
+            }
+        }
+    }
+
+    // Optional: Check if two elements are in the same set
+    bool are_connected(int i, int j) {
+        return find(i) == find(j);
+    }
+};
+
+int main() {
+    std::cout << "--- DSU Example: Connecting Cities ---" << std::endl;
+
+    int num_cities = 5;
+    DSU dsu(num_cities);
+
+    std::cout << "Initial state: Each city is disconnected." << std::endl;
+    std::cout << "Are cities 0 and 1 connected? " << (dsu.are_connected(0, 1) ? "Yes" : "No") << std::endl; // No
+
+    std::cout << "\nConnecting city 0 and 1..." << std::endl;
+    dsu.unite(0, 1);
+    std::cout << "Are cities 0 and 1 connected? " << (dsu.are_connected(0, 1) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are cities 0 and 2 connected? " << (dsu.are_connected(0, 2) ? "Yes" : "No") << std::endl; // No
+
+    std::cout << "\nConnecting city 2 and 3..." << std::endl;
+    dsu.unite(2, 3);
+    std::cout << "Are cities 2 and 3 connected? " << (dsu.are_connected(2, 3) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are cities 0 and 3 connected? " << (dsu.are_connected(0, 3) ? "Yes" : "No") << std::endl; // No
+
+    std::cout << "\nConnecting city 0 and 2 (merging their groups)..." << std::endl;
+    dsu.unite(0, 2);
+    std::cout << "Are cities 0 and 3 connected? " << (dsu.are_connected(0, 3) ? "Yes" : "No") << std::endl; // Yes (0-1, 2-3, 0-2 -> 0-1-2-3)
+    std::cout << "Are cities 1 and 3 connected? " << (dsu.are_connected(1, 3) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are cities 1 and 4 connected? " << (dsu.are_connected(1, 4) ? "Yes" : "No") << std::endl; // No
+
+    std::cout << "\nRoot of 1: " << dsu.find(1) << std::endl; // Should be the root of the large connected component
+    std::cout << "Root of 3: " << dsu.find(3) << std::endl; // Should be the same as root of 1
+
+    return 0;
+}
+```
+
+---
