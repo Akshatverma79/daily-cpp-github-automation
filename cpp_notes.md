@@ -72100,3 +72100,195 @@ Segment Trees are your go-to data structure for efficiently handling **range que
 Keep practicing, and you'll master them in no time! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Fenwick Trees (Binary Indexed Tree)  
+🕒 2026-08-12 14:46:18
+
+Let's get cracking with Fenwick Trees! 🌳✨
+
+---
+
+## Fenwick Trees (Binary Indexed Tree - BIT): Your Speedy Sum Buddy!
+
+### What does it mean?
+
+Imagine you have a list of numbers, and you constantly need to do two things:
+1.  **Update** a single number in the list.
+2.  **Find the sum** of all numbers from the beginning up to any point (this is called a **prefix sum**).
+
+Doing this with a regular array is slow for one of the operations (`O(N)` for updates if you need to maintain prefix sums, or `O(N)` for queries if you don't).
+
+A **Fenwick Tree (FT)**, also known as a **Binary Indexed Tree (BIT)**, is a clever data structure that lets you do both of these tasks **super fast**! Think of it as a smarter way to manage cumulative sums.
+
+### Why it matters?
+
+Fenwick Trees are incredibly useful because they offer a fantastic balance:
+
+*   **Speed:** Both updating an element and querying a prefix sum take only `O(log N)` time. That's lightning fast for large lists!
+*   **Simplicity:** They are relatively simpler to implement compared to more general structures like Segment Trees for this specific problem type.
+*   **Space Efficiency:** They use `O(N)` space, which is just like storing the original array.
+*   **Common Use Case:** Perfect for competitive programming problems where you have many point updates and range sum queries (especially prefix sums).
+
+### How it Works (The Magic Behind `i & (-i)`)
+
+The core idea of a Fenwick Tree is that each node `ft[i]` doesn't store a single element's value. Instead, `ft[i]` stores the sum of a *range* of elements from the original array.
+
+The size and starting point of this range are determined by the `lowest set bit` of `i`. This "lowest set bit" can be found using the cool binary trick: `i & (-i)`.
+
+*   **`update(index, delta)`:** To add `delta` to `original_array[index]`:
+    *   We traverse upwards in the Fenwick Tree, adding `delta` to all `ft` nodes that cover `index`.
+    *   To find the next node, we add `i & (-i)` to the current `index`.
+    *   Example: If you update `index 4`, you update `ft[4]`, then `ft[4 + (4&-4)] = ft[8]`, then `ft[8 + (8&-8)] = ft[16]`, and so on.
+
+*   **`query(index)`:** To get the sum from `original_array[1]` to `original_array[index]`:
+    *   We traverse downwards, summing up the relevant `ft` nodes.
+    *   To find the previous node, we subtract `i & (-i)` from the current `index`.
+    *   Example: If you query `index 7`, you sum `ft[7]`, then `ft[7 - (7&-7)] = ft[6]`, then `ft[6 - (6&-6)] = ft[4]`, then `ft[4 - (4&-4)] = ft[0]` (stop).
+
+*(Note: Fenwick Trees often use 1-based indexing for easier binary arithmetic, so `index 0` is typically unused.)*
+
+### 1 Example Problem (Small)
+
+**Scenario:**
+You have an array, initially all zeros, of size 5: `[0, 0, 0, 0, 0]`
+
+**Tasks:**
+1.  **Update:** Add `5` to the element at index `2`.
+2.  **Update:** Add `3` to the element at index `4`.
+3.  **Query:** What is the sum of elements from index `0` to `3`?
+4.  **Update:** Add `10` to the element at index `2` (again).
+5.  **Query:** What is the sum of elements from index `0` to `3` now?
+
+**Expected Output:**
+*   After tasks 1-2, array is conceptually: `[0, 5, 0, 3, 0]` (using 0-based for conceptual array)
+*   Query 3 (sum 0-3): `0 + 5 + 0 + 3 = 8`
+*   After task 4, array is conceptually: `[0, 15, 0, 3, 0]`
+*   Query 5 (sum 0-3): `0 + 15 + 0 + 3 = 18`
+
+### 1 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::iota, optional
+
+// Fenwick Tree (Binary Indexed Tree) implementation
+class FenwickTree {
+private:
+    std::vector<int> ft; // The Fenwick Tree array (1-based indexing)
+    int N;               // Size of the original array (0-based indexing)
+
+public:
+    // Constructor: Initializes a Fenwick Tree for an array of 'size' elements
+    // Note: The Fenwick Tree 'ft' will have N+1 elements, index 0 is unused.
+    FenwickTree(int size) : N(size) {
+        ft.assign(N + 1, 0); // Initialize all Fenwick Tree nodes to 0
+    }
+
+    // Constructor to build from an initial array
+    FenwickTree(const std::vector<int>& initial_array) : N(initial_array.size()) {
+        ft.assign(N + 1, 0);
+        // Build the Fenwick Tree by performing updates for each element
+        for (int i = 0; i < N; ++i) {
+            update(i, initial_array[i]); // Using 0-based 'i' for input
+        }
+    }
+
+    // Update operation: Adds 'delta' to the element at 'index'
+    // 'index' is 0-based (like a normal array)
+    void update(int index, int delta) {
+        // Convert 0-based index to 1-based for Fenwick Tree
+        index++; 
+        for (; index <= N; index += (index & -index)) {
+            ft[index] += delta;
+        }
+    }
+
+    // Query operation: Returns the prefix sum from index 0 up to 'index'
+    // 'index' is 0-based (like a normal array)
+    int query(int index) {
+        int sum = 0;
+        // Convert 0-based index to 1-based for Fenwick Tree
+        index++; 
+        for (; index > 0; index -= (index & -index)) {
+            sum += ft[index];
+        }
+        return sum;
+    }
+
+    // Helper to get range sum [left, right] (inclusive, 0-based)
+    int query_range(int left, int right) {
+        if (left > right) return 0; // Handle invalid range
+        return query(right) - (left > 0 ? query(left - 1) : 0);
+    }
+};
+
+int main() {
+    int N_elements = 5;
+    
+    // Create a Fenwick Tree for 5 elements, initially all zeros
+    FenwickTree ft(N_elements); 
+
+    std::cout << "--- Initial State ---" << std::endl;
+    std::cout << "Sum up to index 2 (0-based): " << ft.query(2) << std::endl; // Expected: 0
+
+    // Task 1: Add 5 to element at index 2 (0-based)
+    ft.update(1, 5); // Index 1 (0-based) is the 2nd element
+    std::cout << "\n--- After update(1, 5) ---" << std::endl;
+    // Conceptually array is now: [0, 5, 0, 0, 0]
+    std::cout << "Sum up to index 0: " << ft.query(0) << std::endl; // Expected: 0
+    std::cout << "Sum up to index 1: " << ft.query(1) << std::endl; // Expected: 5
+    std::cout << "Sum up to index 2: " << ft.query(2) << std::endl; // Expected: 5
+    std::cout << "Sum up to index 4: " << ft.query(4) << std::endl; // Expected: 5
+
+    // Task 2: Add 3 to element at index 4 (0-based)
+    ft.update(3, 3); // Index 3 (0-based) is the 4th element
+    std::cout << "\n--- After update(3, 3) ---" << std::endl;
+    // Conceptually array is now: [0, 5, 0, 3, 0]
+    std::cout << "Sum up to index 0: " << ft.query(0) << std::endl; // Expected: 0
+    std::cout << "Sum up to index 1: " << ft.query(1) << std::endl; // Expected: 5
+    std::cout << "Sum up to index 2: " << ft.query(2) << std::endl; // Expected: 5
+    std::cout << "Sum up to index 3: " << ft.query(3) << std::endl; // Expected: 8 (5 + 3)
+    std::cout << "Sum up to index 4: " << ft.query(4) << std::endl; // Expected: 8
+
+    // Task 3: Query sum of elements from index 0 to 3
+    std::cout << "\n--- Query (0-3) ---" << std::endl;
+    std::cout << "Sum from index 0 to 3: " << ft.query_range(0, 3) << std::endl; // Expected: 8
+
+    // Task 4: Add 10 to element at index 2 (0-based) again
+    ft.update(1, 10); 
+    std::cout << "\n--- After update(1, 10) ---" << std::endl;
+    // Conceptually array is now: [0, 15, 0, 3, 0]
+    std::cout << "Sum up to index 1: " << ft.query(1) << std::endl; // Expected: 15
+    std::cout << "Sum up to index 3: " << ft.query(3) << std::endl; // Expected: 18 (15 + 3)
+
+    // Task 5: Query sum of elements from index 0 to 3 now
+    std::cout << "\n--- Query (0-3) Again ---" << std::endl;
+    std::cout << "Sum from index 0 to 3: " << ft.query_range(0, 3) << std::endl; // Expected: 18
+
+    // Example with initial array
+    std::vector<int> initial_data = {1, 2, 3, 4, 5}; // Array: [1, 2, 3, 4, 5]
+    FenwickTree ft2(initial_data);
+    
+    std::cout << "\n--- Fenwick Tree built from {1, 2, 3, 4, 5} ---" << std::endl;
+    std::cout << "Sum up to index 0: " << ft2.query(0) << std::endl; // Expected: 1
+    std::cout << "Sum up to index 2: " << ft2.query(2) << std::endl; // Expected: 1 + 2 + 3 = 6
+    std::cout << "Sum from index 1 to 3: " << ft2.query_range(1, 3) << std::endl; // Expected: 2 + 3 + 4 = 9
+
+    ft2.update(1, 10); // Add 10 to element at index 1 (value 2 becomes 12)
+    // Conceptually array: [1, 12, 3, 4, 5]
+    std::cout << "\n--- After update(1, 10) on ft2 ---" << std::endl;
+    std::cout << "Sum up to index 2: " << ft2.query(2) << std::endl; // Expected: 1 + 12 + 3 = 16
+    std::cout << "Sum from index 1 to 3: " << ft2.query_range(1, 3) << std::endl; // Expected: 12 + 3 + 4 = 19
+
+    return 0;
+}
+```
+
+---
+
+That's Fenwick Trees for you! A super efficient tool for specific sum and update tasks. Keep practicing, and you'll master this "tree-mendous" data structure! 🚀
+
+---
