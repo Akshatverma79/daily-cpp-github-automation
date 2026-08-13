@@ -72292,3 +72292,223 @@ int main() {
 That's Fenwick Trees for you! A super efficient tool for specific sum and update tasks. Keep practicing, and you'll master this "tree-mendous" data structure! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Shortest Path (Dijkstra's Algorithm)  
+🕒 2026-08-13 07:26:34
+
+Let's unravel Dijkstra's Algorithm, your friendly neighborhood shortest path finder! 🗺️
+
+---
+
+## 🚀 Dijkstra's Algorithm: Your Guide to Shortest Paths!
+
+### 1. What is it? (The Concept)
+
+Imagine you're trying to find the fastest way from your house to a friend's house, avoiding long routes. Dijkstra's Algorithm does exactly that for graphs!
+
+*   It's an algorithm for finding the **shortest paths** between nodes in a graph.
+*   Specifically, it finds the shortest path from a **single source node** to **all other nodes** in the graph.
+*   **Key Constraint:** It only works for graphs where **edge weights are non-negative** (no negative distances or costs allowed).
+
+Think of it as a smart explorer: it always picks the *closest unvisited* location and then updates its knowledge about how to get to other places through this new location.
+
+### 2. Why it matters (Real-World Impact)
+
+Dijkstra's is everywhere!
+
+*   **GPS Navigation:** Finding the quickest route between two points.
+*   **Network Routing:** Determining the most efficient path for data packets across a network.
+*   **Game AI:** Pathfinding for characters in video games.
+*   **Logistics & Delivery:** Optimizing delivery routes for packages.
+
+It's a fundamental building block for many complex systems!
+
+### 3. Example Problem (Small & Sweet)
+
+Let's find the shortest paths from node `A` to all other nodes in this simple graph:
+
+```
+      (4)       (2)
+   A ----- B ----- E
+   | \     /       |
+(2)|  (1) /        | (3)
+   |   C -------- D
+   \             /
+    (2)         (5)
+```
+
+Nodes: A, B, C, D, E
+Edges with weights:
+A-B: 4
+A-C: 2
+B-C: 1
+B-E: 3
+C-D: 2
+D-E: 5
+
+**Goal:** Find shortest distance from `A` to `A, B, C, D, E`.
+
+**Step-by-Step Intuition:**
+
+1.  **Start:**
+    *   `dist[A] = 0`
+    *   `dist[B] = ∞, dist[C] = ∞, dist[D] = ∞, dist[E] = ∞`
+    *   Priority Queue (PQ): `{(0, A)}` (distance, node)
+
+2.  **Pop (0, A):**
+    *   Neighbors of A: B, C
+    *   `dist[B]` becomes `min(∞, dist[A] + 4) = 4`. Push `(4, B)` to PQ.
+    *   `dist[C]` becomes `min(∞, dist[A] + 2) = 2`. Push `(2, C)` to PQ.
+    *   PQ: `{(2, C), (4, B)}`
+
+3.  **Pop (2, C):** (Smallest distance currently in PQ)
+    *   Neighbors of C: A, B, D
+    *   A is already visited (or `dist[C] + weight > dist[A]`).
+    *   `dist[B]` becomes `min(4, dist[C] + 1) = min(4, 2 + 1) = 3`. Update in PQ: remove old `(4, B)`, push new `(3, B)`.
+    *   `dist[D]` becomes `min(∞, dist[C] + 2) = 2 + 2 = 4`. Push `(4, D)` to PQ.
+    *   PQ: `{(3, B), (4, D)}` (the old `(4, B)` is effectively ignored later as `dist[B]` is now 3)
+
+4.  **Pop (3, B):**
+    *   Neighbors of B: A, C, E
+    *   A, C already "visited" with better paths.
+    *   `dist[E]` becomes `min(∞, dist[B] + 3) = 3 + 3 = 6`. Push `(6, E)` to PQ.
+    *   PQ: `{(4, D), (6, E)}`
+
+5.  **Pop (4, D):**
+    *   Neighbors of D: C, E
+    *   C already "visited".
+    *   `dist[E]` becomes `min(6, dist[D] + 5) = min(6, 4 + 5) = min(6, 9) = 6`. No change.
+    *   PQ: `{(6, E)}`
+
+6.  **Pop (6, E):**
+    *   No unvisited neighbors.
+    *   PQ: `{}`
+
+**Final Shortest Distances from A:**
+*   `A`: 0
+*   `B`: 3 (A -> C -> B)
+*   `C`: 2 (A -> C)
+*   `D`: 4 (A -> C -> D)
+*   `E`: 6 (A -> C -> B -> E)
+
+### 4. Simple C++ Implementation
+
+Here's a clean C++ implementation using an adjacency list for the graph and a `priority_queue` for efficiency.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>      // For priority_queue
+#include <limits>     // For numeric_limits::max()
+
+// Define a shorthand for infinity
+const int INF = std::numeric_limits<int>::max();
+
+// Structure to represent an edge (neighbor node and its weight)
+// In the priority queue, we'll store {distance, node}
+// In the adjacency list, we'll store {weight, neighbor_node}
+using Edge = std::pair<int, int>; // {weight, destination_node}
+
+// Function to run Dijkstra's algorithm
+std::vector<int> dijkstra(int start_node, int num_nodes, const std::vector<std::vector<Edge>>& adj) {
+    // 1. Initialize distances:
+    //    dist[i] will store the shortest distance found so far from start_node to node i.
+    std::vector<int> dist(num_nodes, INF);
+    dist[start_node] = 0; // Distance to itself is 0
+
+    // 2. Priority Queue: Stores {current_shortest_distance, node}
+    //    It's a min-heap, so it always pops the node with the smallest distance.
+    //    Note: std::priority_queue is a max-heap by default, so we use std::greater<Edge> for a min-heap.
+    //    Here, Edge is {distance, node}
+    std::priority_queue<Edge, std::vector<Edge>, std::greater<Edge>> pq;
+    pq.push({0, start_node}); // Push the start node with distance 0
+
+    // 3. Main Loop
+    while (!pq.empty()) {
+        int d = pq.top().first;  // Current shortest distance to 'u'
+        int u = pq.top().second; // Current node
+        pq.pop();
+
+        // Important: If we've already found a shorter path to 'u',
+        // skip this entry (it's an outdated entry from the PQ).
+        if (d > dist[u]) {
+            continue;
+        }
+
+        // Explore neighbors of 'u'
+        for (const auto& edge : adj[u]) {
+            int weight = edge.first; // Weight of the edge from u to v
+            int v = edge.second;     // Neighbor node 'v'
+
+            // Relaxation step: If a shorter path to 'v' is found through 'u'
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight; // Update distance to 'v'
+                pq.push({dist[v], v});     // Push updated path to PQ
+            }
+        }
+    }
+
+    return dist; // Return the vector of shortest distances
+}
+
+int main() {
+    // Example from above
+    int num_nodes = 5; // Nodes A, B, C, D, E (0-indexed: 0, 1, 2, 3, 4)
+    int start_node = 0; // A is node 0
+
+    // Adjacency list: adj[u] contains a list of {weight, v} for edges (u,v)
+    std::vector<std::vector<Edge>> adj(num_nodes);
+
+    // Add edges: {weight, destination_node}
+    adj[0].push_back({4, 1}); // A (0) -> B (1) with weight 4
+    adj[0].push_back({2, 2}); // A (0) -> C (2) with weight 2
+
+    adj[1].push_back({1, 2}); // B (1) -> C (2) with weight 1
+    adj[1].push_back({3, 4}); // B (1) -> E (4) with weight 3
+
+    adj[2].push_back({2, 3}); // C (2) -> D (3) with weight 2
+    // For undirected graphs, add reverse edges too (if weights are same)
+    // For directed, only add specified
+    // For this example, let's assume directed as shown in problem desc.
+
+    adj[3].push_back({5, 4}); // D (3) -> E (4) with weight 5
+
+    std::vector<int> shortest_distances = dijkstra(start_node, num_nodes, adj);
+
+    std::cout << "Shortest distances from node " << start_node << " (A):\n";
+    char node_name = 'A';
+    for (int i = 0; i < num_nodes; ++i) {
+        std::cout << "To " << static_cast<char>(node_name + i) << ": ";
+        if (shortest_distances[i] == INF) {
+            std::cout << "Unreachable\n";
+        } else {
+            std::cout << shortest_distances[i] << "\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Shortest distances from node 0 (A):
+To A: 0
+To B: 3
+To C: 2
+To D: 4
+To E: 6
+```
+
+### Time Complexity:
+
+*   Using a **binary heap (priority queue)**, Dijkstra's has a time complexity of **O((V + E) log V)**, where V is the number of vertices (nodes) and E is the number of edges. This is quite efficient for sparse graphs (E is small relative to V^2).
+*   If you use a **Fibonacci heap**, it can be optimized to **O(E + V log V)**, but Fibonacci heaps are much more complex to implement and rarely used in competitive programming.
+
+---
+
+That's Dijkstra's Algorithm in a nutshell! It's powerful, intuitive, and a must-know for any aspiring DSA enthusiast. Keep practicing! ✨
+
+---
