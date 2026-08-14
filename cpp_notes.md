@@ -72733,3 +72733,195 @@ int main() {
 That's Bellman-Ford for you! A robust algorithm ready for paths with tricky negative costs and keeping an eye out for those endless gain loops. Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2026-08-14 07:23:59
+
+Here's a clean and simple note on the Floyd-Warshall Algorithm!
+
+---
+
+## 🗺️ Floyd-Warshall Algorithm: All Paths, All the Time!
+
+Imagine you have a map with cities and roads connecting them, each road having a "cost" (distance, time, etc.). You want to know the *shortest* way to get from *any* city to *any other* city. That's exactly what Floyd-Warshall helps you with!
+
+### 💡 What's the Concept?
+
+The Floyd-Warshall algorithm is a **Dynamic Programming** algorithm used to find the **shortest paths between all pairs of vertices** in a weighted, directed graph.
+
+It works by systematically trying every possible intermediate vertex `k` for every pair of source `i` and destination `j`.
+
+**The core idea:** For any two vertices `i` and `j`, the shortest path between them either:
+1.  Doesn't go through an intermediate vertex `k`.
+2.  Goes through an intermediate vertex `k`.
+
+So, we update the shortest path `dist[i][j]` by comparing its current value with the path `dist[i][k] + dist[k][j]`.
+
+**Key Feature:** It can handle graphs with **negative edge weights** (but not negative cycles, which would make shortest paths undefined).
+
+### ✨ Why It Matters?
+
+1.  **All-Pairs Shortest Path (APSP):** When you need to know the shortest route between *every single pair* of nodes in a graph. (Unlike Dijkstra, which finds shortest paths from a *single source*).
+2.  **Navigation & Routing:** Pre-calculating distances between all major locations.
+3.  **Network Protocols:** Finding optimal routes for data packets.
+4.  **Transitive Closure:** Determining if there's *any* path (not just shortest) between two vertices.
+5.  **Simplicity:** It's relatively easy to implement with three nested loops.
+
+### 🚶‍♂️ Small Example Problem
+
+Let's say we have 3 cities (0, 1, 2) and some direct routes:
+
+*   0 to 1: cost 4
+*   0 to 2: cost 10
+*   1 to 2: cost 3
+*   2 to 0: cost 2
+
+We want to find the shortest path between all pairs.
+
+**1. Initial Distance Matrix (dist):**
+*   `dist[i][j]` is the direct cost if an edge exists, `0` if `i == j`, and `INF` (infinity) if no direct edge.
+
+```
+      0   1   2
+   -----------------
+0 |   0   4  10
+1 | INF   0   3
+2 |   2 INF   0
+```
+
+**2. Iteration `k = 0` (Allowing vertex 0 as an intermediate):**
+*   Consider if paths through 0 shorten any `dist[i][j]`.
+*   Example: `dist[2][1]` = `min(INF, dist[2][0] + dist[0][1])` = `min(INF, 2 + 4)` = `6`. Update!
+
+```
+      0   1   2
+   -----------------
+0 |   0   4  10
+1 | INF   0   3
+2 |   2   6   0  (dist[2][1] updated)
+```
+
+**3. Iteration `k = 1` (Allowing vertex 1 as an intermediate):**
+*   Consider if paths through 1 shorten any `dist[i][j]`.
+*   Example: `dist[0][2]` = `min(10, dist[0][1] + dist[1][2])` = `min(10, 4 + 3)` = `7`. Update!
+
+```
+      0   1   2
+   -----------------
+0 |   0   4   7  (dist[0][2] updated)
+1 | INF   0   3
+2 |   2   6   0
+```
+
+**4. Iteration `k = 2` (Allowing vertex 2 as an intermediate):**
+*   Consider if paths through 2 shorten any `dist[i][j]`.
+*   Example: `dist[1][0]` = `min(INF, dist[1][2] + dist[2][0])` = `min(INF, 3 + 2)` = `5`. Update!
+
+```
+      0   1   2
+   -----------------
+0 |   0   4   7
+1 |   5   0   3  (dist[1][0] updated)
+2 |   2   6   0
+```
+
+**Final Shortest Path Matrix:** This matrix now holds the shortest path between every pair of vertices!
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int INF = 1e9; // A large number to represent infinity (avoids overflow issues compared to INT_MAX)
+
+void floydWarshall(int V, std::vector<std::vector<int>>& dist) {
+    // The core of the Floyd-Warshall algorithm
+    // k is the intermediate vertex
+    for (int k = 0; k < V; ++k) {
+        // i is the source vertex
+        for (int i = 0; i < V; ++i) {
+            // j is the destination vertex
+            for (int j = 0; j < V; ++j) {
+                // If vertex k is on the shortest path from i to j,
+                // then update the value of dist[i][j]
+                
+                // Important: Check if dist[i][k] and dist[k][j] are not INF
+                // to prevent overflow when adding INF + INF or INF + a number
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+
+    // Optional: Detect negative cycles
+    // If after all iterations, dist[i][i] < 0 for any i,
+    // it means there's a negative cycle reachable from i and leading back to i.
+    for (int i = 0; i < V; ++i) {
+        if (dist[i][i] < 0) {
+            std::cout << "Graph contains a negative cycle accessible from vertex " << i << std::endl;
+            // Depending on requirements, you might want to exit or handle this differently
+        }
+    }
+}
+
+void printSolution(int V, const std::vector<std::vector<int>>& dist) {
+    std::cout << "Shortest path matrix:\n";
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF ";
+            } else {
+                std::cout << dist[i][j] << "   ";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main() {
+    int V = 3; // Number of vertices
+
+    // Initialize the distance matrix based on the example problem
+    // dist[i][j] stores the shortest distance from i to j
+    std::vector<std::vector<int>> dist = {
+        {0,   4,  10},
+        {INF, 0,   3},
+        {2,   INF, 0}
+    };
+
+    std::cout << "Initial matrix:\n";
+    printSolution(V, dist);
+    std::cout << "\n";
+
+    floydWarshall(V, dist);
+
+    printSolution(V, dist);
+
+    return 0;
+}
+```
+
+**Output for the example:**
+
+```
+Initial matrix:
+0   4   10   
+INF 0   3   
+2   INF 0   
+
+Shortest path matrix:
+0   4   7   
+5   0   3   
+2   6   0   
+```
+
+---
+
+**Complexity:** The time complexity of Floyd-Warshall is **O(V^3)**, where `V` is the number of vertices, due to its three nested loops. This makes it suitable for graphs with a moderate number of vertices.
+
+---
