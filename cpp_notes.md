@@ -73293,3 +73293,205 @@ int main() {
 Hope this helps you grasp Topological Sort with Kahn's Algorithm! It's a fundamental graph algorithm with lots of practical uses. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Strongly Connected Components  
+🕒 2026-08-15 14:03:08
+
+Hey there, aspiring DSA wizard! 👋 Let's break down Strongly Connected Components (SCCs) – a super useful concept in graph theory.
+
+---
+
+### What are Strongly Connected Components?
+
+Imagine you have a bunch of one-way streets (a **directed graph**).
+
+*   **Strongly Connected:** Two nodes `u` and `v` are "strongly connected" if you can get from `u` to `v` AND from `v` to `u`. Think of it like a two-way street, even if you have to take a long, winding path.
+*   **Strongly Connected Component (SCC):** This is a *maximal* subgraph where every node is strongly connected to every other node within that subgraph. "Maximal" just means you can't add any more nodes to this group and still maintain the strong connectivity property.
+
+**In simpler terms:** An SCC is like a "club" of nodes where everyone in the club can reach everyone else in the club, and vice-versa, by following the directed paths. Once you leave the club, you might not be able to get back in easily.
+
+---
+
+### Why Do They Matter?
+
+SCCs are powerful because they help simplify complex directed graphs:
+
+1.  **Simplification:** If you "condense" each SCC into a single "super-node," the resulting graph is always a **Directed Acyclic Graph (DAG)**. This is a huge deal because DAGs are much easier to work with (e.g., you can topologically sort them).
+2.  **Cycle Detection:** If an SCC has more than one node, it *guarantees* there's a cycle within that component.
+3.  **Real-world Applications:**
+    *   **Dependency Analysis:** In build systems or task scheduling, identifying SCCs can reveal circular dependencies (deadlocks).
+    *   **Network Analysis:** Finding groups of highly interconnected parts of a network.
+    *   **2-Satisfiability (2-SAT):** A class of logic problems can be solved by transforming them into an SCC problem.
+
+---
+
+### Example Problem
+
+Let's find the SCCs in this simple directed graph:
+
+**Nodes:** 0, 1, 2, 3, 4, 5
+
+**Edges:**
+*   0 -> 1
+*   1 -> 0
+*   1 -> 2
+*   2 -> 3
+*   3 -> 4
+*   4 -> 2
+*   4 -> 5
+
+**Let's trace it:**
+*   Can 0 reach 1? Yes (0->1). Can 1 reach 0? Yes (1->0). So {0, 1} form an SCC.
+*   From 2: 2->3->4->2. Can 2 reach 3? Yes. Can 3 reach 2? Yes (3->4->2). Same for 2,4 and 3,4. So {2, 3, 4} form another SCC.
+*   From 4, we can go to 5. But can 5 go back to 4? No. So 5 is an SCC by itself.
+*   From {0,1} you can go to {2,3,4} via 1->2. But you can't go back.
+*   From {2,3,4} you can go to {5} via 4->5. But you can't go back.
+
+**Expected SCCs:**
+*   `{0, 1}`
+*   `{2, 3, 4}`
+*   `{5}`
+
+---
+
+### Simple C++ Implementation (Kosaraju's Algorithm)
+
+Kosaraju's algorithm is a classic way to find SCCs. It's quite intuitive, involving two DFS passes:
+
+1.  **DFS Pass 1:** Perform a DFS on the original graph. As each node *finishes* (i.e., all its descendants have been visited), add it to a stack. This stack will give us an ordering of nodes, with "source-like" nodes of SCCs appearing later in the stack.
+2.  **Reverse Graph:** Create a new graph where all edges are reversed.
+3.  **DFS Pass 2:** Pop nodes from the stack obtained in Step 1. For each unvisited node, perform a DFS on the *reversed* graph. All nodes reachable from this starting node in the reversed graph (and not yet visited) belong to the same SCC.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <algorithm> // For std::reverse (optional, just for printing if preferred)
+
+// Adjacency list for the original graph
+std::vector<std::vector<int>> adj;
+// Adjacency list for the reversed graph
+std::vector<std::vector<int>> rev_adj;
+// Visited array for DFS
+std::vector<bool> visited;
+// Stack to store nodes in order of finishing times (DFS Pass 1)
+std::stack<int> order_stack;
+// To store all found SCCs
+std::vector<std::vector<int>> all_sccs;
+
+// --- DFS Pass 1: Populate the order_stack ---
+void dfs1(int u) {
+    visited[u] = true;
+    for (int v : adj[u]) {
+        if (!visited[v]) {
+            dfs1(v);
+        }
+    }
+    // After visiting all descendants, push u to stack
+    order_stack.push(u);
+}
+
+// --- DFS Pass 2: Find SCCs on the reversed graph ---
+void dfs2(int u, std::vector<int>& current_scc) {
+    visited[u] = true;
+    current_scc.push_back(u);
+    for (int v : rev_adj[u]) {
+        if (!visited[v]) {
+            dfs2(v, current_scc);
+        }
+    }
+}
+
+// Main function to find all SCCs
+void find_sccs(int n_nodes) {
+    // Initialize visited array for DFS Pass 1
+    visited.assign(n_nodes, false);
+
+    // Step 1: Populate order_stack with finishing times
+    for (int i = 0; i < n_nodes; ++i) {
+        if (!visited[i]) {
+            dfs1(i);
+        }
+    }
+
+    // Initialize visited array for DFS Pass 2 (important to reset!)
+    visited.assign(n_nodes, false);
+
+    // Step 2: Process nodes in decreasing order of finishing times (from stack)
+    while (!order_stack.empty()) {
+        int u = order_stack.top();
+        order_stack.pop();
+
+        if (!visited[u]) {
+            std::vector<int> current_scc;
+            dfs2(u, current_scc);
+            all_sccs.push_back(current_scc);
+        }
+    }
+}
+
+int main() {
+    int num_nodes = 6; // Nodes 0 to 5
+    adj.resize(num_nodes);
+    rev_adj.resize(num_nodes);
+
+    // Add edges for our example graph
+    // 0 -> 1
+    adj[0].push_back(1);
+    rev_adj[1].push_back(0); // Reversed edge: 1 -> 0
+
+    // 1 -> 0
+    adj[1].push_back(0);
+    rev_adj[0].push_back(1); // Reversed edge: 0 -> 1
+
+    // 1 -> 2
+    adj[1].push_back(2);
+    rev_adj[2].push_back(1); // Reversed edge: 2 -> 1
+
+    // 2 -> 3
+    adj[2].push_back(3);
+    rev_adj[3].push_back(2); // Reversed edge: 3 -> 2
+
+    // 3 -> 4
+    adj[3].push_back(4);
+    rev_adj[4].push_back(3); // Reversed edge: 4 -> 3
+
+    // 4 -> 2
+    adj[4].push_back(2);
+    rev_adj[2].push_back(4); // Reversed edge: 2 -> 4
+
+    // 4 -> 5
+    adj[4].push_back(5);
+    rev_adj[5].push_back(4); // Reversed edge: 5 -> 4
+
+    // Find the SCCs
+    find_sccs(num_nodes);
+
+    // Print the results
+    std::cout << "Strongly Connected Components:\n";
+    for (const auto& scc : all_sccs) {
+        std::cout << "{ ";
+        for (int node : scc) {
+            std::cout << node << " ";
+        }
+        std::cout << "}\n";
+    }
+
+    return 0;
+}
+```
+
+**Output of the example code:**
+
+```
+Strongly Connected Components:
+{ 0 1 }
+{ 2 4 3 }
+{ 5 }
+```
+
+This matches our expected SCCs! Pretty neat, right? Now you have a solid grasp of SCCs and how to find them. Keep exploring! ✨
+
+---
