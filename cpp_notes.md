@@ -73134,3 +73134,162 @@ MST algorithms (like Prim's and Kruskal's) are elegant examples of **greedy algo
 Keep practicing and these concepts will become second nature! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-08-15 06:37:38
+
+Hey there, future DSA pro! Let's demystify Topological Sort, specifically using Kahn's Algorithm.
+
+---
+
+## 🗺️ Topological Sort (Kahn's Algorithm)
+
+### What it Means (The Concept)
+
+Imagine you have a bunch of tasks, and some tasks *must* be done before others. Topological Sort helps you find a valid order to do all of them.
+
+*   It's a linear ordering of vertices (nodes) in a **Directed Acyclic Graph (DAG)**.
+*   **Directed:** Edges have a direction (e.g., Task A *must* precede Task B, so `A -> B`).
+*   **Acyclic:** No cycles! If there's a cycle (e.g., A needs B, B needs C, and C needs A), then a linear ordering isn't possible.
+*   **The Rule:** For every directed edge `u -> v`, `u` must appear before `v` in the ordering.
+
+Kahn's Algorithm is a popular way to find one such valid order. Its core idea is simple: *start with tasks that have no prerequisites.*
+
+### Why it Matters (Importance)
+
+Topological Sort is super useful for scheduling and dependency resolution! Think about:
+
+*   **Task Scheduling:** Which courses to take before others? (e.g., Calculus before Advanced Math)
+*   **Build Systems:** Which code modules to compile first? (e.g., `make` files)
+*   **Dependency Resolution:** Installing software packages with prerequisites.
+*   **Project Management:** Ordering project tasks with dependencies.
+
+### How Kahn's Algorithm Works (Simplified Steps)
+
+1.  **Count In-degrees:** For every node, calculate its "in-degree" – the number of incoming edges it has. This tells you how many prerequisites a task has.
+2.  **Initialize Queue:** Add all nodes with an in-degree of `0` to a queue. These are the tasks you can start immediately.
+3.  **Process Queue:**
+    *   While the queue is not empty:
+        *   Dequeue a node `u`. Add `u` to your result list (this is part of the valid order).
+        *   For each neighbor `v` (task `u` precedes `v`):
+            *   Decrement `v`'s in-degree (you've now completed one of its prerequisites).
+            *   If `v`'s in-degree becomes `0`, enqueue `v` (it's now ready to be processed!).
+4.  **Check for Cycles:** If the final result list doesn't contain all nodes, it means there was a cycle in the graph, and a topological sort isn't possible.
+
+### Example Problem
+
+Let's order some courses:
+
+*   Course 0 has no prerequisites.
+*   Course 1 requires Course 0. (`0 -> 1`)
+*   Course 2 requires Course 0. (`0 -> 2`)
+*   Course 3 requires Course 1 and Course 2. (`1 -> 3`, `2 -> 3`)
+
+**Graph:**
+```
+  0
+ / \
+v   v
+1   2
+ \ /
+  v
+  3
+```
+
+**Valid Topological Sorts:** `0, 1, 2, 3` OR `0, 2, 1, 3`
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <numeric> // For std::iota (optional, not strictly needed for algorithm)
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSortKahn(int numNodes, const std::vector<std::vector<int>>& edges) {
+    // 1. Initialize data structures
+    std::vector<std::vector<int>> adj(numNodes); // Adjacency list for graph
+    std::vector<int> inDegree(numNodes, 0);      // In-degree for each node
+
+    // 2. Build graph and calculate in-degrees
+    // Each 'edge' represents a dependency: {course_to_take, prerequisite_course}
+    // So, prerequisite_course -> course_to_take
+    for (const auto& edge : edges) {
+        int course_to_take = edge[0];
+        int prerequisite_course = edge[1];
+        adj[prerequisite_course].push_back(course_to_take);
+        inDegree[course_to_take]++; // Increment in-degree of the course that has a prerequisite
+    }
+
+    // 3. Initialize queue with nodes having 0 in-degree
+    std::queue<int> q;
+    for (int i = 0; i < numNodes; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 4. Process nodes from the queue
+    std::vector<int> result;
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u);
+
+        // For each neighbor 'v' of 'u'
+        for (int v : adj[u]) {
+            inDegree[v]--; // Decrement in-degree of neighbor
+            if (inDegree[v] == 0) {
+                q.push(v); // If in-degree becomes 0, add to queue
+            }
+        }
+    }
+
+    // 5. Check for cycles (if result size is less than numNodes, a cycle exists)
+    if (result.size() != numNodes) {
+        // A cycle was detected, topological sort is not possible
+        std::cout << "Error: A cycle was detected in the graph!\n";
+        return {}; // Return empty vector or throw an error
+    }
+
+    return result;
+}
+
+int main() {
+    int numCourses = 4;
+    // Edges represent {course_to_take, prerequisite_course}
+    // e.g., {1, 0} means Course 1 requires Course 0 (0 -> 1)
+    std::vector<std::vector<int>> prerequisites = {
+        {1, 0}, // 0 -> 1
+        {2, 0}, // 0 -> 2
+        {3, 1}, // 1 -> 3
+        {3, 2}  // 2 -> 3
+    };
+
+    std::vector<int> order = topologicalSortKahn(numCourses, prerequisites);
+
+    if (!order.empty()) {
+        std::cout << "A valid topological order of courses is: ";
+        for (int course : order) {
+            std::cout << course << " ";
+        }
+        std::cout << std::endl; // Expected: 0 1 2 3 OR 0 2 1 3
+    }
+
+    // Example with a cycle (if 3 required 0 and 0 required 3)
+    // numCourses = 2;
+    // prerequisites = {{0, 1}, {1, 0}}; // 1 -> 0, 0 -> 1 (cycle!)
+    // order = topologicalSortKahn(numCourses, prerequisites);
+
+    return 0;
+}
+```
+
+---
+
+Hope this helps you grasp Topological Sort with Kahn's Algorithm! It's a fundamental graph algorithm with lots of practical uses. Happy coding!
+
+---
