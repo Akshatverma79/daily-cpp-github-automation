@@ -73495,3 +73495,197 @@ Strongly Connected Components:
 This matches our expected SCCs! Pretty neat, right? Now you have a solid grasp of SCCs and how to find them. Keep exploring! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bridges and Articulation Points  
+🕒 2026-08-16 06:39:18
+
+Hey there, future graph guru! 👋 Let's dive into some pretty cool concepts that help us find the "critical spots" in a graph.
+
+---
+
+### Graph Guardians: Bridges & Articulation Points
+
+Imagine your graph is a network, a city, or even a circuit board. Bridges and Articulation Points are like the vital junctions or connections that, if removed, could break the network apart!
+
+---
+
+#### 1. What do they mean?
+
+*   **Bridges (Cut Edges):**
+    *   **Concept:** An edge in an undirected graph whose removal increases the number of connected components.
+    *   **Analogy:** Think of a real-world bridge connecting two islands. If that bridge is destroyed, the islands become disconnected.
+    *   **Visual:** If you delete the edge, and two nodes that were once reachable from each other are no longer connected, it's a bridge.
+
+*   **Articulation Points (Cut Vertices):**
+    *   **Concept:** A vertex in an undirected graph whose removal (along with all incident edges) increases the number of connected components.
+    *   **Analogy:** Imagine a critical support pillar in a building. If you remove that pillar, parts of the building might collapse and split into separate pieces.
+    *   **Visual:** If you delete the node and all edges connected to it, and the remaining graph breaks into more pieces, that node was an articulation point.
+
+---
+
+#### 2. Why do they matter?
+
+These concepts are super practical!
+
+*   **Network Reliability:** Identifying bridges helps you find single points of failure in communication networks (internet, power grids). If that connection goes down, parts of your network might become isolated.
+*   **Infrastructure Design:** Knowing articulation points in road networks or pipeline systems can highlight critical junctions. Removing one could cause massive disruptions.
+*   **Social Networks:** Critical individuals (articulation points) might be key influencers or connectors between different communities. Removing them could fragment the network.
+*   **Vulnerability Analysis:** In security, these points can represent vulnerabilities that, if exploited, can isolate large parts of a system.
+
+---
+
+#### 3. Example Problem (Small & Sweet)
+
+**Problem:** Given a simple graph, find all its Bridges and Articulation Points.
+
+**Graph:**
+```
+     0 --- 1 --- 3 --- 4
+     |     |
+     2 ----/
+```
+**Input (N M, then M edges):**
+```
+5 5
+0 1
+1 2
+2 0
+1 3
+3 4
+```
+
+**Expected Output:**
+*   **Bridges:** `(1, 3)`, `(3, 4)`
+    *   Removing (1,3) separates {0,1,2} from {3,4}.
+    *   Removing (3,4) separates {0,1,2,3} from {4}.
+*   **Articulation Points:** `1`, `3`
+    *   Removing 1 disconnects {0,2} from {3,4}.
+    *   Removing 3 disconnects {0,1,2} from {4}.
+
+---
+
+#### 4. Simple C++ Implementation (Using DFS)
+
+The common way to find both is with a single Depth-First Search (DFS) traversal, keeping track of `discovery_time` (when a node is first visited) and `low_link_value` (the lowest discovery time reachable from the node or its DFS subtree *without* using the immediate parent edge).
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <set>       // To store unique articulation points
+
+// Global variables for simplicity in competitive programming style
+std::vector<std::vector<int>> adj;
+std::vector<bool> visited;
+std::vector<int> discovery_time; // disc[u]: discovery time of u
+std::vector<int> low_link_value; // low[u]: lowest discovery time reachable from u (or its subtree)
+int timer; // Global timer for discovery_time
+
+std::vector<std::pair<int, int>> bridges;
+std::set<int> articulation_points; // Use a set to automatically handle unique points
+
+// DFS function to find bridges and articulation points
+void find_ap_and_bridges_dfs(int u, int p = -1) { // u: current node, p: parent of u
+    visited[u] = true;
+    discovery_time[u] = low_link_value[u] = timer++;
+
+    int children_count = 0; // For root articulation point check
+
+    for (int v : adj[u]) {
+        if (v == p) continue; // Don't go back to parent
+
+        if (visited[v]) {
+            // v is visited and not parent of u -> back-edge
+            // Update low_link_value of u (can reach an ancestor via v)
+            low_link_value[u] = std::min(low_link_value[u], discovery_time[v]);
+        } else {
+            // v is not visited -> forward edge (tree edge)
+            children_count++;
+            find_ap_and_bridges_dfs(v, u); // Recur for v
+
+            // After DFS call returns for v, update low_link_value of u
+            low_link_value[u] = std::min(low_link_value[u], low_link_value[v]);
+
+            // --- BRIDGE CONDITION ---
+            // If the lowest_link_value of child v is greater than the discovery_time of u,
+            // it means there is no back-edge from v's subtree to u or any of u's ancestors.
+            // So, (u, v) is a bridge.
+            if (low_link_value[v] > discovery_time[u]) {
+                bridges.push_back({u, v});
+            }
+
+            // --- ARTICULATION POINT CONDITION ---
+            // 1. For non-root node u:
+            //    If low_link_value of child v is greater than or equal to discovery_time of u,
+            //    it means v and its subtree cannot reach any ancestor of u (or u itself)
+            //    without passing through u. So, u is an articulation point.
+            if (p != -1 && low_link_value[v] >= discovery_time[u]) {
+                articulation_points.insert(u);
+            }
+        }
+    }
+
+    // --- ARTICULATION POINT CONDITION (for ROOT node) ---
+    // The root of the DFS tree is an articulation point if it has more than one child
+    // in the DFS tree. (The `children_count` variable handles this.)
+    if (p == -1 && children_count > 1) {
+        articulation_points.insert(u);
+    }
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int N, M; // N: number of nodes, M: number of edges
+    std::cin >> N >> M;
+
+    adj.resize(N);
+    visited.assign(N, false);
+    discovery_time.assign(N, -1);
+    low_link_value.assign(N, -1);
+    timer = 0;
+
+    for (int i = 0; i < M; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u); // Undirected graph
+    }
+
+    // Call DFS for each unvisited node to handle disconnected graphs
+    for (int i = 0; i < N; ++i) {
+        if (!visited[i]) {
+            find_ap_and_bridges_dfs(i); // p = -1 indicates it's a root of a DFS tree
+        }
+    }
+
+    std::cout << "Bridges:\n";
+    if (bridges.empty()) {
+        std::cout << "None\n";
+    } else {
+        for (const auto& bridge : bridges) {
+            std::cout << "(" << bridge.first << ", " << bridge.second << ")\n";
+        }
+    }
+
+    std::cout << "\nArticulation Points:\n";
+    if (articulation_points.empty()) {
+        std::cout << "None\n";
+    } else {
+        for (int ap : articulation_points) {
+            std::cout << ap << "\n";
+        }
+    }
+
+    return 0;
+}
+```
+
+---
+
+This method runs in **O(V + E)** time, which is very efficient for graph problems. Keep exploring, and happy coding! ✨
+
+---
