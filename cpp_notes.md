@@ -73689,3 +73689,160 @@ int main() {
 This method runs in **O(V + E)** time, which is very efficient for graph problems. Keep exploring, and happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-08-16 14:08:23
+
+Hey there, future DSA pro! 👋 Let's dive into a classic problem: **Longest Common Subsequence (LCS)**.
+
+---
+
+### DSA Note: Longest Common Subsequence (LCS)
+
+#### What is LCS? 🤔
+
+Imagine you have two strings. A **subsequence** is a sequence that can be derived from another sequence by deleting zero or more elements without changing the order of the remaining elements.
+
+*   Example: "ACE" is a subsequence of "ABCDE". "AEC" is NOT.
+
+The **Longest Common Subsequence (LCS)** of two strings is the longest sequence of characters that appears in both strings in the same relative order, but not necessarily contiguously.
+
+*   **Key Distinction:** It's *subsequence*, not *substring*. Characters don't have to be adjacent in the original string.
+
+#### Why Does LCS Matter? 🚀
+
+LCS is super useful in many real-world applications:
+
+1.  **Diff Tools:** Ever used Git or compared two files? Tools like `diff` use LCS to figure out the minimal changes (additions/deletions) needed to transform one file into another.
+2.  **Bioinformatics:** Comparing DNA or protein sequences to find similarities or evolutionary relationships.
+3.  **Plagiarism Detection:** Identifying similarities between documents.
+4.  **Spell Checkers & Data Compression:** Though often indirect, the principles can be applied.
+
+#### 1 Example Problem (Small & Sweet)
+
+**Problem:** Find the length of the Longest Common Subsequence of two strings:
+`text1 = "ABC"`
+`text2 = "ACB"`
+
+**Solution:**
+Let's list common subsequences:
+*   "A"
+*   "B"
+*   "C"
+*   "AB" (from "A**B**C" and "AC**B**")
+*   "AC" (from "**A**BC" and "**AC**B")
+
+The longest ones are "AB" and "AC", both with length 2. So, the LCS length is **2**.
+
+#### How to Solve LCS (Dynamic Programming Intuition)
+
+LCS is a classic Dynamic Programming (DP) problem. We build up the solution from smaller subproblems.
+
+Let `dp[i][j]` be the length of the LCS of `text1[0...i-1]` and `text2[0...j-1]`.
+
+1.  **Base Cases:** If either string is empty, the LCS length is 0.
+    *   `dp[0][j] = 0` for all `j`
+    *   `dp[i][0] = 0` for all `i`
+
+2.  **Recursive Relation (Building the DP Table):**
+    *   **If `text1[i-1]` == `text2[j-1]` (characters match):**
+        *   We found a common character! The LCS length increases by 1, based on the LCS of the strings *before* these matching characters.
+        *   `dp[i][j] = 1 + dp[i-1][j-1]`
+    *   **If `text1[i-1]` != `text2[j-1]` (characters don't match):**
+        *   We can't include both characters. We have two choices:
+            1.  Exclude `text1[i-1]` and find LCS of `text1[0...i-2]` and `text2[0...j-1]`. (This is `dp[i-1][j]`)
+            2.  Exclude `text2[j-1]` and find LCS of `text1[0...i-1]` and `text2[0...j-2]`. (This is `dp[i][j-1]`)
+        *   We take the maximum of these two options.
+        *   `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`
+
+**Let's trace our example: `text1 = "ABC"`, `text2 = "ACB"`**
+
+```
+    ""  A   C   B  <-- text2
+""  0   0   0   0
+A   0   1   1   1
+B   0   1   1   2  <-- dp[3][3] (LCS of "ABC", "ACB")
+C   0   1   2   2
+^
+text1
+```
+
+*   `dp[0][j]` and `dp[i][0]` are all 0s (base cases).
+*   `dp[1][1]` (A vs A): Match! `1 + dp[0][0] = 1 + 0 = 1`.
+*   `dp[1][2]` (A vs C): No Match. `max(dp[0][2], dp[1][1]) = max(0, 1) = 1`.
+*   `dp[2][3]` (B vs B): Match! `1 + dp[1][2] = 1 + 1 = 2`.
+*   `dp[3][2]` (C vs C): Match! `1 + dp[2][1] = 1 + 1 = 2`.
+*   ...and so on, until we reach `dp[3][3]`.
+
+The final answer is `dp[m][n]`, where `m` and `n` are the lengths of `text1` and `text2`. In our case, `dp[3][3]` is **2**.
+
+#### 1 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length();
+    int n = text2.length();
+
+    // Create a 2D DP table.
+    // dp[i][j] will store the length of LCS of text1[0...i-1] and text2[0...j-1]
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the dp table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            // If characters match
+            if (text1[i - 1] == text2[j - 1]) {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else { // If characters don't match
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the LCS length for the full strings
+    return dp[m][n];
+}
+
+int main() {
+    std::string s1 = "ABC";
+    std::string s2 = "ACB";
+    std::cout << "LCS of \"" << s1 << "\" and \"" << s2 << "\" is: " 
+              << longestCommonSubsequence(s1, s2) << std::endl; // Expected: 2
+
+    std::string s3 = "AGGTAB";
+    std::string s4 = "GXTXAYB";
+    std::cout << "LCS of \"" << s3 << "\" and \"" << s4 << "\" is: " 
+              << longestCommonSubsequence(s3, s4) << std::endl; // Expected: 4 ("GTAB")
+
+    std::string s5 = "XMJYAUZ";
+    std::string s6 = "MZJAWXU";
+    std::cout << "LCS of \"" << s5 << "\" and \"" << s6 << "\" is: " 
+              << longestCommonSubsequence(s5, s6) << std::endl; // Expected: 4 ("MJAU")
+              
+    std::string s7 = "ABCDE";
+    std::string s8 = "ACE";
+    std::cout << "LCS of \"" << s7 << "\" and \"" << s8 << "\" is: " 
+              << longestCommonSubsequence(s7, s8) << std::endl; // Expected: 3 ("ACE")
+
+    return 0;
+}
+```
+
+---
+
+#### Complexity
+
+*   **Time Complexity:** O(m * n), where `m` and `n` are the lengths of the two strings. We fill an `m x n` table, and each cell takes constant time.
+*   **Space Complexity:** O(m * n) for the DP table. (Can be optimized to O(min(m, n)) if we only need the length, not the actual subsequence, by noticing we only need the previous row/column.)
+
+And that's LCS in a nutshell! Keep practicing, and you'll master these DP patterns in no time. Happy coding! ✨
+
+---
