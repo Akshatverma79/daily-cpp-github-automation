@@ -74323,3 +74323,169 @@ Node 4: -3
 Happy tree-climbing! 🌳✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Bitmasks  
+🕒 2026-08-18 14:17:43
+
+Hey there, future DP master! Let's dive into DP on Bitmasks. It's a super cool technique for problems involving subsets or permutations when the number of items isn't too large.
+
+---
+
+## 🚀 DP on Bitmasks
+
+### What it is
+
+Imagine you have a set of items (like cities, people, or tasks). DP on Bitmasks is a dynamic programming technique where:
+
+1.  **Bitmask as State:** We use an integer (a "bitmask") to represent which items have been "used" or "visited" so far.
+    *   If the `i`-th bit is `1`, it means the `i`-th item is in our current set.
+    *   If the `i`-th bit is `0`, it means the `i`-th item is *not* in our current set.
+2.  **DP State:** Your DP state often looks like `dp[mask]` or `dp[mask][last_item]`.
+    *   `dp[mask]` might store the minimum cost/max value for processing the items represented by `mask`.
+    *   `dp[mask][last_item]` might store the minimum cost/max value for processing items in `mask`, ending at `last_item`.
+
+This allows us to track which combinations of items have been processed efficiently.
+
+### Why it Matters
+
+*   **Subset/Permutation Problems:** It's perfect when you need to consider all subsets of items or all permutations (where each item is used exactly once).
+*   **Small N:** It works well when the total number of items `N` is small (typically `N <= 20` to `N <= 25`) because the number of possible masks is `2^N`, which grows very quickly.
+*   **State Compression:** It "compresses" the information about which items are selected into a single integer, saving memory and making state transitions easier.
+
+### Let's Learn with an Example!
+
+**Problem:** You have `N` cities. You start at City 0. You need to visit every other city exactly once and return to City 0. What's the minimum total travel cost? (This is a simplified Traveling Salesperson Problem).
+
+**Small Example:** Let `N=4` cities.
+Cost matrix `cost[i][j]` to travel from city `i` to city `j`:
+
+```
+cost = {
+    {0, 10, 15, 20}, // From City 0
+    {5, 0, 9, 10},   // From City 1
+    {6, 13, 0, 12},  // From City 2
+    {8, 8, 9, 0}     // From City 3
+}
+```
+
+**The Idea (DP State):**
+
+We need to know:
+1.  Which cities we've **already visited**.
+2.  Which city we are **currently at** (the `last_city` in our path).
+
+So, our DP state will be `dp[mask][last_city]`:
+*   `mask`: A bitmask where the `i`-th bit is `1` if city `i` has been visited.
+*   `last_city`: The city we arrived at most recently.
+
+`dp[mask][last_city]` will store the minimum cost to visit all cities in `mask`, ending up at `last_city`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int INF = 1e9; // A large value representing infinity
+
+int solve_tsp_bitmask(int N, const std::vector<std::vector<int>>& cost) {
+    // dp[mask][last_city] stores the minimum cost to visit cities in 'mask',
+    // ending at 'last_city'.
+    // The mask size is 2^N, and last_city is N.
+    std::vector<std::vector<int>> dp(1 << N, std::vector<int>(N, INF));
+
+    // Base Case: Start at City 0.
+    // Mask: (1 << 0) means only City 0 is visited.
+    // Last city: 0. Cost: 0.
+    dp[1 << 0][0] = 0;
+
+    // Iterate through all possible masks (subsets of cities visited)
+    // from 1 (only city 0 visited) up to (1 << N) - 1 (all cities visited).
+    for (int mask = 1; mask < (1 << N); ++mask) {
+        // Iterate through all possible 'last_city' (current city)
+        for (int last_city = 0; last_city < N; ++last_city) {
+            // If 'last_city' is included in the current 'mask' AND
+            // we have a valid path to 'last_city' with this 'mask'
+            if ((mask & (1 << last_city)) && dp[mask][last_city] != INF) {
+                // Try to move to a 'next_city'
+                for (int next_city = 0; next_city < N; ++next_city) {
+                    // If 'next_city' has NOT been visited yet (not in current mask)
+                    if (!(mask & (1 << next_city))) {
+                        int new_mask = mask | (1 << next_city); // Add 'next_city' to the mask
+                        
+                        // Update the minimum cost to reach 'new_mask' ending at 'next_city'
+                        dp[new_mask][next_city] = std::min(
+                            dp[new_mask][next_city],
+                            dp[mask][last_city] + cost[last_city][next_city]
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    // After filling DP table, find the minimum cost to visit all cities
+    // (mask = (1 << N) - 1 means all cities visited)
+    // and return to City 0 from any 'last_city'.
+    int min_total_cost = INF;
+    int final_mask = (1 << N) - 1; // Mask where all N bits are set (all cities visited)
+
+    // Consider returning from any city 'i' back to City 0
+    for (int i = 0; i < N; ++i) {
+        if (dp[final_mask][i] != INF) {
+            min_total_cost = std::min(min_total_cost, dp[final_mask][i] + cost[i][0]);
+        }
+    }
+
+    return min_total_cost;
+}
+
+int main() {
+    int N = 4;
+    std::vector<std::vector<int>> cost = {
+        {0, 10, 15, 20},
+        {5, 0, 9, 10},
+        {6, 13, 0, 12},
+        {8, 8, 9, 0}
+    };
+
+    int min_cost = solve_tsp_bitmask(N, cost);
+
+    if (min_cost == INF) {
+        std::cout << "No valid path found (this shouldn't happen with connected graphs)." << std::endl;
+    } else {
+        std::cout << "Minimum cost to visit all cities and return to City 0: " << min_cost << std::endl;
+        // For the given example, the answer should be 35
+        // (e.g., 0 -> 1 (5) -> 3 (10) -> 2 (9) -> 0 (11) = 35  <-- wait, example path calculation for 35: 0->1 (10), 1->3 (10), 3->2 (9), 2->0 (6) = 35)
+        // (My example path: 0->1 (10), 1->3 (10), 3->2 (9), 2->0 (6) => Total 35)
+        // (Another path: 0->2 (15), 2->1 (13), 1->3 (10), 3->0 (8) => Total 46)
+        // (Another path: 0->1 (10), 1->2 (9), 2->3 (12), 3->0 (8) => Total 39)
+    }
+
+    return 0;
+}
+```
+
+---
+
+**Output for the example:**
+
+```
+Minimum cost to visit all cities and return to City 0: 35
+```
+
+**Explanation of Bitwise Operations:**
+
+*   `1 << i`: Creates a mask with only the `i`-th bit set to `1`. This is equivalent to `2^i`.
+*   `mask | (1 << next_city)`: Sets the `next_city`-th bit in `mask` to `1` (adds `next_city` to the set).
+*   `mask & (1 << last_city)`: Checks if the `last_city`-th bit is set in `mask` (is `last_city` in the set?).
+*   `!(mask & (1 << next_city))`: Checks if the `next_city`-th bit is *not* set in `mask` (is `next_city` *not* in the set?).
+
+And that's DP on Bitmasks! It's a powerful tool once you get comfortable with those bitwise operations. Keep practicing! 💪
+
+---
