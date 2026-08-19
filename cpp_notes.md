@@ -74489,3 +74489,88 @@ Minimum cost to visit all cities and return to City 0: 35
 And that's DP on Bitmasks! It's a powerful tool once you get comfortable with those bitwise operations. Keep practicing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-08-19 06:42:17
+
+Hey there, future bit master! 👋 Let's dive into the fascinating world of Bit Manipulation – it's super cool and surprisingly useful!
+
+---
+
+## DSA Notes: Bit Manipulation Basics
+
+### 🚀 What's Bit Manipulation?
+
+Imagine numbers aren't just values like 5 or 10, but a sequence of tiny switches, either `ON` (1) or `OFF` (0). That's their **binary representation**.
+
+**Bit manipulation** is all about directly working with these individual `1`s and `0`s (bits) of a number. Instead of doing arithmetic on the whole number, we're flipping, checking, or shifting its underlying bits.
+
+For example, the number `5` is `...00000101` in binary. Bit manipulation lets us look at that last `1` or flip the middle `0` to a `1` if we wanted to.
+
+### 💪 Why Does It Matter?
+
+1.  **⚡ Super Fast:** Operations at the bit level are extremely efficient because that's how computers fundamentally process data. They are often `O(1)` (constant time) and done directly by the CPU.
+2.  **💾 Memory Efficient:** Sometimes you can store multiple `boolean` flags or small pieces of information within a single integer, saving memory.
+3.  **💡 Clever Solutions:** Many interview problems and real-world algorithms (like hashing, compression, encryption) have elegant and optimized solutions using bit manipulation. It's a hallmark of a strong problem-solver!
+
+### 🔑 Key Bitwise Operators (The Tools!)
+
+You'll use these special operators in C++:
+
+*   `&` (AND): Returns 1 if *both* bits are 1, otherwise 0.
+*   `|` (OR): Returns 1 if *at least one* bit is 1, otherwise 0.
+*   `^` (XOR): Returns 1 if the bits are *different*, otherwise 0.
+*   `~` (NOT): Flips all bits (0 becomes 1, 1 becomes 0).
+*   `<<` (Left Shift): Shifts bits to the left, adding 0s on the right. (Multiplies by powers of 2)
+*   `>>` (Right Shift): Shifts bits to the right, discarding bits on the right. (Divides by powers of 2)
+
+---
+
+### 🌟 Example Problem: Is a Number Even or Odd?
+
+**Problem:** Given an integer `n`, determine if it's even or odd *without using the modulo operator (`%`)*.
+
+**Think Bitwise:**
+An even number always has its **least significant bit** (the rightmost bit) as `0`.
+An odd number always has its **least significant bit** as `1`.
+
+So, if we can just check that last bit, we're good!
+
+How to check the last bit? We can use the `&` (AND) operator with `1`.
+*   `1` in binary is `...00000001`.
+*   Any number `n & 1` will effectively "isolate" the last bit of `n`.
+    *   If `n` is even (`...X0`), then `...X0 & 1` gives `0`.
+    *   If `n` is odd (`...X1`), then `...X1 & 1` gives `1`.
+
+### 💻 C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to check if a number is even or odd using bit manipulation
+bool isEven(int n) {
+    // If the last bit is 0, the number is even.
+    // (n & 1) will be 0 for even numbers, and 1 for odd numbers.
+    return (n & 1) == 0; 
+}
+
+int main() {
+    int num1 = 4; // Binary: ...0100
+    int num2 = 7; // Binary: ...0111
+    int num3 = 0; // Binary: ...0000
+
+    std::cout << num1 << " is " << (isEven(num1) ? "Even" : "Odd") << std::endl; // Output: 4 is Even
+    std::cout << num2 << " is " << (isEven(num2) ? "Even" : "Odd") << std::endl; // Output: 7 is Odd
+    std::cout << num3 << " is " << (isEven(num3) ? "Even" : "Odd") << std::endl; // Output: 0 is Even
+
+    return 0;
+}
+```
+
+---
+
+That's your first step into the bitwise world! Keep playing with these operators; they're like little puzzle pieces that unlock powerful optimizations. Happy coding! ✨
+
+---
