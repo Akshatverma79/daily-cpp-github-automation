@@ -74866,3 +74866,89 @@ int main() {
 This DP approach is a fundamental way to solve many combinatorial games. You just need to correctly define your states (`dp[i]`) and transitions (possible moves and their impact on `dp[i - move]`). Happy strategizing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Arrays Basics  
+🕒 2026-08-20 14:21:46
+
+Let's dive into the very first step of Data Structures and Algorithms: **Arrays**!
+
+---
+
+## Arrays Basics (C++)
+
+### 1. What is an Array?
+
+Imagine you have a list of similar things you want to store together, like a list of test scores or a sequence of characters. An **Array** is a perfect way to do this!
+
+*   It's a **collection of items of the same data type** (e.g., all integers, or all characters).
+*   These items are stored in **contiguous memory locations** – think of it as a row of connected boxes, one after another.
+*   You access each item using an **index**, which is like its unique number or address in the array. In C++ (and most languages), indices typically **start from `0`**.
+
+**Analogy:** Think of an array like a train. Each car in the train (element) holds the same type of cargo (data type), and you can refer to each car by its number (index) starting from the engine as car #0.
+
+### 2. Why Do Arrays Matter?
+
+Arrays are fundamental because:
+
+*   **Grouping Related Data:** They allow you to store and manage multiple related values under a single variable name (e.g., all grades for a student).
+*   **Efficient Access:** If you know the index of an element, you can access it almost instantly (this is called O(1) time complexity) because the computer knows exactly where it is in memory.
+*   **Foundation:** Many other powerful data structures (like strings, stacks, queues, hash tables, and even `std::vector` in C++) are built upon or heavily use array-like principles.
+
+### 3. Example Problem: Sum of Array Elements
+
+**Problem:** Given an array of integers, calculate and print the sum of all its elements.
+
+**Example Input:**
+`[10, 20, 30]`
+
+**Expected Output:**
+`The sum of array elements is: 60`
+
+### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations (like printing to console)
+
+int main() {
+    // 1. Declare and Initialize an Array
+    // Here, 'scores' is an array of integers.
+    // C++ automatically figures out its size (3 elements) from the initializer list.
+    int scores[] = {10, 20, 30};
+
+    // To explicitly declare size: int scores[3] = {10, 20, 30};
+
+    // 2. Determine the Array Size (Important for loops!)
+    // For C-style arrays, we can calculate size: total bytes / bytes per element
+    int arraySize = sizeof(scores) / sizeof(scores[0]);
+    // In this case, arraySize will be 3.
+
+    // 3. Variable to store the sum
+    int totalSum = 0;
+
+    // 4. Loop through the Array to sum its elements
+    // The loop runs from index 0 up to (but not including) arraySize.
+    for (int i = 0; i < arraySize; ++i) {
+        // Access each element using its index 'i'
+        totalSum += scores[i]; // Add the current element to totalSum
+    }
+
+    // 5. Print the result
+    std::cout << "The sum of array elements is: " << totalSum << std::endl;
+
+    return 0; // Indicates that the program finished successfully
+}
+```
+
+**Output of the code:**
+
+```
+The sum of array elements is: 60
+```
+
+---
+
+**Bonus Tip:** While C-style arrays (`int scores[]`) are fundamental, in modern C++ you'll often use `std::vector` for more flexible dynamic arrays (arrays that can change size). But understanding basic arrays is crucial before moving on to `std::vector`!
+
+---
