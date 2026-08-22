@@ -75275,3 +75275,114 @@ Notice how `num1` and `num2` were actually changed in `main`! That's the power o
 Keep exploring, you're doing great!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-08-22 14:02:12
+
+Hey there, future coding superstar! 🚀 Let's unlock the magic of **Recursion** – a super powerful concept in DSA.
+
+---
+
+### 💡 Recursion Basics (C++)
+
+Recursion is a way of solving problems by breaking them down into smaller, self-similar subproblems until they become simple enough to solve directly. Think of it as a function that calls itself!
+
+---
+
+#### 1. What Recursion Means
+
+At its heart, recursion is when a function calls itself, either directly or indirectly, to solve a problem.
+
+It's built on two essential parts:
+
+*   **Base Case:** This is the simplest version of the problem that can be solved directly, *without* further recursion. This is **CRUCIAL** – it tells the recursion when to stop, preventing an infinite loop (and a stack overflow error!).
+*   **Recursive Step:** This is where the function calls itself with a *smaller/simpler version* of the original problem. Each recursive call brings you closer to the base case.
+
+---
+
+#### 2. Why It Matters
+
+*   **Elegance & Readability:** For problems that naturally have a self-similar structure (like tree traversals, graph algorithms, or mathematical sequences), recursive solutions can be incredibly elegant and often easier to read than their iterative counterparts.
+*   **Problem-Solving Approach:** It's a fundamental problem-solving technique in computer science, teaching you to break down complex problems into manageable pieces.
+*   **DSA Foundation:** Many core Data Structures and Algorithms (like trees, graphs, dynamic programming, divide & conquer) are inherently recursive.
+
+---
+
+#### 3. Example Problem: Factorial
+
+Let's calculate the factorial of a non-negative integer `n` (denoted as `n!`).
+The factorial of `n` is the product of all positive integers less than or equal to `n`.
+
+*   **Problem:** Calculate `n!`
+*   **Definition:** `n! = n * (n-1) * (n-2) * ... * 1`
+*   **Example:** `5! = 5 * 4 * 3 * 2 * 1 = 120`
+
+**How to think recursively:**
+
+1.  **Base Case:** What's the simplest factorial we know?
+    *   `0! = 1`
+    *   `1! = 1`
+    *   So, if `n` is `0` or `1`, the answer is `1`.
+
+2.  **Recursive Step:** How can we express `n!` in terms of a smaller factorial?
+    *   `n! = n * (n-1)!`
+    *   For example, `5! = 5 * 4!`
+    *   This means `factorial(n)` can be found by `n * factorial(n-1)`. We are reducing `n` by `1` each time, moving towards our base case of `0` or `1`.
+
+---
+
+#### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case:
+    // If n is 0 or 1, the factorial is 1.
+    // This condition is crucial to stop the recursion and prevent infinite calls.
+    if (n <= 1) {
+        return 1;
+    }
+    
+    // 2. Recursive Step:
+    // For any n > 1, factorial(n) is n multiplied by factorial(n-1).
+    // The problem gets smaller with each call (n-1), moving towards the base case.
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Expected Output: 120
+    
+    int anotherNum = 0;
+    std::cout << "Factorial of " << anotherNum << " is: " << factorial(anotherNum) << std::endl; // Expected Output: 1
+    
+    return 0;
+}
+```
+
+---
+
+**Breakdown of `factorial(5)` call:**
+
+1.  `factorial(5)`: `5 <= 1` is false. Returns `5 * factorial(4)`
+2.  `factorial(4)`: `4 <= 1` is false. Returns `4 * factorial(3)`
+3.  `factorial(3)`: `3 <= 1` is false. Returns `3 * factorial(2)`
+4.  `factorial(2)`: `2 <= 1` is false. Returns `2 * factorial(1)`
+5.  `factorial(1)`: `1 <= 1` is true. Returns `1` (Base Case reached!)
+
+Now, the results "unwind" back up the call stack:
+
+1.  `factorial(2)` returns `2 * 1 = 2`
+2.  `factorial(3)` returns `3 * 2 = 6`
+3.  `factorial(4)` returns `4 * 6 = 24`
+4.  `factorial(5)` returns `5 * 24 = 120`
+
+---
+
+You got this! Recursion might feel a bit mind-bending at first, but with practice, it becomes a powerful and intuitive tool in your DSA arsenal. Keep coding! ✨
+
+---
