@@ -75469,3 +75469,146 @@ int main() {
 **Remember:** Always define your **base case** clearly, otherwise, your function will call itself forever (or until it runs out of memory and crashes!). Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-08-23 14:08:59
+
+Hey there, future DSA pro! 👋 Let's dive into the fascinating world of Linked Lists.
+
+---
+
+## Linked List Basics (C++)
+
+### 🚀 What is a Linked List?
+
+Imagine a treasure hunt where each clue tells you where to find the *next* clue. That's pretty much a Linked List!
+
+*   It's a **linear data structure** (like an array), but instead of storing data in contiguous memory locations, it stores them in individual units called **nodes**.
+*   Each **node** contains two things:
+    1.  The actual **data** (or "value").
+    2.  A **pointer** (or "link") to the *next* node in the sequence.
+*   The first node is called the **Head**, and it's how you access the entire list.
+*   The last node's pointer points to `nullptr` (or `NULL`), signaling the end of the list.
+
+**Think of it like:** `[Data | ->]` -> `[Data | ->]` -> `[Data | nullptr]`
+
+### 🤔 Why does it matter?
+
+Linked lists are super useful because they solve some problems arrays have:
+
+1.  **Dynamic Size:** Unlike arrays, linked lists can grow or shrink in size as needed. You don't have to pre-allocate a fixed amount of memory.
+2.  **Efficient Insertions/Deletions:** Adding or removing an element, especially in the middle of the list, is very fast! You just need to change a few pointers, not shift a bunch of elements like in an array.
+3.  **Flexibility:** They're the building blocks for other complex data structures like Stacks, Queues, and even some hash tables.
+
+### 💡 Example Problem: "Append a new value to the end of the list"
+
+Let's say you have a shopping list, and you want to add "Milk" to the very end.
+
+**How it works:**
+1.  You start at the `head` of your list.
+2.  You travel from node to node (using their `next` pointers) until you find the very last node (the one pointing to `nullptr`).
+3.  Once you find it, you create a *new* node with "Milk" in it.
+4.  You then make the *old* last node point to this *new* "Milk" node. Voila!
+
+---
+
+### 💻 Simple C++ Implementation
+
+Here's how we'd build a basic Linked List that can add new items to its end:
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;     // Data held by the node
+    Node* next;   // Pointer to the next node in the list
+
+    // Constructor to easily create a new Node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// 2. Define the LinkedList class
+class LinkedList {
+public:
+    Node* head; // Pointer to the first node of the list
+
+    // Constructor for the LinkedList
+    LinkedList() : head(nullptr) {}
+
+    // Method to add a new node to the end of the list (our example problem!)
+    void append(int val) {
+        Node* newNode = new Node(val); // Create a new node
+
+        if (head == nullptr) {
+            // If the list is empty, the new node becomes the head
+            head = newNode;
+            return;
+        }
+
+        // If the list is not empty, traverse to find the last node
+        Node* current = head;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+
+        // Make the last node point to our new node
+        current->next = newNode;
+    }
+
+    // Method to print all elements in the list
+    void printList() {
+        Node* current = head;
+        if (current == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+        std::cout << "List: ";
+        while (current != nullptr) {
+            std::cout << current->data << " -> ";
+            current = current->next;
+        }
+        std::cout << "nullptr" << std::endl;
+    }
+
+    // IMPORTANT: Destructor to free memory and prevent memory leaks!
+    ~LinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next; // Save next node
+            delete current;                 // Delete current node
+            current = nextNode;             // Move to the next node
+        }
+        head = nullptr; // Ensure head is null after cleanup
+    }
+};
+
+// 3. Main function to test our LinkedList
+int main() {
+    LinkedList myList; // Create an empty linked list
+
+    std::cout << "Initial list: ";
+    myList.printList(); // Should print "List is empty."
+
+    myList.append(10); // Add 10
+    myList.append(20); // Add 20
+    myList.append(30); // Add 30
+
+    std::cout << "After appending 10, 20, 30: ";
+    myList.printList(); // Should print: List: 10 -> 20 -> 30 -> nullptr
+
+    myList.append(40); // Add 40
+    std::cout << "After appending 40: ";
+    myList.printList(); // Should print: List: 10 -> 20 -> 30 -> 40 -> nullptr
+
+    return 0;
+}
+```
+
+---
+
+That's the basic rundown! You now have a solid foundation for understanding Linked Lists. Keep practicing, and you'll master them in no time! ✨
+
+---
