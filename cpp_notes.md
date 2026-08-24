@@ -75612,3 +75612,192 @@ int main() {
 That's the basic rundown! You now have a solid foundation for understanding Linked Lists. Keep practicing, and you'll master them in no time! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-08-24 06:57:40
+
+Hey there, future DSA pro! 👋 Let's unlock the magic of **Doubly Linked Lists**!
+
+---
+
+### Doubly Linked List: Your Two-Way Street! 🚦
+
+#### 1. What is it? 🤔
+
+Imagine a regular linked list, but each node gets an upgrade! In a **Doubly Linked List (DLL)**, every node not only points to the *next* node in the sequence but also to the *previous* node.
+
+Think of it like this:
+
+```
+[null] <- [Node 1] <-> [Node 2] <-> [Node 3] -> [null]
+          (data, prev, next)
+```
+
+*   **`data`**: The actual value stored in the node.
+*   **`next`**: A pointer to the next node in the list.
+*   **`prev`**: A pointer to the previous node in the list.
+
+This "two-way" connection is what makes it special!
+
+#### 2. Why should I care? ✨
+
+Doubly Linked Lists are super handy for a few reasons:
+
+*   **Bidirectional Traversal:** You can easily move forward (using `next`) or backward (using `prev`) through the list. No more always starting from the `head` to find something behind you!
+*   **Easier Deletion:** If you have a pointer to a specific node, deleting it is much simpler and faster (O(1)) because you can directly access its previous and next nodes to "stitch" the list back together. In a singly linked list, you'd have to traverse from the `head` to find the *previous* node first, which takes O(N) time.
+*   **Real-world uses:** Great for implementing things like browser history (back/forward buttons), undo/redo functionalities, or even an LRU cache.
+
+#### 3. Let's try an example! 🚀
+
+**Problem:** Create a Doubly Linked List, insert a few elements at the beginning and end, then print the list both forwards and backwards.
+
+This simple task will show off its core capabilities!
+
+#### 4. C++ Implementation Time! 💻
+
+Here's a straightforward C++ implementation for our problem:
+
+```cpp
+#include <iostream>
+
+// 1. Node Structure
+struct Node {
+    int data;
+    Node* prev; // Pointer to the previous node
+    Node* next; // Pointer to the next node
+
+    Node(int val) : data(val), prev(nullptr), next(nullptr) {}
+};
+
+// 2. Doubly Linked List Class
+class DoublyLinkedList {
+private:
+    Node* head; // Pointer to the first node
+    Node* tail; // Pointer to the last node
+
+public:
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // --- Operations ---
+
+    // Insert a new node at the front of the list
+    void insertAtFront(int data) {
+        Node* newNode = new Node(data);
+        if (head == nullptr) { // List is empty
+            head = newNode;
+            tail = newNode;
+        } else {
+            newNode->next = head;
+            head->prev = newNode;
+            head = newNode;
+        }
+        std::cout << "Inserted " << data << " at front." << std::endl;
+    }
+
+    // Insert a new node at the end of the list
+    void insertAtEnd(int data) {
+        Node* newNode = new Node(data);
+        if (tail == nullptr) { // List is empty
+            head = newNode;
+            tail = newNode;
+        } else {
+            newNode->prev = tail;
+            tail->next = newNode;
+            tail = newNode;
+        }
+        std::cout << "Inserted " << data << " at end." << std::endl;
+    }
+
+    // Display the list elements from head to tail
+    void displayForward() {
+        if (head == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+        Node* current = head;
+        std::cout << "List (Forward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->next;
+        }
+        std::cout << "null" << std::endl;
+    }
+
+    // Display the list elements from tail to head
+    void displayBackward() {
+        if (tail == nullptr) {
+            std::cout << "List is empty." << std::endl;
+            return;
+        }
+        Node* current = tail;
+        std::cout << "List (Backward): ";
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->prev;
+        }
+        std::cout << "null" << std::endl;
+    }
+
+    // Remember to free memory to prevent leaks! (Destructor or specific delete method)
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = nullptr;
+        tail = nullptr;
+    }
+};
+
+// --- Main function to demonstrate ---
+int main() {
+    DoublyLinkedList dll;
+
+    // 1. Insert elements
+    dll.insertAtFront(10); // List: 10
+    dll.insertAtEnd(20);   // List: 10 <-> 20
+    dll.insertAtFront(5);  // List: 5 <-> 10 <-> 20
+    dll.insertAtEnd(30);   // List: 5 <-> 10 <-> 20 <-> 30
+
+    std::cout << "\n--- After insertions ---" << std::endl;
+    // 2. Display forwards
+    dll.displayForward();
+
+    // 3. Display backwards
+    dll.displayBackward();
+
+    std::cout << "\n--- Testing with an empty list ---" << std::endl;
+    DoublyLinkedList emptyDll;
+    emptyDll.displayForward();
+    emptyDll.displayBackward();
+
+    return 0;
+}
+```
+
+**Output of the code:**
+
+```
+Inserted 10 at front.
+Inserted 20 at end.
+Inserted 5 at front.
+Inserted 30 at end.
+
+--- After insertions ---
+List (Forward): 5 <-> 10 <-> 20 <-> 30 <-> null
+List (Backward): 30 <-> 20 <-> 10 <-> 5 <-> null
+
+--- Testing with an empty list ---
+List is empty.
+List is empty.
+```
+
+---
+
+That's your quick dive into Doubly Linked Lists! They're a super flexible data structure once you get the hang of those `prev` and `next` pointers. Keep exploring! ✨
+
+---
