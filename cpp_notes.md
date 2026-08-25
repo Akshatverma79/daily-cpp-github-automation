@@ -75968,3 +75968,109 @@ int main() {
 There you have it! A simple breakdown of what Stacks are, why they're important, and how you can implement one yourself in C++. Keep practicing, and you'll master them in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-08-25 06:46:21
+
+Let's dive into Queues – a super common and intuitive data structure!
+
+---
+
+### **Queues: First In, First Out (FIFO)!**
+
+#### **1. What the concept means**
+
+Imagine a line at a coffee shop or people waiting to board a bus. The person who gets in line *first* is the one who gets served *first*. That's exactly how a Queue works!
+
+*   **Definition:** A linear data structure that follows the **FIFO** (First In, First Out) principle.
+*   **Operations:**
+    *   **Enqueue (Push):** Adding an element to the **rear** (back) of the queue.
+    *   **Dequeue (Pop):** Removing an element from the **front** of the queue.
+    *   **Front (Peek):** Looking at the element at the front without removing it.
+    *   **isEmpty:** Checking if the queue has any elements.
+
+#### **2. Why it matters**
+
+Queues are everywhere in computing because many real-world scenarios require processing items in the order they arrived.
+
+*   **Task Scheduling:** Operating systems use queues to manage processes, ensuring tasks are executed in the order they were requested.
+*   **Printer Queues:** Documents are printed in the order they were sent to the printer.
+*   **Buffering:** When you stream video, data is loaded into a buffer (often a queue) so you can watch smoothly while the next parts are loading.
+*   **Call Centers:** Customers are typically put into a queue and served by the next available representative.
+*   **Algorithms:** Essential for Breadth-First Search (BFS) in graphs, which explores all neighbors at the current depth level before moving on to nodes at the next depth level.
+
+#### **3. Example Problem**
+
+**Problem:** Simulate a simple print queue. Documents arrive and should be printed in the order they were submitted.
+
+**Scenario:**
+1.  Document "Report.pdf" arrives.
+2.  Document "Invoice.docx" arrives.
+3.  Print the next document.
+4.  Document "Presentation.pptx" arrives.
+5.  Print the next document.
+6.  Print the next document.
+
+**Expected Output:**
+*   Adding Report.pdf
+*   Adding Invoice.docx
+*   Printing: Report.pdf
+*   Adding Presentation.pptx
+*   Printing: Invoice.docx
+*   Printing: Presentation.pptx
+
+#### **4. Simple C++ Implementation (using `std::queue`)**
+
+C++'s Standard Template Library (STL) provides a `queue` container adapter that makes using queues incredibly easy! It automatically handles the underlying data structure (usually a `std::deque` by default).
+
+```cpp
+#include <iostream> // For input/output operations (like cout)
+#include <queue>    // For using the std::queue container
+
+int main() {
+    // 1. Declare a queue to hold strings (our document names)
+    std::queue<std::string> printQueue;
+
+    std::cout << "--- Simulating a Print Queue ---" << std::endl;
+
+    // 2. Enqueue / Push documents
+    std::cout << "Adding Report.pdf" << std::endl;
+    printQueue.push("Report.pdf"); // Add to the rear
+
+    std::cout << "Adding Invoice.docx" << std::endl;
+    printQueue.push("Invoice.docx"); // Add to the rear
+
+    // 3. Dequeue / Pop and process the front document
+    if (!printQueue.empty()) { // Always check if not empty before popping/fronting
+        std::cout << "Printing: " << printQueue.front() << std::endl; // Look at front
+        printQueue.pop(); // Remove from front
+    }
+
+    // 4. Another document arrives
+    std::cout << "Adding Presentation.pptx" << std::endl;
+    printQueue.push("Presentation.pptx"); // Add to the rear
+
+    // 5. Process remaining documents
+    std::cout << "\nProcessing remaining documents:" << std::endl;
+    while (!printQueue.empty()) {
+        std::cout << "Printing: " << printQueue.front() << std::endl;
+        printQueue.pop();
+    }
+
+    // Check if the queue is truly empty now
+    std::cout << "\nIs print queue empty? " << (printQueue.empty() ? "Yes" : "No") << std::endl;
+    
+    // You can also check the size
+    std::cout << "Current queue size: " << printQueue.size() << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+**Key Takeaway:** Queues are all about "First In, First Out." They're a fundamental concept for managing ordered tasks and are widely used in various computing applications!
+
+---
