@@ -77001,3 +77001,141 @@ int main() {
 Both achieve the same goal of avoiding redundant calculations! Happy learning!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-08-28 23:13:40
+
+Hey there, future DSA wizard! 👋 Let's unlock the mystery of Knapsack Problems.
+
+---
+
+### **Topic: Knapsack Problems** 🎒
+
+#### 1. What does "Knapsack" mean? (Concept)
+
+Imagine you're preparing for an adventure and you have a **backpack (knapsack)** with a **limited weight capacity**. You find several **items**, each with its own **weight** and a certain **value** (how much you want it).
+
+The **Knapsack Problem** is all about figuring out: **Which items should you put into your backpack to get the maximum total value, without exceeding its weight capacity?**
+
+*   **0/1 Knapsack:** This is the most common version, where you can either take an item *entirely* (1) or leave it *entirely* (0). No partial items allowed! This is what we'll focus on.
+*   It's a classic problem often solved using **Dynamic Programming (DP)**, which involves breaking it down into smaller, overlapping subproblems.
+
+#### 2. Why does it matter? (Importance)
+
+Knapsack problems are super practical and pop up in many real-world scenarios:
+
+*   **Resource Allocation:** Deciding which projects to fund (items) to maximize profit (value) within a budget (capacity).
+*   **Logistics:** Loading cargo onto a truck or plane efficiently.
+*   **Cutting Stock:** Optimizing how to cut materials to minimize waste.
+*   **Financial Portfolio:** Selecting investments (items) to maximize returns (value) while managing risk (weight).
+*   It's also a very popular **interview question** to test your DP skills!
+
+#### 3. Let's try an example! (Small Problem)
+
+You have a knapsack with a **capacity of 5 kg**.
+Here are the items available:
+
+| Item | Weight (kg) | Value ($) |
+| :--- | :---------- | :-------- |
+| 1    | 2           | 3         |
+| 2    | 3           | 4         |
+| 3    | 4           | 5         |
+
+**Question:** What's the maximum total value you can put in your knapsack?
+
+**Think it through:**
+*   If you take Item 1 (2kg, $3) + Item 2 (3kg, $4) = Total 5kg, $7.
+*   If you take Item 1 (2kg, $3) + Item 3 (4kg, $5) = Total 6kg (TOO HEAVY!).
+*   If you take Item 2 (3kg, $4) + Item 3 (4kg, $5) = Total 7kg (TOO HEAVY!).
+*   What if you only take Item 3? 4kg, $5.
+*   What if you only take Item 1? 2kg, $3.
+*   What if you only take Item 2? 3kg, $4.
+
+Looks like taking **Item 1 + Item 2** gives the best value of **$7**.
+
+#### 4. Simple C++ Implementation (0/1 Knapsack)
+
+We'll use a 2D DP table `dp[i][w]` to store the maximum value we can get using the first `i` items with a knapsack capacity of `w`.
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For dynamic arrays
+#include <algorithm> // For std::max
+
+// Function to solve the 0/1 Knapsack Problem
+int knapsack(int capacity, const std::vector<int>& weights, const std::vector<int>& values, int n) {
+    // Create a 2D DP table: dp[i][w]
+    // dp[i][w] will store the maximum value that can be obtained
+    // with a knapsack of capacity 'w' using the first 'i' items.
+    // We add 1 to n and capacity for 0-based indexing convenience (0 items, 0 capacity)
+    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(capacity + 1, 0));
+
+    // Build the DP table
+    // Iterate through each item (from 1 to n)
+    for (int i = 1; i <= n; ++i) {
+        // Iterate through each possible weight capacity (from 1 to 'capacity')
+        for (int w = 1; w <= capacity; ++w) {
+            // Get the weight and value of the current item (remember: vectors are 0-indexed)
+            int currentItemWeight = weights[i - 1];
+            int currentItemValue = values[i - 1];
+
+            // Option 1: If the current item's weight is more than the current knapsack capacity 'w',
+            // we cannot include this item. So, the max value is the same as
+            // the max value without this item (i.e., using only the first 'i-1' items).
+            if (currentItemWeight > w) {
+                dp[i][w] = dp[i - 1][w];
+            }
+            // Option 2: If we can include the current item, we have two choices:
+            else {
+                // Choice A: DON'T include the current item.
+                // Value is the same as using the first 'i-1' items with the same capacity 'w'.
+                int valueWithoutCurrent = dp[i - 1][w];
+
+                // Choice B: INCLUDE the current item.
+                // Value is its current value PLUS the max value we could get from
+                // the first 'i-1' items with the remaining capacity (w - currentItemWeight).
+                int valueWithCurrent = currentItemValue + dp[i - 1][w - currentItemWeight];
+
+                // Take the maximum of these two choices
+                dp[i][w] = std::max(valueWithoutCurrent, valueWithCurrent);
+            }
+        }
+    }
+
+    // The final answer is in the bottom-right corner of the DP table:
+    // the max value using all 'n' items with the full 'capacity'.
+    return dp[n][capacity];
+}
+
+int main() {
+    // Our example problem:
+    int knapsackCapacity = 5; // Max weight capacity of the knapsack
+    std::vector<int> itemWeights = {2, 3, 4}; // Weights of items
+    std::vector<int> itemValues = {3, 4, 5};   // Values of items
+    int numberOfItems = itemWeights.size(); // Number of items
+
+    // Calculate the maximum value
+    int maxValue = knapsack(knapsackCapacity, itemWeights, itemValues, numberOfItems);
+
+    std::cout << "Max value in knapsack: $" << maxValue << std::endl; // Expected output: $7
+
+    // --- Another quick test case ---
+    int cap2 = 10;
+    std::vector<int> w2 = {1, 3, 4, 5};
+    std::vector<int> v2 = {10, 20, 30, 40};
+    int n2 = w2.size();
+    int maxVal2 = knapsack(cap2, w2, v2, n2);
+    std::cout << "Max value for 2nd case: $" << maxVal2 << std::endl; // Expected output: $70 (e.g., items with weights 3,4,3 or 4,5,1)
+
+    return 0;
+}
+
+```
+
+---
+
+And there you have it! The Knapsack Problem, broken down and implemented. Keep exploring, and you'll master DP in no time! Happy coding! ✨
+
+---
