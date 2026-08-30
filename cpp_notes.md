@@ -77527,3 +77527,136 @@ int main() {
 That's the Two Pointer technique in a nutshell! Keep practicing, and you'll spot these patterns in problems very quickly. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Binary Search Basics  
+🕒 2026-08-30 17:48:04
+
+Let's get straight to it! Binary Search is a super important concept in DSA.
+
+---
+
+### 🚀 Binary Search: Find It Fast!
+
+Ever tried finding a word in a dictionary? You don't start from 'A' and read every word, right? You open to the middle, see if your word comes before or after, and then repeat the process on the relevant half. That's Binary Search in a nutshell!
+
+#### 🤔 What It Means
+
+Binary Search is an **efficient algorithm** for finding an item from a **sorted list/array**. It repeatedly divides the search interval in half.
+
+**The Golden Rule:** The array/list **MUST BE SORTED** for Binary Search to work!
+
+#### ✨ Why It Matters
+
+1.  **Speed:** It's incredibly fast! Instead of checking every single item (which is O(n) complexity), Binary Search cuts the search space in half with each step.
+2.  **Efficiency:** This gives it a **logarithmic time complexity (O(log n))**. For large datasets, O(log n) is vastly superior to O(n). Imagine searching 1 billion items: O(n) means 1 billion checks, O(log n) means ~30 checks!
+3.  **Foundation:** It's a fundamental algorithm used in many other complex data structures and algorithms.
+
+#### 🎯 How It Works (Simplified)
+
+1.  Start with a `low` pointer at the beginning and a `high` pointer at the end of the array.
+2.  Calculate the `mid` element.
+3.  Compare the `mid` element with your `target`:
+    *   If `mid` is the `target`, you found it! Return its index.
+    *   If `target` is smaller than `mid`, it must be in the left half. Move `high` to `mid - 1`.
+    *   If `target` is larger than `mid`, it must be in the right half. Move `low` to `mid + 1`.
+4.  Repeat steps 2-3 until you find the target or `low` crosses `high` (meaning the target isn't in the array).
+
+#### 📝 Example Problem
+
+**Problem:** Find the index of the number `23` in the following sorted array.
+
+`nums = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]`
+`target = 23`
+
+**Steps:**
+
+1.  `low = 0`, `high = 9`
+    *   `mid = (0 + 9) / 2 = 4`
+    *   `nums[4] = 16`. `16 < 23`, so `target` is in the right half.
+    *   `low = mid + 1 = 5`
+
+2.  `low = 5`, `high = 9`
+    *   `mid = (5 + 9) / 2 = 7`
+    *   `nums[7] = 56`. `56 > 23`, so `target` is in the left half.
+    *   `high = mid - 1 = 6`
+
+3.  `low = 5`, `high = 6`
+    *   `mid = (5 + 6) / 2 = 5`
+    *   `nums[5] = 23`. `23 == 23`, **Found!**
+    *   Return index `5`.
+
+#### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector
+
+// Function to perform Binary Search
+// Returns the index of the target if found, otherwise returns -1
+int binarySearch(const std::vector<int>& arr, int target) {
+    int low = 0;                  // Start of the search space
+    int high = arr.size() - 1;    // End of the search space
+
+    // Keep searching as long as the search space is valid (low <= high)
+    while (low <= high) {
+        // Calculate the middle index
+        // Using low + (high - low) / 2 prevents potential integer overflow
+        // that (low + high) / 2 could cause if low and high are very large
+        int mid = low + (high - low) / 2;
+
+        // Check if the middle element is our target
+        if (arr[mid] == target) {
+            return mid; // Target found, return its index
+        } 
+        // If target is greater, it must be in the right half
+        else if (arr[mid] < target) {
+            low = mid + 1; // Move low to mid + 1
+        } 
+        // If target is smaller, it must be in the left half
+        else { // arr[mid] > target
+            high = mid - 1; // Move high to mid - 1
+        }
+    }
+
+    // If the loop finishes, it means the target was not found
+    return -1; 
+}
+
+int main() {
+    std::vector<int> nums = {2, 5, 8, 12, 16, 23, 38, 56, 72, 91};
+    int target1 = 23;
+    int target2 = 10;
+    int target3 = 91;
+
+    int index1 = binarySearch(nums, target1);
+    if (index1 != -1) {
+        std::cout << "Target " << target1 << " found at index: " << index1 << std::endl; // Expected: 5
+    } else {
+        std::cout << "Target " << target1 << " not found." << std::endl;
+    }
+
+    int index2 = binarySearch(nums, target2);
+    if (index2 != -1) {
+        std::cout << "Target " << target2 << " found at index: " << index2 << std::endl;
+    } else {
+        std::cout << "Target " << target2 << " not found." << std::endl; // Expected: Not found
+    }
+    
+    int index3 = binarySearch(nums, target3);
+    if (index3 != -1) {
+        std::cout << "Target " << target3 << " found at index: " << index3 << std::endl; // Expected: 9
+    } else {
+        std::cout << "Target " << target3 << " not found." << std::endl;
+    }
+
+    return 0;
+}
+```
+
+---
+
+That's the core of Binary Search! Remember: **sorted data + half the problem each time = lightning-fast search!**
+
+---
