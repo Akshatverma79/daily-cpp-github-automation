@@ -78638,3 +78638,146 @@ int main() {
 There you have it! Two powerful and efficient ways to tackle string matching. KMP shines with its no-backtracking guarantee, while Rabin-Karp is elegant with its rolling hash, especially good for multiple pattern searches. Keep coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-09-02 17:25:12
+
+Here's a clean and simple note on Backtracking!
+
+---
+
+## Backtracking Basics
+
+Hey future problem-solver! Let's demystify Backtracking.
+
+### What is it? 🤔
+
+Imagine you're in a maze. You go down one path. If it hits a dead end, you **backtrack** to the last junction and try another path.
+
+That's essentially Backtracking in programming! It's a systematic way to explore all possible solutions to a problem by:
+
+1.  **Building a solution step-by-step.**
+2.  **Making a choice** at each step.
+3.  If a choice leads to a dead end (an invalid or non-optimal partial solution), you **"undo" that choice** (backtrack) and try another.
+4.  It often uses **recursion** because each step involves solving a smaller version of the same problem.
+
+Think of it as trial-and-error, but super organized!
+
+### Why does it matter? 🌟
+
+*   **Powerful for Combinatorial Problems:** It's super effective for problems where you need to find all possible permutations, combinations, subsets, or arrangements (like solving Sudoku, N-Queens, generating valid parentheses, etc.).
+*   **Exhaustive Search:** It guarantees finding *all* solutions if they exist, or the *best* solution if you're optimizing.
+*   **Common Interview Topic:** Backtracking is a fundamental algorithm and frequently appears in technical interviews.
+
+### How it works (in a nutshell)
+
+A typical backtracking function looks something like this:
+
+```cpp
+void solve(current_state) {
+    // 1. Base Case: If current_state is a complete/valid solution, process it (e.g., print).
+    if (is_solution(current_state)) {
+        process_solution(current_state);
+        return; // Or continue exploring if multiple solutions are needed
+    }
+
+    // 2. Recursive Step: Explore choices
+    for (choice in possible_choices_from_current_state) {
+        // a. Make a choice (add it to current_state)
+        make_choice(current_state, choice);
+
+        // b. Recurse (explore further with the new choice)
+        solve(new_state); // Call solve for the next step
+
+        // c. Backtrack (undo the choice to try other options)
+        undo_choice(current_state, choice);
+    }
+}
+```
+
+---
+
+### Example Problem: Permutations of a String
+
+**Problem:** Given a string `S`, find all possible unique permutations of `S`.
+
+**Input:** `"ABC"`
+
+**Expected Output:**
+ABC
+ACB
+BAC
+BCA
+CAB
+CBA
+
+**Thinking Process:**
+
+1.  We need to place each character in every possible position.
+2.  Let's use an index to track the current position we're filling.
+3.  For each position, we can pick any of the remaining characters.
+4.  Once a character is picked and placed, we recursively solve for the next position with the remaining characters.
+5.  After the recursive call returns, we "undo" the placement (swap back) to try other characters for the current position.
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output
+#include <string>   // For string manipulation
+#include <vector>   // Not strictly needed for this string example, but good to include for general DSA
+
+// Function to generate all permutations of a string
+// s: The string we are permuting (passed by reference to modify)
+// index: The current starting position to consider for permutations
+void generatePermutations(std::string& s, int index) {
+    // 1. Base Case: If index reaches the end of the string,
+    //    it means we have generated a complete permutation.
+    if (index == s.length()) {
+        std::cout << s << std::endl; // Print the permutation
+        return;
+    }
+
+    // 2. Recursive Step: Iterate through characters from 'index' to the end
+    //    to place them at the current 'index' position.
+    for (int i = index; i < s.length(); ++i) {
+        // a. Make a choice: Swap s[index] with s[i]
+        //    This places a new character at the current 'index' position.
+        std::swap(s[index], s[i]);
+
+        // b. Recurse: Call the function for the next position (index + 1)
+        //    to permute the rest of the string.
+        generatePermutations(s, index + 1);
+
+        // c. Backtrack: Undo the choice (swap back s[index] and s[i])
+        //    This restores the string to its state before the swap,
+        //    allowing the loop to try other characters at the current 'index'.
+        std::swap(s[index], s[i]);
+    }
+}
+
+int main() {
+    std::string myString = "ABC";
+    std::cout << "Permutations of \"" << myString << "\":" << std::endl;
+    generatePermutations(myString, 0); // Start generating permutations from index 0
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+Permutations of "ABC":
+ABC
+ACB
+BAC
+BCA
+CAB
+CBA
+```
+
+---
+
+And that's Backtracking in a nutshell! Keep practicing, and you'll master it. Happy coding!
+
+---
