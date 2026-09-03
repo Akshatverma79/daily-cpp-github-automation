@@ -78999,3 +78999,132 @@ Found 92 solutions for N = 8 Queens.
 You've just walked through the magic of Backtracking! Remember the three steps: **Choose, Explore, Undo.** This pattern is your superpower for tackling many complex problems in DSA. Keep practicing, and you'll be solving mazes and placing queens like a pro in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Heaps and Priority Queues  
+🕒 2026-09-03 17:18:03
+
+Hey there, future DSA pro! 👋 Let's dive into Heaps and Priority Queues – they're super handy!
+
+---
+
+### 🌟 Heaps & Priority Queues: Your VIP Line for Data! 🌟
+
+#### 💡 What is the concept?
+
+Imagine a line where VIPs always go first, regardless of when they arrived! That's the core idea behind a **Priority Queue**.
+
+1.  **Priority Queue (PQ):** This is an **abstract data type** (ADT). Think of it as a special kind of "list" where each item has a "priority." When you ask for an item, it *always* gives you the one with the highest (or lowest) priority, not necessarily the one that's been there the longest.
+    *   **Operations:**
+        *   `insert(item, priority)`: Add an item.
+        *   `extract_min()` or `extract_max()`: Get and remove the item with the highest/lowest priority.
+        *   `peek_min()` or `peek_max()`: Just look at the item with the highest/lowest priority without removing it.
+
+2.  **Heap:** How does a Priority Queue do its magic so efficiently? Most of the time, it uses a data structure called a **Heap**.
+    *   A Heap is a **tree-based data structure** (specifically, a complete binary tree) with a special property:
+        *   **Max-Heap:** For any given node, its value is greater than or equal to the values of its children. This means the largest element is always at the root (top).
+        *   **Min-Heap:** For any given node, its value is less than or equal to the values of its children. This means the smallest element is always at the root (top).
+    *   Heaps are typically implemented using an array, which makes them very memory-efficient!
+
+#### 🚀 Why does it matter?
+
+Heaps and Priority Queues are incredibly efficient for problems where you constantly need to fetch the "best" or "worst" item, or efficiently keep a collection ordered by priority without fully sorting it every time.
+
+*   **Efficient Retrieval:** They allow you to find the max/min element in `O(1)` time and remove it in `O(log n)` time. Adding an element also takes `O(log n)`.
+*   **Real-world Uses:**
+    *   **Task Scheduling:** Which process should the CPU run next? (Highest priority!)
+    *   **Event Management:** In simulations, which event happens next? (Earliest time!)
+    *   **Graph Algorithms:** Dijkstra's shortest path, Prim's minimum spanning tree.
+    *   **Data Compression:** Huffman coding.
+    *   **Operating Systems:** Managing interrupts.
+
+---
+
+#### 🎯 Example Problem: Finding the Top K Scores
+
+Let's say you have a list of student scores: `[10, 5, 20, 8, 15, 30]`. You want to find the top 3 highest scores.
+
+**How a Priority Queue helps:**
+We can maintain a min-heap of size `k`. As we iterate through the scores:
+1.  If the heap has less than `k` elements, just add the current score.
+2.  If the heap already has `k` elements, compare the current score with the *smallest* element in the heap (which is `heap.top()` for a min-heap).
+    *   If the current score is *greater* than the smallest in the heap, it means the current score *could* be one of the top `k`. So, remove the smallest element from the heap and add the current score.
+    *   If the current score is *not* greater, it means it's not among the top `k`, so we ignore it.
+
+After checking all scores, the `k` elements remaining in the min-heap will be your top `k` highest scores!
+
+---
+
+#### 💻 Simple C++ Implementation (`std::priority_queue`)
+
+C++ provides `std::priority_queue` in the `<queue>` header, which implements a max-heap by default. We can customize it to be a min-heap.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>        // For std::priority_queue
+#include <functional>   // For std::greater (to make a min-heap)
+
+// Function to find the K largest numbers using a min-heap
+void findKLargestNumbers(const std::vector<int>& scores, int k) {
+    // 1. Create a MIN-HEAP of size K
+    //    We use std::greater<int> as the comparator to make it a min-heap.
+    //    It will store the K largest numbers encountered so far.
+    std::priority_queue<int, std::vector<int>, std::greater<int>> min_heap;
+
+    for (int score : scores) {
+        if (min_heap.size() < k) {
+            // If the heap has less than K elements, just add the current score
+            min_heap.push(score);
+        } else if (score > min_heap.top()) {
+            // If the heap is full (K elements) and the current score
+            // is greater than the smallest element in our heap (min_heap.top()),
+            // then the current score is part of the top K.
+            min_heap.pop();     // Remove the smallest of the current top K
+            min_heap.push(score); // Add the new larger score
+        }
+    }
+
+    // Now, the min_heap contains the K largest numbers.
+    // When we pop from a min-heap, we get them in ascending order.
+    std::cout << "The " << k << " largest scores are: ";
+    while (!min_heap.empty()) {
+        std::cout << min_heap.top() << " "; // Get the smallest of the remaining K
+        min_heap.pop();
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    std::vector<int> studentScores = {10, 5, 20, 8, 15, 30};
+    int k = 3;
+
+    findKLargestNumbers(studentScores, k);
+    // Expected Output: The 3 largest scores are: 15 20 30
+
+    std::cout << "\n--- Quick Demo of std::priority_queue ---\n";
+
+    // Default std::priority_queue is a MAX-HEAP
+    std::priority_queue<int> max_heap;
+    max_heap.push(10);
+    max_heap.push(5);
+    max_heap.push(20);
+    std::cout << "Max-Heap top (largest): " << max_heap.top() << std::endl; // Output: 20
+
+    // Explicitly creating a MIN-HEAP
+    std::priority_queue<int, std::vector<int>, std::greater<int>> min_heap_demo;
+    min_heap_demo.push(10);
+    min_heap_demo.push(5);
+    min_heap_demo.push(20);
+    std::cout << "Min-Heap top (smallest): " << min_heap_demo.top() << std::endl; // Output: 5
+
+    return 0;
+}
+
+```
+---
+
+That's it! Heaps and Priority Queues are fundamental tools in your DSA toolkit, making many complex problems much simpler and more efficient to solve. Keep practicing! 💪
+
+---
