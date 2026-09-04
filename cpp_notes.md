@@ -79316,3 +79316,188 @@ int main() {
 And there you have it! A clean, simple introduction to Tries. They are a fundamental and very useful data structure in computer science. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Disjoint Set Union (DSU)  
+🕒 2026-09-04 17:10:42
+
+Hey there, future DSA master! 👋 Let's dive into one of the coolest data structures: **Disjoint Set Union (DSU)**, also known as **Union-Find**.
+
+---
+
+### What is Disjoint Set Union (DSU)? 🤔
+
+Imagine you have a bunch of individual items, and you want to group them into collections. Over time, these groups might merge. DSU is a data structure that helps you manage these collections (sets) of items such that:
+
+1.  Each item belongs to exactly one set (they are "disjoint" – no overlaps).
+2.  You can efficiently perform two main operations:
+    *   **`find(element)`**: Tell me which set this `element` belongs to (by returning a "representative" of its set, usually the root of a tree).
+    *   **`union(element1, element2)`**: Merge the sets containing `element1` and `element2` into a single set.
+
+Think of it like managing friendship circles:
+*   Initially, everyone is in their own circle.
+*   If Alice and Bob become friends, their circles merge.
+*   You can always ask, "Who is the 'leader' of Alice's friend group?" (that's `find`).
+*   You can say, "Merge the groups of Charlie and David" (that's `union`).
+
+---
+
+### Why Does It Matter? 🚀
+
+DSU is super powerful for problems involving connectivity and grouping:
+
+*   **Efficient Connectivity Checks**: Quickly determine if two elements are in the same group/component.
+*   **Graph Problems**: A cornerstone for algorithms like Kruskal's for Minimum Spanning Trees.
+*   **Network Problems**: Tracking connected components in a network.
+*   **Maze Generation**: Keeping track of connected cells.
+*   **Speed!**: With clever optimizations (Path Compression and Union by Rank/Size), DSU operations are nearly constant time on average, making it incredibly fast for large datasets.
+
+---
+
+### Example Problem: "Friendship Circles" 🤝
+
+Let's say you have `N` people, initially everyone is friends only with themselves. You are given a list of direct friendships. Your task is to find out how many distinct friendship circles (groups) there are in total.
+
+**Input:**
+`N = 5` people (0 to 4)
+Friendships:
+*   (0, 1)
+*   (2, 3)
+*   (0, 2)
+
+**How DSU helps:**
+1.  Initially, 5 circles: `{0}, {1}, {2}, {3}, {4}`.
+2.  Friendship (0, 1): `union(0, 1)`. Circles become: `{0, 1}, {2}, {3}, {4}`.
+3.  Friendship (2, 3): `union(2, 3)`. Circles become: `{0, 1}, {2, 3}, {4}`.
+4.  Friendship (0, 2): `union(0, 2)`.
+    *   `find(0)` points to the representative of `{0, 1}`.
+    *   `find(2)` points to the representative of `{2, 3}`.
+    *   These are different, so merge them! Circles become: `{0, 1, 2, 3}, {4}`.
+5.  After all friendships, we have 2 distinct circles.
+
+---
+
+### Simple C++ Implementation 💻
+
+We'll use two key optimizations:
+1.  **Path Compression** for `find`: Makes `find` faster by flattening the tree structure.
+2.  **Union by Size** for `unite`: Attaches the smaller tree to the root of the larger tree, keeping trees balanced and shallow.
+
+```cpp
+#include <vector>
+#include <numeric> // For std::iota
+#include <iostream>
+
+// --- DSU Class ---
+class DSU {
+private:
+    std::vector<int> parent; // parent[i] stores the parent of element i
+    std::vector<int> sz;     // sz[i] stores the size of the set if i is a root
+
+public:
+    // Constructor: Initializes N sets, each containing one element
+    DSU(int n) {
+        parent.resize(n);
+        std::iota(parent.begin(), parent.end(), 0); // parent[i] = i initially
+        sz.assign(n, 1);                            // Each set initially has size 1
+    }
+
+    // Find operation with Path Compression
+    // Returns the representative (root) of the set containing 'i'
+    int find(int i) {
+        if (parent[i] == i) { // If 'i' is its own parent, it's the root
+            return i;
+        }
+        // Path compression: Make 'i' point directly to its root
+        return parent[i] = find(parent[i]); 
+    }
+
+    // Union operation with Union by Size
+    // Merges the sets containing 'i' and 'j'
+    // Returns true if sets were merged, false if they were already in the same set
+    bool unite(int i, int j) {
+        int root_i = find(i);
+        int root_j = find(j);
+
+        if (root_i != root_j) { // If they are in different sets
+            // Union by Size: Attach smaller tree under the root of the larger tree
+            if (sz[root_i] < sz[root_j]) {
+                std::swap(root_i, root_j); // Ensure root_i is the larger tree's root
+            }
+            parent[root_j] = root_i; // Make root_i the parent of root_j
+            sz[root_i] += sz[root_j]; // Update size of the new combined set
+            return true; // Sets were merged
+        }
+        return false; // Already in the same set
+    }
+
+    // Helper: Get the size of the set containing element 'i'
+    int get_set_size(int i) {
+        return sz[find(i)];
+    }
+};
+
+// --- Example Usage ---
+int main() {
+    int N = 5; // 5 people (0 to 4)
+    DSU dsu(N);
+
+    std::cout << "Initial state (distinct circles): " << N << std::endl; // 5
+
+    // Friendships
+    std::cout << "\nProcessing friendships:\n";
+    dsu.unite(0, 1); // 0 and 1 become friends
+    std::cout << "United (0, 1).\n";
+
+    dsu.unite(2, 3); // 2 and 3 become friends
+    std::cout << "United (2, 3).\n";
+
+    dsu.unite(0, 2); // 0 and 2 become friends (also connects 1 and 3 indirectly!)
+    std::cout << "United (0, 2).\n";
+
+    dsu.unite(4, 4); // Trying to unite an element with itself
+    std::cout << "United (4, 4).\n"; // Does nothing
+
+    // Count distinct circles
+    int distinct_circles = 0;
+    for (int i = 0; i < N; ++i) {
+        if (dsu.parent[i] == i) { // If 'i' is a root, it represents a distinct circle
+            distinct_circles++;
+        }
+    }
+
+    std::cout << "\nAfter all friendships, distinct circles: " << distinct_circles << std::endl; // Should be 2
+
+    // Check connectivity
+    std::cout << "\nAre 0 and 1 in the same circle? " << (dsu.find(0) == dsu.find(1) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are 1 and 3 in the same circle? " << (dsu.find(1) == dsu.find(3) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << "Are 0 and 4 in the same circle? " << (dsu.find(0) == dsu.find(4) ? "Yes" : "No") << std::endl; // No
+
+    return 0;
+}
+```
+
+**Output of the example:**
+
+```
+Initial state (distinct circles): 5
+
+Processing friendships:
+United (0, 1).
+United (2, 3).
+United (0, 2).
+United (4, 4).
+
+After all friendships, distinct circles: 2
+
+Are 0 and 1 in the same circle? Yes
+Are 1 and 3 in the same circle? Yes
+Are 0 and 4 in the same circle? No
+```
+
+---
+
+And there you have it! A neat little tool for managing sets and connections. Keep practicing, and you'll be using DSU like a pro in no time! 💪
+
+---
