@@ -79834,3 +79834,222 @@ int main() {
 Keep practicing, and you'll master this powerful tool in no time! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Shortest Path (Dijkstra's Algorithm)  
+🕒 2026-09-06 10:23:25
+
+Here's a clean and simple DSA learning note on Dijkstra's Algorithm!
+
+---
+
+## 🧭 Shortest Path: Dijkstra's Algorithm
+
+Hey there, future algorithm master! Let's talk about finding the shortest paths – a super common and useful problem in the world of computer science.
+
+### 💡 What is Dijkstra's Algorithm?
+
+Imagine you're trying to find the quickest route from your home to a friend's house, considering different roads with varying traffic (weights). Dijkstra's Algorithm does exactly that for graphs!
+
+*   **Goal:** It finds the **shortest path from a single starting node (source) to *all other nodes*** in a graph.
+*   **Graph Type:** Works on **weighted graphs** (edges have "costs" or "distances") where all **edge weights are non-negative** (no shortcuts that magically take negative time!).
+*   **How it works (in a nutshell):** It's a "greedy" algorithm. It continuously picks the unvisited node with the smallest known distance from the source and updates the distances of its neighbors. Think of it like a ripple expanding outwards, always choosing the path of least resistance.
+
+### 🤔 Why Does It Matter?
+
+Dijkstra's is a cornerstone algorithm with tons of real-world applications:
+
+*   **GPS Navigation:** Finding the fastest/shortest route between two points.
+*   **Network Routing:** Determining the most efficient path for data packets across the internet.
+*   **Logistics & Delivery:** Optimizing delivery routes for services like Amazon or food delivery.
+*   **Resource Allocation:** In various systems, finding the cheapest or quickest way to allocate resources.
+*   **Foundation:** Many other complex graph problems build upon its principles.
+
+### 📝 Small Example Problem
+
+Let's find the shortest paths from node `A` to all other nodes.
+
+**Graph:**
+```
+     (1)      (2)
+   A ----> B ----> D
+   |       |       ^
+(4)|       |(5)     | (1)
+   v       v       |
+   C <---------- E
+     (3)
+```
+
+Wait, let's make it simpler and easier to trace:
+
+**Simplified Graph:**
+```
+     (1)      (5)
+   A ----> B ----> D
+   |       |
+(4)|       |(2)
+   v       v
+   C <---- E
+     (1)
+```
+No, let's use the one from thinking process for clarity.
+
+**Simplified Graph (revisited for tracing ease):**
+```
+      (1)
+   A ----- B
+   |     / |
+(4)|   (2) | (5)
+   |  /    |
+   C ----- D
+      (1)
+```
+*Goal:* Shortest paths from `A` to `B`, `C`, `D`.
+
+**Let's Trace (mental walk-through from A):**
+
+1.  **Start:** `A` (dist=0), `B` (inf), `C` (inf), `D` (inf). Priority Queue (PQ): `{(0, A)}`
+2.  **Pop (0, A):**
+    *   `A`'s neighbors: `B` (weight 1), `C` (weight 4).
+    *   Update `B`: `dist[B] = 0 + 1 = 1`. Push `(1, B)` to PQ.
+    *   Update `C`: `dist[C] = 0 + 4 = 4`. Push `(4, C)` to PQ.
+    *   PQ: `{(1, B), (4, C)}`
+3.  **Pop (1, B):** (Smallest distance in PQ is `1` for `B`)
+    *   `B`'s neighbors: `C` (weight 2), `D` (weight 5).
+    *   Update `C`: Current `dist[C]` is `4`. Path `A -> B -> C` is `1 + 2 = 3`. Since `3 < 4`, update `dist[C] = 3`. Push `(3, C)` to PQ.
+    *   Update `D`: `dist[D] = 1 + 5 = 6`. Push `(6, D)` to PQ.
+    *   PQ: `{(3, C), (4, C), (6, D)}` (Note: `(4, C)` is an outdated entry for `C`, we'll ignore it later.)
+4.  **Pop (3, C):** (Smallest distance in PQ is `3` for `C`)
+    *   `C`'s neighbors: `D` (weight 1).
+    *   Update `D`: Current `dist[D]` is `6`. Path `A -> B -> C -> D` is `3 + 1 = 4`. Since `4 < 6`, update `dist[D] = 4`. Push `(4, D)` to PQ.
+    *   PQ: `{(4, C), (4, D), (6, D)}`
+5.  **Pop (4, C):** This is the outdated `(4, C)` entry. `dist[C]` is currently `3`. Since `4 > dist[C]`, we ignore this entry.
+6.  **Pop (4, D):** (Smallest distance in PQ is `4` for `D`)
+    *   `D` has no unvisited neighbors with a shorter path.
+    *   PQ: `{(6, D)}`
+7.  **Pop (6, D):** This is the outdated `(6, D)` entry. `dist[D]` is currently `4`. Since `6 > dist[D]`, we ignore this entry.
+8.  **PQ is empty.**
+
+**Shortest Distances from A:**
+*   `A` to `A`: 0
+*   `A` to `B`: 1 (`A -> B`)
+*   `A` to `C`: 3 (`A -> B -> C`)
+*   `A` to `D`: 4 (`A -> B -> C -> D`)
+
+### 💻 Simple C++ Implementation
+
+We'll use an adjacency list to represent the graph and a `priority_queue` to efficiently get the next closest node.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>    // For priority_queue
+#include <limits>   // For numeric_limits::max()
+
+// Using namespace std for brevity in a learning note
+using namespace std;
+
+const int INF = numeric_limits<int>::max(); // Represents infinity
+
+// Function to implement Dijkstra's algorithm
+void dijkstra(int start_node, int num_nodes, const vector<vector<pair<int, int>>>& adj) {
+    // 1. Initialize distances
+    vector<int> dist(num_nodes, INF); // Stores shortest distance from start_node to each node
+    dist[start_node] = 0;             // Distance to starting node is 0
+
+    // 2. Priority Queue
+    // Stores pairs of {distance, node}.
+    // `greater<pair<int, int>>` makes it a min-priority queue (smallest distance first).
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+
+    // Add the starting node to the priority queue
+    pq.push({0, start_node}); // {distance, node}
+
+    // 3. Main loop
+    while (!pq.empty()) {
+        int d = pq.top().first;  // Current smallest distance found
+        int u = pq.top().second; // Node corresponding to that distance
+        pq.pop();
+
+        // Important: If we found a shorter path to 'u' already, skip this older entry
+        if (d > dist[u]) {
+            continue;
+        }
+
+        // Explore neighbors of 'u'
+        for (auto& edge : adj[u]) {
+            int v = edge.first;   // Neighbor node
+            int weight = edge.second; // Weight of the edge u -> v
+
+            // If a shorter path to 'v' is found through 'u'
+            if (dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight; // Update distance
+                pq.push({dist[v], v});      // Add to priority queue
+            }
+        }
+    }
+
+    // 4. Print results
+    cout << "Shortest distances from node " << start_node << ":" << endl;
+    for (int i = 0; i < num_nodes; ++i) {
+        if (dist[i] == INF) {
+            cout << "  To node " << i << ": IMPOSSIBLE (not reachable)" << endl;
+        } else {
+            cout << "  To node " << i << ": " << dist[i] << endl;
+        }
+    }
+}
+
+int main() {
+    // Example graph setup:
+    // N nodes (0-indexed)
+    // adj[u] contains {v, weight} for edges u -> v
+
+    int num_nodes = 5; // Let's use 5 nodes: 0, 1, 2, 3, 4
+    vector<vector<pair<int, int>>> adj(num_nodes);
+
+    // Adding edges (Node, Weight)
+    // Our example graph:
+    // A(0) --(1)--> B(1)
+    // A(0) --(4)--> C(2)
+    // B(1) --(2)--> C(2)
+    // B(1) --(5)--> D(3)
+    // C(2) --(1)--> D(3)
+    // D(3) --(3)--> E(4) // Added an extra node to show more connections
+
+    adj[0].push_back({1, 1}); // 0 -> 1 with weight 1
+    adj[0].push_back({2, 4}); // 0 -> 2 with weight 4
+
+    adj[1].push_back({2, 2}); // 1 -> 2 with weight 2
+    adj[1].push_back({3, 5}); // 1 -> 3 with weight 5
+
+    adj[2].push_back({3, 1}); // 2 -> 3 with weight 1
+
+    adj[3].push_back({4, 3}); // 3 -> 4 with weight 3
+
+    // Run Dijkstra from node 0 (our 'A' in the example)
+    dijkstra(0, num_nodes, adj);
+
+    // Output:
+    // Shortest distances from node 0:
+    //   To node 0: 0
+    //   To node 1: 1
+    //   To node 2: 3
+    //   To node 3: 4
+    //   To node 4: 7 (0->1->2->3->4 = 1+2+1+3 = 7)
+
+    return 0;
+}
+```
+
+### ✨ Key Takeaways & Tips
+
+*   **Greedy Choice:** Always picks the "closest" unvisited node.
+*   **Non-Negative Weights:** This is *critical*! If you have negative edge weights, Dijkstra won't work correctly. You'd need Bellman-Ford or SPFA instead.
+*   **Time Complexity:** Typically **O(E log V)** where E is the number of edges and V is the number of vertices. This is because each edge relaxation (checking neighbors) involves a priority queue operation (`push` or `pop`).
+*   **Data Structures:** Adjacency list (for graph) and a min-priority queue (for efficiently getting the next closest node) are your best friends here.
+
+Dijkstra's is a powerful tool in your DSA arsenal. Keep practicing with different graph problems, and you'll master it in no time! Happy coding!
+
+---
