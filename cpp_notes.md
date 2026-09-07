@@ -80247,3 +80247,202 @@ int main() {
 And there you have it! Bellman-Ford: your trusty companion for shortest paths, even when things get a little negative! Keep practicing, and you'll master it in no time! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2026-09-07 11:44:49
+
+Okay, let's dive into the Floyd-Warshall algorithm!
+
+---
+
+## Floyd-Warshall Algorithm: Your All-Pairs Shortest Path Buddy!
+
+Hey there, future algorithm master! Today, we're demystifying a neat little algorithm for finding shortest paths.
+
+### 1. What is the concept?
+
+The Floyd-Warshall algorithm is a classic **Dynamic Programming** algorithm used to find the **shortest path between *all pairs* of vertices** in a weighted graph.
+
+Think of it like this:
+You want to go from city A to city B. You could go directly, or you could stop at city K first (A -> K -> B). Floyd-Warshall systematically tries *every single possible city K* as an intermediate stop for *every single pair* of cities (A, B) to see if it can find a shorter path.
+
+The core idea is:
+`dist[i][j]` (shortest path from `i` to `j`)
+becomes `min(dist[i][j], dist[i][k] + dist[k][j])`
+
+Where:
+*   `i` is the starting vertex.
+*   `j` is the ending vertex.
+*   `k` is the intermediate vertex we're currently "allowing" to be part of the path.
+
+We iterate through all possible `k`'s first, then all `i`'s, then all `j`'s.
+
+### 2. Why does it matter?
+
+*   **All-Pairs Shortest Path (APSP):** When you need to know the shortest path from *every* node to *every other* node, Floyd-Warshall is a go-to.
+*   **Simplicity:** Compared to running Dijkstra's from every node (which would also work for non-negative weights), Floyd-Warshall's implementation is often simpler and more compact.
+*   **Negative Weights:** Unlike Dijkstra's, Floyd-Warshall can handle graphs with negative edge weights (though it cannot handle negative cycles that are reachable and can lead to infinitely decreasing paths – it would detect them if `dist[i][i]` becomes negative).
+*   **Applications:** It's used in network routing, finding the transitive closure of a graph, and even in some computational geometry problems.
+*   **Complexity:** It runs in **O(V^3)** time, where V is the number of vertices. This makes it suitable for graphs with up to a few hundred vertices.
+
+### 3. Example Problem (Small & Sweet)
+
+Let's say we have 3 cities (0, 1, 2) and the direct travel costs (weights):
+
+*   0 to 1: 3
+*   1 to 2: 1
+*   0 to 2: 7
+*   2 to 0: 2
+*   No direct path means `INF` (infinity). Self-loops are 0.
+
+**Initial Distance Matrix:**
+
+```
+   0  1  2
+0 [0, 3, 7]
+1 [INF, 0, 1]
+2 [2, INF, 0]
+```
+
+**Let's trace a couple of updates:**
+
+1.  **k = 0 (using city 0 as an intermediate stop):**
+    *   Path `2 -> 1`: Currently `INF`. Can we go `2 -> 0 -> 1`?
+        *   `dist[2][0] + dist[0][1]` = `2 + 3 = 5`.
+        *   Since `5 < INF`, we update `dist[2][1]` to `5`.
+    *   No other paths are shortened by using 0 as an intermediate.
+
+    Matrix after `k=0`:
+    ```
+       0  1  2
+    0 [0, 3, 7]
+    1 [INF, 0, 1]
+    2 [2, 5, 0]  (Updated: 2->1 is now 5)
+    ```
+
+2.  **k = 1 (using city 1 as an intermediate stop):**
+    *   Path `0 -> 2`: Currently `7`. Can we go `0 -> 1 -> 2`?
+        *   `dist[0][1] + dist[1][2]` = `3 + 1 = 4`.
+        *   Since `4 < 7`, we update `dist[0][2]` to `4`.
+    *   No other paths are shortened by using 1 as an intermediate.
+
+    Matrix after `k=1`:
+    ```
+       0  1  2
+    0 [0, 3, 4]  (Updated: 0->2 is now 4)
+    1 [INF, 0, 1]
+    2 [2, 5, 0]
+    ```
+
+3.  **k = 2 (using city 2 as an intermediate stop):**
+    *   Path `1 -> 0`: Currently `INF`. Can we go `1 -> 2 -> 0`?
+        *   `dist[1][2] + dist[2][0]` = `1 + 2 = 3`.
+        *   Since `3 < INF`, we update `dist[1][0]` to `3`.
+
+    Matrix after `k=2`:
+    ```
+       0  1  2
+    0 [0, 3, 4]
+    1 [3, 0, 1]  (Updated: 1->0 is now 3)
+    2 [2, 5, 0]
+    ```
+
+**Final Shortest Path Matrix:**
+
+```
+   0  1  2
+0 [0, 3, 4]
+1 [3, 0, 1]
+2 [2, 5, 0]
+```
+This matrix now shows the shortest path between any two cities!
+
+### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+// A large value to represent "infinity" (no direct path)
+// Make sure it's large enough so that sum of two INF/large numbers doesn't overflow int
+const int INF = 1e9; // 1 billion, a common choice for graph problems
+
+// Function to print the distance matrix
+void printSolution(const std::vector<std::vector<int>>& dist, int V) {
+    std::cout << "Shortest path distances between all pairs of vertices:\n";
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF\t";
+            } else {
+                std::cout << dist[i][j] << "\t";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+// Implements the Floyd-Warshall algorithm
+void floydWarshall(std::vector<std::vector<int>>& graph, int V) {
+    // 'dist' matrix will store the shortest distances
+    // Initialize dist with the given graph (adjacency matrix)
+    std::vector<std::vector<int>> dist = graph;
+
+    // The core of Floyd-Warshall:
+    // Pick all vertices one by one as a source vertex
+    // for intermediate paths
+    for (int k = 0; k < V; ++k) {
+        // Pick all vertices as source one by one
+        for (int i = 0; i < V; ++i) {
+            // Pick all vertices as destination for the above source
+            for (int j = 0; j < V; ++j) {
+                // If vertex k is on the shortest path from i to j,
+                // then update the value of dist[i][j]
+
+                // Avoid overflow and adding to INF (which means path doesn't exist)
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+
+    // Print the final solution
+    printSolution(dist, V);
+
+    // Optional: Check for negative cycles
+    // If dist[i][i] is negative for any i, a negative cycle exists
+    // for (int i = 0; i < V; ++i) {
+    //     if (dist[i][i] < 0) {
+    //         std::cout << "Warning: Graph contains a negative cycle involving vertex " << i << std::endl;
+    //         break;
+    //     }
+    // }
+}
+
+int main() {
+    // Example from above: 3 vertices
+    int V = 3;
+
+    // Initialize the graph (adjacency matrix)
+    // INF means no direct edge
+    std::vector<std::vector<int>> graph = {
+        {0, 3, 7},
+        {INF, 0, 1},
+        {2, INF, 0}
+    };
+
+    floydWarshall(graph, V);
+
+    return 0;
+}
+```
+
+---
+
+That's it! Floyd-Warshall in a nutshell. It's a powerful tool for pathfinding when you need comprehensive shortest path information in a graph. Happy coding!
+
+---
