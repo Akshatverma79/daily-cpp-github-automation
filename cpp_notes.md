@@ -80843,3 +80843,210 @@ int main() {
 You got this! MSTs are a fundamental concept, and understanding these two algorithms will really boost your graph theory skills. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-09-08 10:43:11
+
+Hey there, future DSA master! Let's unravel the magic of **Topological Sort**, specifically using Kahn's Algorithm. It's super useful in many real-world scenarios!
+
+---
+
+## **Topological Sort (Kahn's Algorithm)**
+
+### **🧐 What is it?**
+
+Imagine you have a bunch of tasks, and some tasks *must* be completed before others (dependencies). Topological Sort is a way to find a **linear ordering** of these tasks such that for every dependency (Task A must happen before Task B), Task A appears before Task B in your sorted list.
+
+**Key constraint:** This only works for **Directed Acyclic Graphs (DAGs)**. "Directed" means the order matters (A -> B is different from B -> A). "Acyclic" means there are no cycles (you can't have A -> B -> C -> A, because then you'd be stuck in an endless loop of dependencies!).
+
+### **🌟 Why does it matter?**
+
+Topological Sort pops up everywhere you have sequential dependencies:
+
+*   **Task Scheduling:** Building software (which files compile first?), project management (which steps to do in what order?).
+*   **Course Prerequisites:** Which courses do you need to take before enrolling in advanced ones?
+*   **Dependency Resolution:** Package managers (installing software), data pipelines.
+*   **Instruction Scheduling:** Optimizing CPU instruction execution.
+
+It essentially helps you figure out a valid order to process things when prerequisites are involved.
+
+### **💡 Kahn's Algorithm: The Simple Idea**
+
+Kahn's algorithm is super intuitive:
+
+1.  **Find your starting points:** Identify all tasks that have *no prerequisites* (no incoming dependencies). These are the tasks you can start immediately.
+2.  **Process and remove:** Take one of these "ready" tasks, add it to your sorted list, and then imagine you've completed it.
+3.  **Update dependencies:** When you complete a task, it might unlock other tasks that were dependent on it. So, for every task that *depended* on the one you just finished, reduce its count of remaining prerequisites.
+4.  **New starting points:** If reducing a task's prerequisites makes its count zero, it means *all* its prerequisites are now met! Add this task to your list of "ready" tasks.
+5.  **Repeat:** Keep doing this until you've processed all tasks.
+
+**Data Structures for Kahn's:**
+*   **`inDegree` array:** To store the count of incoming edges (prerequisites) for each node.
+*   **Adjacency list:** To represent the graph (which nodes a node points to).
+*   **Queue:** To hold all the nodes that currently have an `inDegree` of 0 (our "ready" tasks).
+
+### **📝 Example Problem**
+
+Let's say you have these dependencies:
+
+*   Task 0 must be done before Task 1.
+*   Task 0 must be done before Task 2.
+*   Task 1 must be done before Task 3.
+
+**Graph representation:**
+```
+  0
+ / \
+1   2
+|
+3
+```
+
+**Let's trace Kahn's:**
+
+1.  **Initial In-Degrees:**
+    *   `inDegree[0] = 0`
+    *   `inDegree[1] = 1` (from 0)
+    *   `inDegree[2] = 1` (from 0)
+    *   `inDegree[3] = 1` (from 1)
+
+2.  **Initialize Queue:** Only Task 0 has `inDegree` 0.
+    *   `Queue = [0]`
+    *   `Result = []`
+
+3.  **Process:**
+    *   **Dequeue 0.** Add 0 to `Result`. (`Result = [0]`)
+        *   0 points to 1 and 2.
+        *   Decrement `inDegree[1]` to 0. Add 1 to `Queue`.
+        *   Decrement `inDegree[2]` to 0. Add 2 to `Queue`.
+        *   `Queue = [1, 2]`
+    *   **Dequeue 1.** Add 1 to `Result`. (`Result = [0, 1]`)
+        *   1 points to 3.
+        *   Decrement `inDegree[3]` to 0. Add 3 to `Queue`.
+        *   `Queue = [2, 3]`
+    *   **Dequeue 2.** Add 2 to `Result`. (`Result = [0, 1, 2]`)
+        *   2 points to nothing.
+        *   `Queue = [3]`
+    *   **Dequeue 3.** Add 3 to `Result`. (`Result = [0, 1, 2, 3]`)
+        *   3 points to nothing.
+        *   `Queue = []`
+
+**Final Order:** `[0, 1, 2, 3]` (Another valid order could be `[0, 2, 1, 3]`)
+
+### **💻 Simple C++ Implementation**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm> // For std::for_each (optional, can use range-based for loop)
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSort(int numNodes, const std::vector<std::vector<int>>& adj) {
+    // 1. Calculate in-degrees for all nodes
+    std::vector<int> inDegree(numNodes, 0);
+    for (int u = 0; u < numNodes; ++u) {
+        for (int v : adj[u]) {
+            inDegree[v]++;
+        }
+    }
+
+    // 2. Initialize a queue with all nodes having an in-degree of 0
+    std::queue<int> q;
+    for (int i = 0; i < numNodes; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 3. Process nodes using BFS-like approach
+    std::vector<int> result;
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u); // Add to the sorted list
+
+        // For all neighbors of u
+        for (int v : adj[u]) {
+            inDegree[v]--; // Decrement their in-degree
+            if (inDegree[v] == 0) {
+                q.push(v); // If in-degree becomes 0, add to queue
+            }
+        }
+    }
+
+    // Optional: Check for cycle detection
+    // If result.size() is not equal to numNodes, it means there was a cycle
+    // because some nodes could never have their in-degree reduced to 0.
+    if (result.size() != numNodes) {
+        // In a real application, you might throw an error or handle it.
+        // For this simple example, we assume it's a DAG.
+        // std::cerr << "Error: Graph contains a cycle! Topological sort not possible.\n";
+        // return {}; // Return empty or handle as an error
+    }
+
+    return result;
+}
+
+int main() {
+    // Example graph (from our problem): 0 -> 1, 0 -> 2, 1 -> 3
+    // 4 nodes (0, 1, 2, 3)
+    int numNodes = 4;
+    std::vector<std::vector<int>> adj(numNodes);
+
+    // Add edges
+    adj[0].push_back(1); // 0 -> 1
+    adj[0].push_back(2); // 0 -> 2
+    adj[1].push_back(3); // 1 -> 3
+
+    std::vector<int> sortedOrder = topologicalSort(numNodes, adj);
+
+    std::cout << "Topological Order: ";
+    if (sortedOrder.empty() && numNodes > 0) {
+        std::cout << "No valid order (possible cycle)";
+    } else {
+        for (int node : sortedOrder) {
+            std::cout << node << " ";
+        }
+    }
+    std::cout << std::endl; // Expected output: 0 1 2 3 or 0 2 1 3
+
+    // Another example:
+    // 6 nodes
+    // 5 -> 2
+    // 5 -> 0
+    // 4 -> 0
+    // 4 -> 1
+    // 2 -> 3
+    // 3 -> 1
+    int numNodes2 = 6;
+    std::vector<std::vector<int>> adj2(numNodes2);
+    adj2[5].push_back(2);
+    adj2[5].push_back(0);
+    adj2[4].push_back(0);
+    adj2[4].push_back(1);
+    adj2[2].push_back(3);
+    adj2[3].push_back(1);
+
+    std::vector<int> sortedOrder2 = topologicalSort(numNodes2, adj2);
+    std::cout << "Topological Order for second graph: ";
+    if (sortedOrder2.empty() && numNodes2 > 0) {
+        std::cout << "No valid order (possible cycle)";
+    } else {
+        for (int node : sortedOrder2) {
+            std::cout << node << " ";
+        }
+    }
+    std::cout << std::endl; // Expected: 4 5 0 2 3 1 (or other valid permutations)
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Topological Sort using Kahn's Algorithm in a nutshell. It's a fantastic tool for ordering dependent tasks. Happy coding!
+
+---
