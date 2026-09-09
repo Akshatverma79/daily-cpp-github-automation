@@ -81231,3 +81231,227 @@ Strongly Connected Components:
 That's it! You've just grasped the basics of Strongly Connected Components and seen a simple C++ way to find them. Keep exploring, graphs are super fun! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bridges and Articulation Points  
+🕒 2026-09-09 10:51:43
+
+Hey there, fellow graph explorer! Ever wondered which parts of a network are super critical? Like, if you remove them, the whole thing falls apart? That's what Bridges and Articulation Points are all about!
+
+---
+
+### What's the Concept?
+
+Imagine your graph as a city map.
+
+1.  **Articulation Point (Cut Vertex):**
+    *   **What it means:** A vertex (intersection) whose removal *increases the number of connected components* in the graph. Basically, if this intersection is closed, some parts of the city become unreachable from others.
+    *   **Why it matters:** Identifies single points of failure. Think network routers, crucial servers, or vital hubs in transportation systems. Removing an AP can split your network!
+
+2.  **Bridge (Cut Edge):**
+    *   **What it means:** An edge (road) whose removal *increases the number of connected components* in the graph. This road is the *only* link between two sections of the city.
+    *   **Why it matters:** Identifies critical links or bottlenecks. Think single fiber optic cables, essential pipelines, or the only road across a river. Removing a bridge disconnects parts of your network!
+
+---
+
+### How to Find Them? (The Magic of DFS!)
+
+Both Bridges and Articulation Points can be found efficiently using a single Depth First Search (DFS) traversal. We track two important values for each node `u` during DFS:
+
+*   `disc[u]` (Discovery Time): The time (or order) when we first visit `u`.
+*   `low[u]` (Low-link Value): The earliest `disc` time reachable from `u` (including `u` itself) through `u`'s DFS subtree and at most one back-edge to an ancestor.
+
+Here are the conditions:
+
+*   **For an edge `(u, v)` (where `v` is a child of `u` in the DFS tree):**
+    *   It's a **Bridge** if `low[v] > disc[u]`. This means `v` and its subtree cannot reach `u` or any of `u`'s ancestors without using the `u-v` edge.
+
+*   **For a vertex `u`:**
+    *   **If `u` is the root of the DFS tree:** It's an **Articulation Point** if it has more than one child in the DFS tree. (Each child forms a separate component if root is removed).
+    *   **If `u` is not the root:** It's an **Articulation Point** if there exists *any* child `v` of `u` such that `low[v] >= disc[u]`. This implies `v` and its subtree can't reach any ancestor of `u` (or `u` itself via a back-edge) without going through `u`.
+
+---
+
+### 1 Example Problem
+
+Let's consider this tiny graph:
+
+```
+    0 -- 1
+    |    | \
+    2 -- 3  4
+```
+
+Edges: `(0,1), (0,2), (1,3), (1,4), (2,3)`
+
+Let's trace a DFS starting from `0`:
+
+1.  `dfs(0, -1)` (parent is -1)
+    *   `disc[0]=0, low[0]=0`
+    *   Visit `1`: `dfs(1, 0)`
+        *   `disc[1]=1, low[1]=1`
+        *   Visit `3`: `dfs(3, 1)`
+            *   `disc[3]=2, low[3]=2`
+            *   Visit `2`: `dfs(2, 3)`
+                *   `disc[2]=3, low[2]=3`
+                *   `0` is neighbor of `2`, `disc[0]=0`. Back-edge `(2,0)`. `low[2] = min(low[2], disc[0]) = min(3,0) = 0`.
+                *   Backtrack from `2`. `low[2]=0`.
+            *   From `3`, child `2` has `low[2]=0`. `low[2] < disc[3]` (0 < 2). No bridge `(3,2)`.
+            *   Update `low[3] = min(low[3], low[2]) = min(2,0) = 0`.
+            *   Backtrack from `3`. `low[3]=0`.
+        *   From `1`, child `3` has `low[3]=0`. `low[3] < disc[1]` (0 < 1). No bridge `(1,3)`.
+        *   Update `low[1] = min(low[1], low[3]) = min(1,0) = 0`.
+        *   Visit `4`: `dfs(4, 1)`
+            *   `disc[4]=4, low[4]=4`
+            *   No unvisited neighbors. Backtrack from `4`. `low[4]=4`.
+        *   From `1`, child `4` has `low[4]=4`. `low[4] > disc[1]` (4 > 1).
+            *   **` (1,4) is a BRIDGE! `**
+            *   `low[4] >= disc[1]` (4 >= 1).
+            *   **` 1 is an ARTICULATION POINT! `**
+        *   Update `low[1] = min(low[1], low[4]) = min(0,4) = 0`.
+        *   Backtrack from `1`. `low[1]=0`.
+    *   From `0`, child `1` has `low[1]=0`. `low[1] < disc[0]` (0 < 0 is false, they are equal). No bridge `(0,1)`.
+    *   `low[1] >= disc[0]` (0 >= 0). Since `0` is the root and already has child `1`, it is an AP.
+    *   `0` also has `2` as neighbor. `disc[2]=3`. `2` is already visited. `low[0] = min(low[0], disc[2]) = min(0,3)=0`.
+    *   Final check for `0`: Root, has one child `1` (in this DFS path, `2` was visited via `3`). So, `0` is *not* an AP based on the root rule if we only count children from the initial DFS call. (Wait, the root rule applies to *all* children in the DFS tree generated from it. Here, `1` is a child. `2` is *not* a direct child of `0` in the DFS tree as `0` never directly called `dfs(2,0)`).
+
+**Results:**
+*   **Bridges:** `(1,4)`
+*   **Articulation Points:** `1`
+
+---
+
+### 1 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+// Global variables for simplicity in competitive programming style
+std::vector<std::vector<int>> adj;
+std::vector<int> disc, low;
+std::vector<bool> is_ap; // is_articulation_point
+std::vector<std::pair<int, int>> bridges;
+int timer; // To track discovery times
+
+void find_articulation_points_and_bridges_dfs(int u, int p = -1) {
+    disc[u] = low[u] = timer++; // Set discovery time and low-link value
+    int children_count = 0; // For root AP check
+
+    for (int v : adj[u]) {
+        if (v == p) {
+            continue; // Don't go back to parent
+        }
+
+        if (disc[v] != -1) { // If v is already visited (back-edge)
+            low[u] = std::min(low[u], disc[v]); // Update low-link value of u
+        } else { // If v is not visited (forward edge)
+            children_count++;
+            find_articulation_points_and_bridges_dfs(v, u); // Recurse for v
+            low[u] = std::min(low[u], low[v]); // Update u's low-link from v's subtree
+
+            // Bridge Condition
+            if (low[v] > disc[u]) {
+                bridges.push_back({u, v});
+            }
+
+            // Articulation Point Condition (Non-root)
+            // If v's subtree cannot reach an ancestor of u (or u itself via back-edge)
+            // then u is an AP.
+            if (low[v] >= disc[u] && p != -1) {
+                is_ap[u] = true;
+            }
+        }
+    }
+
+    // Articulation Point Condition (Root of DFS tree)
+    // If u is the root (p == -1) and has more than one child in DFS tree
+    if (p == -1 && children_count > 1) {
+        is_ap[u] = true;
+    }
+}
+
+void solve() {
+    int n, m; // n = number of nodes, m = number of edges
+    std::cout << "Enter number of nodes and edges: ";
+    std::cin >> n >> m;
+
+    adj.assign(n, std::vector<int>());
+    disc.assign(n, -1); // -1 indicates unvisited
+    low.assign(n, -1);
+    is_ap.assign(n, false);
+    bridges.clear();
+    timer = 0;
+
+    std::cout << "Enter edges (u v):" << std::endl;
+    for (int i = 0; i < m; ++i) {
+        int u, v;
+        std::cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u); // Assuming undirected graph
+    }
+
+    // Call DFS for each unvisited component (in case graph is disconnected)
+    for (int i = 0; i < n; ++i) {
+        if (disc[i] == -1) {
+            find_articulation_points_and_bridges_dfs(i);
+        }
+    }
+
+    std::cout << "\nArticulation Points:" << std::endl;
+    bool found_ap = false;
+    for (int i = 0; i < n; ++i) {
+        if (is_ap[i]) {
+            std::cout << i << " ";
+            found_ap = true;
+        }
+    }
+    if (!found_ap) {
+        std::cout << "None";
+    }
+    std::cout << std::endl;
+
+    std::cout << "\nBridges:" << std::endl;
+    if (bridges.empty()) {
+        std::cout << "None" << std::endl;
+    } else {
+        for (const auto& bridge : bridges) {
+            std::cout << bridge.first << "-" << bridge.second << std::endl;
+        }
+    }
+}
+
+int main() {
+    solve();
+    return 0;
+}
+```
+
+**To test with the example graph (0-1, 0-2, 1-3, 1-4, 2-3):**
+
+Input:
+```
+5 5
+0 1
+0 2
+1 3
+1 4
+2 3
+```
+
+Output:
+```
+Articulation Points:
+1 
+Bridges:
+1-4
+```
+This matches our manual trace! 🎉
+
+---
+
+That's it! Bridges and Articulation Points are powerful tools for understanding critical connections and vulnerabilities in any network. Happy graphing!
+
+---
