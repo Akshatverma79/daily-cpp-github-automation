@@ -81455,3 +81455,150 @@ This matches our manual trace! 🎉
 That's it! Bridges and Articulation Points are powerful tools for understanding critical connections and vulnerabilities in any network. Happy graphing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-09-09 17:20:13
+
+Hey there, future problem-solver! 👋 Let's dive into a classic dynamic programming concept: the **Longest Common Subsequence (LCS)**.
+
+---
+
+### DSA Note: Longest Common Subsequence (LCS)
+
+#### What is LCS? 🤔
+
+Imagine you have two sequences (like strings). A **subsequence** is formed by deleting zero or more characters from the original sequence without changing the order of the remaining characters.
+
+The **Longest Common Subsequence (LCS)** of two sequences is the longest subsequence that is present in both of them.
+
+**Key Point:** Unlike a *substring*, a subsequence doesn't have to be contiguous. The characters just need to maintain their relative order.
+
+*   **Example:**
+    *   String 1: `ABCDEF`
+    *   String 2: `AXBYC`
+    *   Common subsequences: `A`, `B`, `C`, `AC`, `BC`, `ABC`
+    *   Longest Common Subsequence: `ABC` (length 3)
+
+#### Why Does LCS Matter? 🚀
+
+LCS isn't just a theoretical problem; it has practical applications across various fields:
+
+1.  **Bioinformatics:** Comparing DNA or protein sequences to find similarities and evolutionary relationships.
+2.  **File Comparison (Diff Utilities):** Tools like `diff` that show changes between two versions of a file often use LCS-like algorithms to highlight what's been added, deleted, or modified.
+3.  **Plagiarism Detection:** Identifying similarities between documents.
+4.  **Version Control Systems:** Helps in merging changes and understanding code evolution.
+5.  **Text Editing:** Used in features like spell checkers and autocomplete.
+
+It's a fundamental problem that teaches you how to think with Dynamic Programming!
+
+#### 1 Small Example Problem 🧩
+
+Let's find the LCS of these two strings:
+
+*   `text1 = "AGGTAB"`
+*   `text2 = "GXTXAYB"`
+
+**Thinking it through:**
+*   Can `A` be a common subsequence? Yes.
+*   What about `G`? Yes.
+*   `GT`? Yes.
+*   `GTAB`? Yes!
+
+Let's trace it:
+`A` in text1 matches `A` in text2 (after `GXTX`).
+`G` in text1 matches `G` in text2.
+`T` in text1 matches `T` in text2.
+`A` in text1 matches `A` in text2.
+`B` in text1 matches `B` in text2.
+
+The **LCS is "GTAB"** with a length of **4**.
+
+#### How to Solve (Intuition: Dynamic Programming)
+
+The brute-force way would be to list all subsequences of both strings and find the longest common one, which is super inefficient.
+
+LCS has an **optimal substructure** (optimal solution contains optimal solutions to subproblems) and **overlapping subproblems** (the same subproblems are solved multiple times). This makes it a perfect candidate for Dynamic Programming!
+
+We can use a 2D array, let's call it `dp`, where `dp[i][j]` stores the length of the LCS of `text1[0...i-1]` and `text2[0...j-1]`.
+
+1.  **Initialization:** `dp[0][j]` and `dp[i][0]` will be `0`, because an empty string has no common subsequence with any other string.
+2.  **Filling the Table:** For each cell `dp[i][j]`:
+    *   **If `text1[i-1]` (current char in text1) matches `text2[j-1]` (current char in text2):**
+        The current characters contribute to the LCS. So, `dp[i][j] = 1 + dp[i-1][j-1]` (add 1 to the LCS of the strings *before* these matching characters).
+    *   **If `text1[i-1]` does NOT match `text2[j-1]`:**
+        We can't include both characters. We have two choices:
+        1.  Ignore `text1[i-1]` and find LCS of `text1[0...i-2]` and `text2[0...j-1]` (which is `dp[i-1][j]`).
+        2.  Ignore `text2[j-1]` and find LCS of `text1[0...i-1]` and `text2[0...j-2]` (which is `dp[i][j-1]`).
+        We take the maximum of these two options: `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.
+
+3.  **Result:** The final answer will be in `dp[m][n]`, where `m` and `n` are the lengths of `text1` and `text2` respectively.
+
+#### 1 Simple C++ Implementation 💻
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length();
+    int n = text2.length();
+
+    // Create a 2D DP table.
+    // dp[i][j] will store the length of LCS of text1[0...i-1] and text2[0...j-1]
+    // We use (m+1)x(n+1) to handle empty string cases easily (0th row/col)
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the dp table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            // If characters match (remember 0-based indexing for strings)
+            if (text1[i - 1] == text2[j - 1]) {
+                // Current characters contribute, add 1 to the LCS of the preceding parts
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                // Characters do not match, take the maximum LCS by either
+                // excluding text1[i-1] OR excluding text2[j-1]
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the LCS length for the full strings
+    return dp[m][n];
+}
+
+int main() {
+    std::string s1 = "AGGTAB";
+    std::string s2 = "GXTXAYB";
+    std::cout << "LCS length of \"" << s1 << "\" and \"" << s2 << "\" is: "
+              << longestCommonSubsequence(s1, s2) << std::endl; // Expected: 4
+
+    std::string s3 = "ABCDE";
+    std::string s4 = "ACE";
+    std::cout << "LCS length of \"" << s3 << "\" and \"" << s4 << "\" is: "
+              << longestCommonSubsequence(s3, s4) << std::endl; // Expected: 3
+
+    std::string s5 = "ABCDGH";
+    std::string s6 = "AEDFHR";
+    std::cout << "LCS length of \"" << s5 << "\" and \"" << s6 << "\" is: "
+              << longestCommonSubsequence(s5, s6) << std::endl; // Expected: 3 (ADH)
+              
+    std::string s7 = "ABC";
+    std::string s8 = "DEF";
+    std::cout << "LCS length of \"" << s7 << "\" and \"" << s8 << "\" is: "
+              << longestCommonSubsequence(s7, s8) << std::endl; // Expected: 0
+
+    return 0;
+}
+```
+
+---
+
+That's it for the Longest Common Subsequence! It's a fantastic problem to solidify your understanding of Dynamic Programming. Keep practicing, and you'll master it! ✨
+
+---
