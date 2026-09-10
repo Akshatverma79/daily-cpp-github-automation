@@ -81602,3 +81602,134 @@ int main() {
 That's it for the Longest Common Subsequence! It's a fantastic problem to solidify your understanding of Dynamic Programming. Keep practicing, and you'll master it! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Increasing Subsequence (LIS)  
+🕒 2026-09-10 10:46:12
+
+Here's a clean and simple guide to the Longest Increasing Subsequence (LIS)!
+
+---
+
+## 🚀 Longest Increasing Subsequence (LIS): Your Guide to Uphill Paths!
+
+Hey there, future coding rockstar! Let's conquer LIS – a super classic problem in Dynamic Programming.
+
+### 💡 What is LIS? (The Concept)
+
+Imagine you have a list of numbers. An **Increasing Subsequence** is a sequence you can pick from that list where each number is strictly greater than the one before it. The magic part? You don't have to pick them contiguously (they can have other numbers in between!).
+
+The **Longest Increasing Subsequence (LIS)** is simply the increasing subsequence with the maximum possible length.
+
+**Example:**
+For `[1, 3, 2, 4]`:
+*   `[1, 2, 4]` is an increasing subsequence (length 3).
+*   `[1, 3, 4]` is also an increasing subsequence (length 3).
+*   `[1, 3]` (length 2)
+*   `[2, 4]` (length 2)
+The LIS length here is **3**.
+
+### 🤔 Why Does It Matter? (Why Care?)
+
+LIS is a fantastic way to build your Dynamic Programming muscles! It's a fundamental problem that teaches you crucial DP patterns. Beyond learning, it pops up in real-world scenarios like:
+*   **Bioinformatics:** Analyzing gene sequences.
+*   **Data Compression:** Optimizing storage.
+*   **Scheduling:** Finding optimal task sequences.
+
+### 🧩 Let's Try One! (Example Problem)
+
+**Problem:** Given an array of integers `nums`, return the length of the longest strictly increasing subsequence.
+
+**Input:** `nums = [10, 9, 2, 5, 3, 7, 101, 18]`
+
+**Your turn!** Try to find the LIS by hand. What's its length?
+...
+...
+...
+**Hint:** One possible LIS is `[2, 3, 7, 101]`.
+
+**Output:** `4` (the length of `[2, 3, 7, 101]`)
+
+### 🧠 How Do We Solve It? (Simple C++ Implementation)
+
+The most intuitive approach uses Dynamic Programming.
+
+1.  **`dp` Array:** We'll create a `dp` array where `dp[i]` stores the length of the LIS *ending* at `nums[i]`.
+2.  **Initialization:** Every number itself is an LIS of length `1`. So, initialize all `dp[i]` to `1`.
+3.  **Building `dp`:**
+    *   We iterate through `nums` from left to right (let's say `i`).
+    *   For each `nums[i]`, we look at all previous numbers `nums[j]` (where `j < i`).
+    *   If `nums[i]` is *greater* than `nums[j]`, it means `nums[i]` can extend the LIS that ends at `nums[j]`.
+    *   So, we update `dp[i]` to be `max(dp[i], dp[j] + 1)`. We take the maximum because there might be multiple ways to form an LIS ending at `nums[i]`, and we want the longest one.
+4.  **Result:** After filling the `dp` array, the maximum value in `dp` will be the length of the LIS for the entire `nums` array.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+int lengthOfLIS(std::vector<int>& nums) {
+    // If the array is empty, LIS length is 0
+    if (nums.empty()) {
+        return 0;
+    }
+
+    int n = nums.size();
+    // dp[i] will store the length of the LIS ending at nums[i]
+    std::vector<int> dp(n, 1); 
+
+    // Initialize maxLength to 1, as a single element is an LIS of length 1
+    int maxLength = 1; 
+
+    // Fill the dp array
+    // Iterate through each number starting from the second one
+    for (int i = 1; i < n; ++i) {
+        // For each nums[i], look at all numbers before it
+        for (int j = 0; j < i; ++j) {
+            // If nums[i] is strictly greater than nums[j], 
+            // it means nums[i] can extend the LIS ending at nums[j].
+            if (nums[i] > nums[j]) {
+                // Update dp[i] to be the maximum of its current value
+                // or (the LIS ending at nums[j] + 1 for nums[i])
+                dp[i] = std::max(dp[i], dp[j] + 1);
+            }
+        }
+        // Update the overall maximum length found so far
+        maxLength = std::max(maxLength, dp[i]);
+    }
+
+    // The maximum value in the dp array is the length of the LIS
+    return maxLength;
+}
+
+int main() {
+    std::vector<int> nums1 = {10, 9, 2, 5, 3, 7, 101, 18};
+    std::cout << "LIS length for [10, 9, 2, 5, 3, 7, 101, 18]: " 
+              << lengthOfLIS(nums1) << std::endl; // Expected: 4
+
+    std::vector<int> nums2 = {0, 1, 0, 3, 2, 3};
+    std::cout << "LIS length for [0, 1, 0, 3, 2, 3]: " 
+              << lengthOfLIS(nums2) << std::endl; // Expected: 4
+
+    std::vector<int> nums3 = {7, 7, 7, 7, 7, 7, 7};
+    std::cout << "LIS length for [7, 7, 7, 7, 7, 7, 7]: " 
+              << lengthOfLIS(nums3) << std::endl; // Expected: 1
+
+    std::vector<int> nums4 = {};
+    std::cout << "LIS length for []: " 
+              << lengthOfLIS(nums4) << std::endl; // Expected: 0
+
+    std::vector<int> nums5 = {1,2,3,4,5};
+    std::cout << "LIS length for [1,2,3,4,5]: " 
+              << lengthOfLIS(nums5) << std::endl; // Expected: 5
+
+    return 0;
+}
+```
+
+---
+
+Boom! You've got the basics of LIS using Dynamic Programming. This `O(N^2)` approach is a great starting point. There's also an `O(N log N)` solution using binary search, but master this one first! Keep coding! 💪
+
+---
