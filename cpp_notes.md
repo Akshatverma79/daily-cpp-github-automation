@@ -82059,3 +82059,144 @@ Enter 3 edges (u v):
 **Key Takeaway:** DP on Trees is all about using DFS to recursively solve subproblems on subtrees. Define your DP states carefully (often involving choices for the current node, like "included" or "not included"), and build up solutions from children to parents! You got this! 🎉
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Bitmasks  
+🕒 2026-09-11 17:20:03
+
+Hey there, future DP master! Let's dive into **DP on Bitmasks**. It sounds fancy, but it's really a clever way to handle problems involving subsets.
+
+---
+
+### DP on Bitmasks: The Power of Subsets!
+
+**1. What it Means (The Concept)**
+
+Imagine you have a small set of items (say, up to 20-22). You need to make decisions about these items – which ones to pick, which ones to use, etc.
+
+*   **Bitmasks:** We can represent any subset of these items using a single integer! Each bit in the integer corresponds to an item:
+    *   If the `i`-th bit is `1`, it means item `i` is in our current subset.
+    *   If the `i`-th bit is `0`, item `i` is NOT in our current subset.
+    *   Example: If we have 3 items (0, 1, 2):
+        *   `001` (binary `1`) -> Only item 0 is selected.
+        *   `010` (binary `2`) -> Only item 1 is selected.
+        *   `101` (binary `5`) -> Items 0 and 2 are selected.
+        *   `111` (binary `7`) -> All items (0, 1, 2) are selected.
+
+*   **DP (Dynamic Programming):** Now, combine this with DP. Our DP state `dp[mask]` will represent the optimal solution for the subset of items encoded by `mask`. We solve for smaller subsets first, then use those results to build solutions for larger subsets.
+
+**2. Why it Matters**
+
+*   **Subset Problems:** It's super useful for problems where you need to keep track of *which* items have been processed or chosen, and the order of processing them might lead to different outcomes.
+*   **Small `N`:** It shines when the number of items (`N`) is small (typically up to 20-22). Why? Because there are `2^N` possible subsets. If `N=20`, `2^20` is about a million, which is manageable for DP states. If `N` gets larger, `2^N` explodes quickly!
+*   **Classic Examples:** Traveling Salesperson Problem (TSP), minimum cost assignment problems, problems requiring all items to be visited/chosen with dependencies.
+
+---
+
+**3. Example Problem: Minimum Cost Assignment**
+
+Let's say you have `N` workers and `N` tasks.
+`cost[i][j]` is the cost if worker `i` performs task `j`.
+Your goal: Assign each worker to exactly one task, and each task to exactly one worker, such that the total cost is minimized.
+
+*   `N` is small (e.g., `N <= 15` for this problem).
+
+**How DP on Bitmasks helps:**
+
+*   **State:** `dp[mask]` = the minimum cost to assign the tasks represented by `mask` to the first `popcount(mask)` workers (where `popcount(mask)` is the number of set bits in `mask`).
+*   **Transition:** To compute `dp[mask]`, we consider the *current worker* we're trying to assign. This worker is `popcount(mask) - 1`. We iterate through all tasks `j` that are *not* in `mask` yet. If worker `current_worker` takes task `j`, the cost is `cost[current_worker][j]` plus the minimum cost to assign the *remaining* tasks (`mask | (1 << j)`) to the *remaining* workers.
+
+---
+
+**4. Simple C++ Implementation (Minimum Cost Assignment)**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <limits>    // For std::numeric_limits
+
+const int N = 3; // Example: 3 workers, 3 tasks
+                 // N is typically <= 20 for bitmask DP
+
+// costs[worker_idx][task_idx]
+// Example costs:
+// Worker 0: Task 0 (10), Task 1 (20), Task 2 (30)
+// Worker 1: Task 0 (5),  Task 1 (15), Task 2 (25)
+// Worker 2: Task 0 (12), Task 1 (18), Task 2 (28)
+std::vector<std::vector<int>> costs = {
+    {10, 20, 30},
+    {5,  15, 25},
+    {12, 18, 28}
+};
+
+// dp[mask] stores the minimum cost to assign tasks specified by 'mask'
+// dp will be initialized with -1 to indicate uncomputed states
+std::vector<int> dp(1 << N, -1); 
+
+// Recursive function with memoization
+// 'mask' represents the set of tasks that have already been assigned
+int solve(int mask) {
+    // Base case: If all tasks have been assigned, no more cost
+    // A mask with all bits set for N items is (1 << N) - 1
+    if (mask == (1 << N) - 1) {
+        return 0;
+    }
+
+    // Check if we've already computed this state
+    if (dp[mask] != -1) {
+        return dp[mask];
+    }
+
+    // Determine which worker we are currently trying to assign.
+    // The current worker is simply the (number of tasks already assigned)-th worker.
+    // __builtin_popcount(mask) counts the number of set bits in 'mask'.
+    // For C++20, you can use std::popcount(mask).
+    int current_worker = __builtin_popcount(mask); 
+
+    int min_total_cost = std::numeric_limits<int>::max();
+
+    // Iterate through all possible tasks for the current worker
+    for (int task_idx = 0; task_idx < N; ++task_idx) {
+        // Check if task_idx is NOT yet assigned (i.e., its bit is 0 in the mask)
+        if (!((mask >> task_idx) & 1)) { // This is equivalent to !(mask & (1 << task_idx))
+                                         // It checks if the task_idx-th bit is NOT set
+            
+            int current_assignment_cost = costs[current_worker][task_idx];
+            
+            // Recursively find the minimum cost for the remaining assignments
+            // 'mask | (1 << task_idx)' creates a new mask where task_idx is now set
+            int remaining_cost = solve(mask | (1 << task_idx));
+
+            // Ensure remaining_cost is not INT_MAX (if a path is impossible)
+            if (remaining_cost != std::numeric_limits<int>::max()) {
+                min_total_cost = std::min(min_total_cost, current_assignment_cost + remaining_cost);
+            }
+        }
+    }
+
+    // Store and return the computed minimum cost for this mask
+    return dp[mask] = min_total_cost;
+}
+
+int main() {
+    // Start the DP process with an empty mask (no tasks assigned yet)
+    int result = solve(0); 
+
+    std::cout << "Minimum assignment cost: " << result << std::endl; 
+    // For the example costs, it should be 10 (W0->T0) + 15 (W1->T1) + 28 (W2->T2) = 53
+    // Or 10 (W0->T0) + 25 (W1->T2) + 18 (W2->T1) = 53
+    // Actually, it would be 10 (W0->T0) + 15 (W1->T1) + 28 (W2->T2) = 53
+    // Or 10 (W0->T0) + 25 (W1->T2) + 18 (W2->T1) = 53
+    // Let's trace it:
+    // W0-T0 (10), W1-T1 (15), W2-T2 (28) = 53
+    // W0-T0 (10), W1-T2 (25), W2-T1 (18) = 53
+    // W0-T1 (20), W1-T0 (5),  W2-T2 (28) = 53
+    // The minimum for the example is indeed 53.
+
+    return 0;
+}
+```
+
+---
