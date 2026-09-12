@@ -82322,3 +82322,194 @@ int main() {
 And that's your quick intro to Bit Manipulation! It's a fundamental concept that opens up a lot of doors in competitive programming and system-level thinking. Keep practicing, and you'll soon be a bit-twiddling master! 😊
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Math for DSA (GCD, Primes)  
+🕒 2026-09-12 16:33:36
+
+Hey there, future DSA pro! 👋 Let's dive into some essential math concepts that pop up everywhere in competitive programming and algorithm design: **Greatest Common Divisor (GCD)** and **Prime Numbers**.
+
+Don't worry, we'll keep it short, sweet, and to the point!
+
+---
+
+## 1. Greatest Common Divisor (GCD)
+
+### What it Means
+The **Greatest Common Divisor (GCD)** of two or more non-zero integers is the largest positive integer that divides each of the integers without leaving a remainder.
+Think of it as the biggest number they both "share" as a factor.
+
+*   **Example:** For `12` and `18`:
+    *   Divisors of 12: 1, 2, 3, 4, 6, 12
+    *   Divisors of 18: 1, 2, 3, 6, 9, 18
+    *   The largest number they both have is `6`. So, `GCD(12, 18) = 6`.
+
+### Why it Matters
+GCD is surprisingly useful!
+*   **Simplifying Fractions:** To reduce a fraction to its simplest form, you divide both the numerator and denominator by their GCD.
+*   **Number Theory Problems:** It's fundamental in many number theory algorithms and proofs.
+*   **Relatively Prime Numbers:** If `GCD(a, b) = 1`, `a` and `b` are "relatively prime" (or coprime), which is important in cryptography and modular arithmetic.
+*   **Array & String Problems:** Sometimes, problems involving repeating patterns or distributing items might subtly involve GCD.
+
+### Example Problem
+Find the GCD of `24` and `36`.
+
+*   **Solution:**
+    *   Divisors of 24: 1, 2, 3, 4, 6, 8, 12, 24
+    *   Divisors of 36: 1, 2, 3, 4, 6, 9, 12, 18, 36
+    *   The largest common divisor is `12`. So, `GCD(24, 36) = 12`.
+
+### Simple C++ Implementation (Euclidean Algorithm)
+The **Euclidean Algorithm** is a super efficient way to find GCD. It's based on the principle that `GCD(a, b) = GCD(b, a % b)` until `b` becomes 0.
+
+```cpp
+#include <iostream> // For input/output
+#include <numeric>  // For std::gcd (C++17 onwards)
+
+// Function to calculate GCD using the Euclidean Algorithm (recursive)
+int calculateGCD(int a, int b) {
+    // Base case: if b is 0, then a is the GCD
+    if (b == 0) {
+        return a;
+    }
+    // Recursive step: GCD(a, b) = GCD(b, a % b)
+    return calculateGCD(b, a % b);
+}
+
+int main() {
+    int num1 = 24;
+    int num2 = 36;
+
+    std::cout << "GCD of " << num1 << " and " << num2 << " is: " << calculateGCD(num1, num2) << std::endl;
+    // C++17 onwards has a built-in std::gcd!
+    // std::cout << "Using std::gcd: " << std::gcd(num1, num2) << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+## 2. Prime Numbers
+
+### What it Means
+A **Prime Number** is a natural number greater than 1 that has no positive divisors other than 1 and itself.
+Simply put, it can only be divided evenly by 1 and itself.
+
+*   **Examples:** 2, 3, 5, 7, 11, 13, 17, 19, 23, etc.
+*   **Important:** 1 is NOT a prime number. 2 is the smallest and only even prime number.
+
+### Why it Matters
+Primes are the "building blocks" of all integers!
+*   **Fundamental Theorem of Arithmetic:** Every integer greater than 1 can be uniquely represented as a product of prime numbers (prime factorization).
+*   **Cryptography:** Many modern encryption techniques (like RSA) rely heavily on properties of large prime numbers.
+*   **Hashing & Number Theory:** Primes appear in various algorithms for hashing, generating pseudo-random numbers, and other number theory problems.
+*   **Optimizations:** When you need to iterate through divisors or factors, focusing on primes can sometimes lead to optimizations.
+
+### Example Problem
+Check if the number `17` is prime.
+
+*   **Solution:**
+    *   Can 17 be divided by 2? No (`17 % 2 = 1`).
+    *   Can 17 be divided by 3? No (`17 % 3 = 2`).
+    *   Can 17 be divided by 4? No (`17 % 4 = 1`).
+    *   We only need to check up to the square root of 17 (which is about 4.12). Since no number from 2 to 4 divides 17, it is prime.
+    *   Result: `17` is prime.
+
+### Simple C++ Implementation (Primality Test & Sieve)
+
+#### a) Checking if a Single Number is Prime (Trial Division)
+For a single number `n`, we only need to check for divisors up to `sqrt(n)`. If `n` has a divisor greater than `sqrt(n)`, it must also have a divisor smaller than `sqrt(n)`.
+
+```cpp
+#include <iostream>
+#include <cmath> // For std::sqrt
+
+// Function to check if a number is prime
+bool isPrime(int n) {
+    if (n <= 1) { // Numbers less than or equal to 1 are not prime
+        return false;
+    }
+    if (n <= 3) { // 2 and 3 are prime
+        return true;
+    }
+    if (n % 2 == 0 || n % 3 == 0) { // Multiples of 2 or 3 (except 2 and 3 themselves) are not prime
+        return false;
+    }
+    // Check for divisors from 5 onwards
+    // We only need to check numbers of form 6k ± 1
+    // (i.e., i, i+2, i+4, i+6, etc., where i starts at 5)
+    for (int i = 5; i * i <= n; i = i + 6) {
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    int testNum = 17;
+    if (isPrime(testNum)) {
+        std::cout << testNum << " is a prime number." << std::endl;
+    } else {
+        std::cout << testNum << " is not a prime number." << std::endl;
+    }
+
+    testNum = 20;
+    if (isPrime(testNum)) {
+        std::cout << testNum << " is a prime number." << std::endl;
+    } else {
+        std::cout << testNum << " is not a prime number." << std::endl;
+    }
+
+    return 0;
+}
+```
+
+#### b) Finding All Primes Up to N (Sieve of Eratosthenes)
+If you need to find *all* prime numbers up to a certain limit `N`, the **Sieve of Eratosthenes** is incredibly efficient. It works by iteratively marking the multiples of each prime number as composite (not prime).
+
+```cpp
+#include <iostream>
+#include <vector> // For std::vector
+
+// Function to find all primes up to n using Sieve of Eratosthenes
+std::vector<bool> sieve(int n) {
+    // Create a boolean array "is_prime[0..n]" and initialize all entries it as true.
+    // A value in is_prime[i] will be false if i is not prime, else true.
+    std::vector<bool> is_prime(n + 1, true);
+    is_prime[0] = is_prime[1] = false; // 0 and 1 are not prime numbers
+
+    for (int p = 2; p * p <= n; p++) {
+        // If is_prime[p] is true, then it is a prime
+        if (is_prime[p]) {
+            // Mark all multiples of p (starting from p*p) as not prime
+            for (int i = p * p; i <= n; i += p)
+                is_prime[i] = false;
+        }
+    }
+    return is_prime;
+}
+
+int main() {
+    int limit = 30;
+    std::vector<bool> primes_up_to_limit = sieve(limit);
+
+    std::cout << "Prime numbers up to " << limit << " are: ";
+    for (int p = 0; p <= limit; p++) {
+        if (primes_up_to_limit[p]) {
+            std::cout << p << " ";
+        }
+    }
+    std::cout << std::endl; // Output: 2 3 5 7 11 13 17 19 23 29 
+
+    return 0;
+}
+```
+
+---
+
+That's a quick tour through GCD and Prime Numbers! Understanding these basics will give you a solid foundation for many fascinating DSA problems. Keep practicing! ✨
+
+---
