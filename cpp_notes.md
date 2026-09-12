@@ -82200,3 +82200,125 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-09-12 10:12:28
+
+Hey there, future coding wizard! Let's dive into the fascinating world of **Bit Manipulation**. It's like having X-ray vision for numbers!
+
+---
+
+## 🚀 Bit Manipulation Basics
+
+### 🤔 What is it?
+
+Bit manipulation is all about working directly with the individual **bits** (the 0s and 1s) that make up a number in its binary representation. Instead of thinking of `5` as just "five," you think of it as `00000101` (assuming an 8-bit integer).
+
+We use special **bitwise operators** to peek at, change, or combine these bits.
+
+### ✨ Why does it matter?
+
+1.  **Efficiency King 👑:** Bitwise operations are super fast because CPUs handle them directly. They can be much quicker than regular arithmetic for certain tasks (like multiplying/dividing by powers of 2).
+2.  **Memory Saver 💾:** You can store multiple true/false flags in a single integer, each bit representing a different state.
+3.  **Algorithmic Magic 🧙‍♂️:** Many clever algorithms rely on bit manipulation (e.g., checking if a number is a power of 2, set operations, data structures like Fenwick trees).
+4.  **Interview Power-Up 💪:** It's a common topic in technical interviews to test your fundamental understanding of how numbers work at a low level.
+
+### 🛠️ Key Bitwise Operators (The Tools)
+
+| Operator | Name         | What it does                                  |
+| :------- | :----------- | :-------------------------------------------- |
+| `&`      | **AND**      | Bit is 1 if *both* corresponding bits are 1. |
+| `\|`     | **OR**       | Bit is 1 if *at least one* corresponding bit is 1. |
+| `^`      | **XOR**      | Bit is 1 if corresponding bits are *different*. |
+| `~`      | **NOT**      | Flips all bits (0s become 1s, 1s become 0s). |
+| `<<`     | **Left Shift** | Shifts bits to the left, fills with 0s. Multiplies by 2. |
+| `>>`     | **Right Shift**| Shifts bits to the right. Divides by 2.     |
+
+---
+
+### 💡 Example Problem: Is the K-th Bit Set?
+
+**Problem:** Given a number `num` and a 0-indexed bit position `k`, determine if the `k`-th bit is set (i.e., its value is 1).
+
+**Example:**
+*   `num = 10` (binary `00001010`)
+*   `k = 0`: Is the 0th bit set? (No, it's 0)
+*   `k = 1`: Is the 1st bit set? (Yes, it's 1)
+*   `k = 2`: Is the 2nd bit set? (No, it's 0)
+*   `k = 3`: Is the 3rd bit set? (Yes, it's 1)
+
+**How to solve it:**
+
+1.  **Create a Mask:** We need a number with *only* the `k`-th bit set to 1. We can get this by taking `1` (binary `00000001`) and left-shifting it `k` times: `(1 << k)`.
+    *   If `k = 1`, `(1 << 1)` becomes `00000010` (which is 2).
+    *   If `k = 3`, `(1 << 3)` becomes `00001000` (which is 8).
+2.  **Use Bitwise AND:** Perform a bitwise AND operation between `num` and your mask.
+    *   `num & (1 << k)`
+    *   If the `k`-th bit in `num` is 1, the result of the AND will be a non-zero value (specifically, the mask itself).
+    *   If the `k`-th bit in `num` is 0, the result will be `0`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <string>
+#include <algorithm> // For std::reverse
+
+// Helper function to print binary representation (optional, but good for understanding)
+std::string toBinary(int n) {
+    if (n == 0) return "0";
+    std::string binaryString = "";
+    while (n > 0) {
+        binaryString = (n % 2 == 0 ? "0" : "1") + binaryString;
+        n /= 2;
+    }
+    // Pad to 8 bits for consistency in this example
+    while (binaryString.length() < 8) {
+        binaryString = "0" + binaryString;
+    }
+    return binaryString;
+}
+
+
+// Function to check if the k-th bit is set
+bool isKthBitSet(int num, int k) {
+    // 1. Create a mask: (1 << k) will have only the k-th bit set to 1
+    int mask = (1 << k);
+
+    // 2. Perform bitwise AND: If the k-th bit of num is 1,
+    //    (num & mask) will be non-zero (equal to the mask).
+    //    Otherwise, it will be 0.
+    return (num & mask) != 0;
+}
+
+int main() {
+    int num = 10; // Binary: 00001010
+    std::cout << "Number: " << num << " (Binary: " << toBinary(num) << ")\n";
+
+    // Test cases:
+    std::cout << "Is 0th bit set? " << (isKthBitSet(num, 0) ? "Yes" : "No") << " (Expected: No)\n"; // 0th bit is 0
+    std::cout << "Is 1st bit set? " << (isKthBitSet(num, 1) ? "Yes" : "No") << " (Expected: Yes)\n"; // 1st bit is 1
+    std::cout << "Is 2nd bit set? " << (isKthBitSet(num, 2) ? "Yes" : "No") << " (Expected: No)\n"; // 2nd bit is 0
+    std::cout << "Is 3rd bit set? " << (isKthBitSet(num, 3) ? "Yes" : "No") << " (Expected: Yes)\n"; // 3rd bit is 1
+    std::cout << "Is 4th bit set? " << (isKthBitSet(num, 4) ? "Yes" : "No") << " (Expected: No)\n"; // 4th bit is 0
+
+    int anotherNum = 7; // Binary: 00000111
+    std::cout << "\nNumber: " << anotherNum << " (Binary: " << toBinary(anotherNum) << ")\n";
+    std::cout << "Is 0th bit set? " << (isKthBitSet(anotherNum, 0) ? "Yes" : "No") << " (Expected: Yes)\n";
+    std::cout << "Is 1st bit set? " << (isKthBitSet(anotherNum, 1) ? "Yes" : "No") << " (Expected: Yes)\n";
+    std::cout << "Is 2nd bit set? " << (isKthBitSet(anotherNum, 2) ? "Yes" : "No") << " (Expected: Yes)\n";
+    std::cout << "Is 3rd bit set? " << (isKthBitSet(anotherNum, 3) ? "Yes" : "No") << " (Expected: No)\n";
+
+    return 0;
+}
+```
+
+---
+
+And that's your quick intro to Bit Manipulation! It's a fundamental concept that opens up a lot of doors in competitive programming and system-level thinking. Keep practicing, and you'll soon be a bit-twiddling master! 😊
+
+---
