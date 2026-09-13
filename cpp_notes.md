@@ -82513,3 +82513,171 @@ int main() {
 That's a quick tour through GCD and Prime Numbers! Understanding these basics will give you a solid foundation for many fascinating DSA problems. Keep practicing! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-09-13 11:12:24
+
+Let's dive into the fascinating world of Game Theory! 🎲
+
+---
+
+## 🎮 Game Theory Basics: Playing Smart
+
+### What is Game Theory?
+
+Imagine you're in a situation where your success isn't just about what *you* do, but also what *others* do. Game Theory is a field that studies exactly this: **strategic decision-making** between rational players.
+
+It helps us analyze "games" (which can be anything from actual board games to economic negotiations or even ecological interactions) where:
+1.  There are **players** (individuals, companies, etc.).
+2.  Each player has a set of possible **actions** or **moves**.
+3.  The **outcome** for each player depends on the choices made by *all* players.
+4.  Players are **rational**, meaning they want to maximize their own payoff (or minimize their loss).
+
+Essentially, it's about thinking ahead and predicting your opponent's (or co-player's) best moves to make your own optimal choice.
+
+### Why Does It Matter?
+
+Game Theory isn't just for board games! It's a powerful tool used in:
+
+*   **Computer Science & AI:** Designing intelligent agents that can strategize against humans or other AIs (e.g., pathfinding, resource allocation, competitive programming).
+*   **Economics:** Understanding market competition, bidding strategies, and bargaining.
+*   **Politics:** Analyzing elections, international relations, and coalition building.
+*   **Biology:** Explaining evolutionary stable strategies.
+
+It helps us design better systems, make more informed decisions, and even predict outcomes when multiple independent agents are interacting.
+
+---
+
+### Example Problem: The Stone Game (Simplified)
+
+You have a pile of `N` stones. Two players, Player 1 and Player 2, take turns.
+On each turn, a player can remove either **1, 2, or 3** stones.
+The player who takes the last stone wins.
+If you (Player 1) go first, can you win, assuming both players play optimally?
+
+**Let's analyze:**
+*   **Players:** Player 1, Player 2
+*   **Actions:** Remove 1, 2, or 3 stones.
+*   **Outcome:** Winning (taking the last stone) or Losing.
+*   **Optimal Play:** Both players will always try to make a move that leads them to win, or if they can't win, to make a move that delays their loss as much as possible.
+
+This is a classic "Nim-like" game. We can often solve these by figuring out "winning" and "losing" positions.
+
+*   A position `P` is a **winning position** if there exists *at least one* move from `P` to a **losing position**.
+*   A position `P` is a **losing position** if *all* possible moves from `P` lead to **winning positions**.
+
+---
+
+### Simple C++ Implementation (Dynamic Programming)
+
+We can use Dynamic Programming to determine winning/losing states. Let `dp[i]` be `true` if the current player whose turn it is can win with `i` stones, and `false` otherwise.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::iota, though not strictly needed here
+
+// Function to determine if the first player can win
+// n: total number of stones
+// max_remove: maximum stones a player can remove in one turn (e.g., 3 for 1, 2, or 3)
+bool canFirstPlayerWin(int n, int max_remove) {
+    // dp[i] will be true if the player whose turn it is
+    // can win starting with 'i' stones.
+    // dp[0] means 0 stones. The current player cannot move and thus loses.
+    std::vector<bool> dp(n + 1);
+
+    // Base case: If 0 stones, the current player can't make a move and loses.
+    dp[0] = false;
+
+    // Iterate from 1 stone up to n stones
+    for (int i = 1; i <= n; ++i) {
+        dp[i] = false; // Assume current player loses initially from 'i' stones
+
+        // Try all possible moves (taking 1, 2, ... up to max_remove stones)
+        for (int k = 1; k <= max_remove; ++k) {
+            // Check if we can actually take 'k' stones (i.e., i - k >= 0)
+            if (i - k >= 0) {
+                // If taking 'k' stones leads to a state (i-k) where
+                // the *next* player (who is now facing i-k stones) loses,
+                // then the current player (who just made the move) wins!
+                // So, if dp[i-k] is false (next player loses), then dp[i] is true.
+                if (!dp[i - k]) {
+                    dp[i] = true; // Found a winning move!
+                    break;        // No need to check further moves for 'i' stones
+                }
+            }
+        }
+    }
+
+    // The result for n stones tells us if the first player can win.
+    return dp[n];
+}
+
+int main() {
+    int total_stones = 7;     // Example: 7 stones
+    int max_can_remove = 3; // Can remove 1, 2, or 3 stones
+
+    std::cout << "--- Stone Game (1, 2, or 3 stones removable) ---" << std::endl;
+    std::cout << "Total stones: " << total_stones << std::endl;
+
+    if (canFirstPlayerWin(total_stones, max_can_remove)) {
+        std::cout << "First player CAN win." << std::endl;
+    } else {
+        std::cout << "First player CANNOT win." << std::endl;
+    }
+
+    std::cout << "\n--- Testing other scenarios ---" << std::endl;
+
+    // A known losing position for this specific game (N % 4 == 0)
+    total_stones = 4;
+    std::cout << "Total stones: " << total_stones << std::endl;
+    if (canFirstPlayerWin(total_stones, max_can_remove)) {
+        std::cout << "First player CAN win." << std::endl;
+    } else {
+        std::cout << "First player CANNOT win." << std::endl; // Correct: Cannot win
+    }
+
+    // A known winning position
+    total_stones = 1;
+    std::cout << "\nTotal stones: " << total_stones << std::endl;
+    if (canFirstPlayerWin(total_stones, max_can_remove)) {
+        std::cout << "First player CAN win." << std::endl; // Correct: Can win (take 1)
+    } else {
+        std::cout << "First player CANNOT win." << std::endl;
+    }
+
+    total_stones = 8;
+    std::cout << "\nTotal stones: " << total_stones << std::endl;
+    if (canFirstPlayerWin(total_stones, max_can_remove)) {
+        std::cout << "First player CAN win." << std::endl;
+    } else {
+        std::cout << "First player CANNOT win." << std::endl; // Correct: Cannot win
+    }
+
+    return 0;
+}
+```
+
+**Explanation of the C++ Code:**
+
+1.  **`dp` Array:** `dp[i]` stores whether the *current* player (who is about to make a move) can win if there are `i` stones remaining.
+2.  **Base Case `dp[0] = false`:** If there are 0 stones, the current player cannot make a move, so they have already lost.
+3.  **Iteration `for (int i = 1; i <= n; ++i)`:** We build up our solution from small numbers of stones to `n`.
+4.  **Optimal Moves `for (int k = 1; k <= max_remove; ++k)`:** For each number of stones `i`, we simulate trying every possible move (taking `k` stones).
+5.  **Winning Condition `if (!dp[i - k])`:** This is the core Game Theory logic.
+    *   If *I* take `k` stones, `i - k` stones remain.
+    *   Now, it's the *next* player's turn to face `i - k` stones.
+    *   If `dp[i - k]` is `false`, it means the *next* player facing `i - k` stones **will lose**.
+    *   If the next player loses, that means *I win* by making this move!
+    *   So, if we find *any* `k` such that `!dp[i - k]` is true, then `dp[i]` becomes `true` (I can win from this position).
+
+**Observation for this specific game:**
+For this particular "take 1, 2, or 3 stones" game, you might notice a pattern: if `N` is a multiple of 4 (e.g., 4, 8, 12), the first player always loses if the opponent plays optimally. Otherwise, the first player wins. This is because `max_remove + 1 = 4`. The DP approach generalizes to any `max_remove` value.
+
+---
+
+Game Theory is a vast and exciting field, and this is just a tiny peek! Keep exploring!
+
+---
