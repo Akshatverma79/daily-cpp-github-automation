@@ -82889,3 +82889,107 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Time and Space Complexity  
+🕒 2026-09-14 18:54:19
+
+Hey there, future coding superstar! ✨
+
+Let's dive into **Time & Space Complexity**, a super important concept in DSA that helps you write efficient code.
+
+---
+
+### Time & Space Complexity: Your Code's Performance Report!
+
+When you write code, it's not just about getting the *right answer*, but also getting it *fast* and using resources *wisely*. That's where Time and Space Complexity come in!
+
+---
+
+#### 1. What Does It Mean?
+
+*   **Time Complexity:** This measures how the **runtime** of your algorithm grows as the size of its input grows. Think of it as: "How much *time* does my code need to do its job, relative to how much *stuff* I give it?" We don't measure in seconds (because that varies by computer), but in the *number of operations*.
+*   **Space Complexity:** This measures how the **memory usage** of your algorithm grows as the size of its input grows. Think of it as: "How much *extra memory* does my code need, relative to how much *stuff* I give it?"
+
+We typically use **Big O Notation** (like `O(N)`, `O(1)`, `O(N^2)`) to describe this growth. It gives us an upper bound on performance in the worst-case scenario.
+
+---
+
+#### 2. Why Does It Matter?
+
+It's absolutely crucial for writing efficient and scalable algorithms!
+
+*   **Speed:** A slow algorithm might take seconds for small inputs, but hours or even days for large inputs. Nobody likes waiting!
+*   **Resource Management:** An algorithm that uses too much memory might crash on larger inputs or on systems with limited RAM.
+*   **Scalability:** Good complexity means your solution can handle huge amounts of data without falling apart.
+*   **Job Interviews:** It's a fundamental concept in technical interviews to assess your problem-solving skills and understanding of algorithms.
+
+---
+
+#### 3. Example Problem: Summing Array Elements
+
+Let's take a super simple problem:
+
+**Problem:** Given an array of integers, calculate their sum.
+
+**Input:** `[1, 2, 3, 4, 5]`
+**Output:** `15`
+
+---
+
+#### 4. C++ Implementation & Analysis
+
+```cpp
+#include <iostream> // For input/output operations
+#include <vector>   // For using std::vector
+
+// Function to calculate the sum of elements in a vector
+int calculateSum(const std::vector<int>& arr) {
+    int sum = 0; // Initialize a variable to store the sum
+
+    // Iterate through each element in the array
+    // 'num' will take the value of each element in 'arr'
+    for (int num : arr) { 
+        sum += num; // Add the current element to the sum
+    }
+
+    return sum; // Return the final sum
+}
+
+int main() {
+    std::vector<int> myArr = {1, 2, 3, 4, 5};
+    int totalSum = calculateSum(myArr);
+
+    std::cout << "The sum of elements is: " << totalSum << std::endl; // Output: 15
+
+    std::vector<int> anotherArr = {10, 20, 30};
+    totalSum = calculateSum(anotherArr);
+    std::cout << "The sum of elements in another array is: " << totalSum << std::endl; // Output: 60
+
+    return 0;
+}
+```
+
+---
+
+#### Analysis of `calculateSum` function:
+
+*   **Time Complexity: O(N)**
+    *   Let `N` be the number of elements in the input `arr` (e.g., if `arr` has 5 elements, `N=5`).
+    *   The `for` loop runs exactly `N` times, once for each element in the array.
+    *   Inside the loop, operations like `sum += num` are constant time operations.
+    *   Therefore, the total time taken scales linearly with the number of elements. If you double the array size, you roughly double the operations.
+    *   This is known as **Linear Time Complexity**.
+
+*   **Space Complexity: O(1)**
+    *   We only declare a single variable `sum` to store our result.
+    *   This variable takes up a fixed amount of memory, regardless of how large the input array `arr` is.
+    *   We are not creating any new data structures or arrays that grow with the input size.
+    *   This is known as **Constant Space Complexity**.
+
+---
+
+And there you have it! A quick look at Time and Space Complexity. Keep practicing, and you'll get a feel for how different operations impact your code's performance! Happy coding!
+
+---
