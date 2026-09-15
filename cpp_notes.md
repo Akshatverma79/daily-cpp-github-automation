@@ -83098,3 +83098,108 @@ New value accessed via 'ptrScore': 200
 See? Pointers are just fancy address books for your computer's memory! Get comfortable with `&` and `*`, and you're well on your way to mastering more complex C++ concepts and rocking those DSA problems. Keep practicing!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-09-15 17:46:58
+
+Hey there, aspiring coder! 👋 Let's unravel the magic of **Recursion** together.
+
+---
+
+## Recursion Basics: Your Self-Referencing Superpower!
+
+### 🎯 What is Recursion?
+
+Imagine you're solving a puzzle, and you realize that to solve the big puzzle, you just need to solve a *smaller, identical version* of the same puzzle. And to solve that smaller one, you solve an even *smaller, identical version*, and so on, until you reach a puzzle so tiny that its answer is obvious.
+
+That's recursion! In programming, it means **a function that calls itself** to solve a problem. It breaks a problem down into smaller, similar subproblems until a "base case" (the super tiny obvious puzzle) is reached.
+
+### 💡 Why Does It Matter?
+
+Recursion is powerful because it often leads to:
+
+1.  **Elegant & Readability:** For problems that naturally have a self-similar structure (like traversing a tree, exploring a graph, or finding permutations), recursive solutions can be incredibly clean and intuitive, mirroring the problem's definition.
+2.  **Problem-Solving Approach:** It's a fundamental technique in computer science and a critical tool for understanding and implementing many advanced algorithms and data structures.
+
+### 🔑 The Two Golden Rules You MUST Remember:
+
+Every recursive function needs these two parts:
+
+1.  **Base Case:** This is the condition that tells the function when to *stop* calling itself. Without it, you'd have an infinite loop (or more accurately, a "stack overflow" error!). This is your "obvious puzzle" solution.
+2.  **Recursive Step:** This is where the function calls itself with a *modified (usually smaller)* input, moving closer to the base case. This is where you break down the big puzzle.
+
+---
+
+### 📝 Example Problem: Calculating Factorial (N!)
+
+Let's find the factorial of a non-negative integer `n`.
+`n!` is the product of all positive integers less than or equal to `n`.
+Example: `5! = 5 * 4 * 3 * 2 * 1 = 120`
+
+Notice something cool?
+`5! = 5 * (4 * 3 * 2 * 1)`
+`5! = 5 * (4!)`
+
+This is our recursive pattern!
+`n! = n * (n-1)!`
+
+**Base Case:** What's the smallest, most obvious factorial?
+`0! = 1` (by mathematical definition)
+`1! = 1`
+So, when `n` is `0` or `1`, the answer is just `1`. Let's use `n == 0` for our base case.
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case:
+    // If n is 0, the factorial is 1. This stops the recursion.
+    if (n == 0) {
+        return 1;
+    }
+    // Handle negative input (optional, but good practice)
+    if (n < 0) {
+        std::cout << "Factorial of negative numbers is undefined." << std::endl;
+        return -1; // Or throw an exception
+    }
+
+    // 2. Recursive Step:
+    // Multiply n by the factorial of (n-1).
+    // This breaks the problem into a smaller subproblem.
+    return n * factorial(n - 1);
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Output: 120
+
+    int num2 = 0;
+    std::cout << "Factorial of " << num2 << " is: " << factorial(num2) << std::endl; // Output: 1
+
+    int num3 = 3;
+    std::cout << "Factorial of " << num3 << " is: " << factorial(num3) << std::endl; // Output: 6
+    
+    return 0;
+}
+```
+
+**How it works for `factorial(3)`:**
+
+1.  `factorial(3)` calls `3 * factorial(2)`
+2.  `factorial(2)` calls `2 * factorial(1)`
+3.  `factorial(1)` calls `1 * factorial(0)`
+4.  `factorial(0)` hits the base case (`n == 0`), returns `1`.
+5.  `factorial(1)` gets `1`, calculates `1 * 1 = 1`, returns `1`.
+6.  `factorial(2)` gets `1`, calculates `2 * 1 = 2`, returns `2`.
+7.  `factorial(3)` gets `2`, calculates `3 * 2 = 6`, returns `6`.
+
+---
+
+**Remember:** Recursion is a powerful tool. Just make sure your function always has a clear **base case** and that your **recursive step** moves the input closer to that base case! Happy coding! ✨
+
+---
