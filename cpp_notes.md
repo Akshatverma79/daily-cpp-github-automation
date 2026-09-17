@@ -83666,3 +83666,136 @@ int main() {
 And there you have it! Doubly Linked Lists are powerful for when you need that extra flexibility to move both ways. Keep practicing, and you'll master them in no time! 😊
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Stacks Implementation  
+🕒 2026-09-17 17:45:35
+
+Hey there, aspiring coder! Let's dive into Stacks – a fundamental concept in DSA that's super intuitive once you get the hang of it.
+
+---
+
+### Stacks Implementation: Your LIFO Lifeline!
+
+#### 1. What's a Stack? (The Concept)
+
+Imagine a **stack of plates** 🍽️. When you add a new plate, you put it on top. When you want a plate, you take it from the top. You can't reach for a plate in the middle without first removing the ones above it!
+
+That's exactly how a Stack data structure works:
+
+*   **LIFO (Last-In, First-Out):** The last element added to the stack is always the first one to be removed.
+*   **Restricted Access:** You can only add (push) or remove (pop) elements from one end, called the "top" of the stack.
+
+Think of it like a memory box where you can only access the most recent item you put in.
+
+#### 2. Why Do Stacks Matter? (Real-world Utility)
+
+Stacks are surprisingly common and super handy!
+
+*   **Undo/Redo Features:** Ever hit Ctrl+Z? Stacks power that! Each action is "pushed" onto a stack, and "undoing" an action "pops" it off.
+*   **Browser History:** The "Back" button in your web browser uses a stack. Each page you visit is pushed. Clicking "Back" pops the current page and takes you to the previous one.
+*   **Function Call Management:** When your program calls functions, the system uses a "call stack." Each function call is pushed, and when it finishes, it's popped off. This manages execution flow!
+*   **Expression Evaluation:** Converting infix expressions to postfix/prefix, or checking if parentheses are balanced.
+
+#### 3. Example Problem: Balanced Parentheses Check
+
+**Problem:** You're given a string containing just `(` and `)` characters. Determine if the parentheses are "balanced."
+*   **Balanced:** `(())`, `()()`
+*   **Unbalanced:** `(()`, `)(`, `((`
+
+**How a Stack Helps:**
+
+1.  Go through the string character by character.
+2.  If you see an opening parenthesis `(`: **Push** it onto the stack.
+3.  If you see a closing parenthesis `)`:
+    *   Check if the stack is empty. If it is, then you have a closing parenthesis with no matching opening one – it's **unbalanced**!
+    *   If the stack is *not* empty, it means there's an opening parenthesis waiting. **Pop** it off the stack (they match!).
+4.  After checking all characters:
+    *   If the stack is **empty**, all parentheses were perfectly matched – it's **balanced**!
+    *   If the stack is **not empty**, it means there are leftover opening parentheses with no matching closing ones – it's **unbalanced**!
+
+#### 4. Simple C++ Implementation (`std::stack`)
+
+C++'s Standard Template Library (STL) provides a ready-to-use `std::stack` container adapter. It simplifies stack operations by using other containers (like `std::deque` by default) under the hood.
+
+```cpp
+#include <iostream> // For input/output
+#include <stack>    // For std::stack
+#include <string>   // For std::string
+
+int main() {
+    // 1. Declare a stack
+    // We'll store integers in this example.
+    std::stack<int> myStack;
+
+    // 2. Push elements onto the stack
+    std::cout << "Pushing 10, 20, 30 onto the stack...\n";
+    myStack.push(10);
+    myStack.push(20);
+    myStack.push(30);
+
+    // 3. Check the top element
+    std::cout << "Top element is: " << myStack.top() << std::endl; // Output: 30
+
+    // 4. Check the size
+    std::cout << "Stack size: " << myStack.size() << std::endl; // Output: 3
+
+    // 5. Pop elements from the stack
+    std::cout << "Popping elements:\n";
+    while (!myStack.empty()) { // Loop until the stack is empty
+        std::cout << "Popping: " << myStack.top() << std::endl;
+        myStack.pop();
+    }
+    // Output will be: 30, then 20, then 10 (LIFO!)
+
+    // 6. Check if stack is empty after popping all elements
+    if (myStack.empty()) {
+        std::cout << "Stack is now empty!\n";
+    } else {
+        std::cout << "Stack is not empty (this shouldn't happen here).\n";
+    }
+
+    // --- Implementing the Balanced Parentheses Check ---
+    std::cout << "\n--- Balanced Parentheses Check ---\n";
+    std::string test1 = "(()())"; // Balanced
+    std::string test2 = "())(";   // Unbalanced
+    std::string test3 = "((()))"; // Balanced
+
+    auto checkBalance = [](const std::string& s) {
+        std::stack<char> parenStack;
+        for (char c : s) {
+            if (c == '(') {
+                parenStack.push(c);
+            } else if (c == ')') {
+                if (parenStack.empty()) {
+                    return false; // Closing paren without a matching opening one
+                }
+                parenStack.pop(); // Found a match, pop the opening paren
+            }
+        }
+        return parenStack.empty(); // True if all opening parens found a match
+    };
+
+    std::cout << "'" << test1 << "' is balanced: " << (checkBalance(test1) ? "Yes" : "No") << std::endl;
+    std::cout << "'" << test2 << "' is balanced: " << (checkBalance(test2) ? "Yes" : "No") << std::endl;
+    std::cout << "'" << test3 << "' is balanced: " << (checkBalance(test3) ? "Yes" : "No") << std::endl;
+
+
+    return 0;
+}
+```
+
+**Key `std::stack` Operations:**
+
+*   `myStack.push(element)`: Adds `element` to the top of the stack.
+*   `myStack.pop()`: Removes the element from the top of the stack. (Doesn't return it!)
+*   `myStack.top()`: Returns a reference to the top element *without* removing it.
+*   `myStack.empty()`: Returns `true` if the stack has no elements, `false` otherwise.
+*   `myStack.size()`: Returns the number of elements in the stack.
+
+---
+
+That's a quick and clear intro to Stacks! They're simple yet incredibly powerful. Keep practicing, and you'll master them in no time!
+
+---
