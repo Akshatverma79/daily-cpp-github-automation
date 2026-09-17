@@ -83398,3 +83398,271 @@ The line `current = current->next;` is the magic! It makes `current` (our tempor
 That's it for the basics of Linked Lists! Keep practicing, and you'll master them in no time! 🎉
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-09-17 11:06:28
+
+Okay, let's break down Doubly Linked Lists in a friendly way!
+
+---
+
+## 📝 DSA Learning Note: Doubly Linked List (C++)
+
+Hey there! Let's talk about Doubly Linked Lists – they're like a step up from regular (singly) linked lists.
+
+---
+
+### 💡 What is a Doubly Linked List (DLL)?
+
+Imagine a chain of paper clips. In a **singly linked list**, each paper clip only knows about the *next* one in the chain. You can only move forward.
+
+A **Doubly Linked List** (DLL) is like having special paper clips where each one knows both the *next* paper clip **AND** the *previous* one.
+
+*   **Node Structure:** Each item (or "node") in the list typically holds:
+    1.  **Data:** The actual value it stores (e.g., a number, a name).
+    2.  **`next` Pointer:** A reference to the *next* node in the sequence.
+    3.  **`prev` Pointer:** A reference to the *previous* node in the sequence. (This is the "doubly" part!)
+
+*   **Pointers:** The list also maintains `head` and `tail` pointers, pointing to the very first and very last nodes, respectively.
+
+**Visual:**
+`[HEAD] <-> [Node A | prev:HEAD, next:B] <-> [Node B | prev:A, next:C] <-> [Node C | prev:B, next:TAIL] <-> [TAIL]`
+
+---
+
+### 🤔 Why Does It Matter? (Why not just Singly Linked List?)
+
+DLLs offer some cool advantages, but come with a small trade-off:
+
+**🌟 Advantages:**
+1.  **Bi-directional Traversal:** You can move both forwards and backwards through the list. Super handy for many algorithms!
+2.  **Easier Deletion:** If you have a pointer to a specific node, you can delete it without needing to know its *previous* node (because it already knows its `prev`).
+3.  **Efficient Reverse Operations:** Reversing the list or printing it in reverse is straightforward.
+
+**📉 Trade-offs:**
+1.  **More Memory:** Each node needs an extra pointer (`prev`), so it uses a bit more memory.
+2.  **Slightly More Complex Operations:** When inserting or deleting, you have to update *two* pointers (`next` and `prev`) instead of just one.
+
+---
+
+### 📝 Example Problem: Deleting a Specific Node
+
+**Problem:** You are given a pointer to a specific node `X` within a Doubly Linked List. How would you delete node `X` efficiently, given *only* this pointer (and not the head of the list)?
+
+**How DLLs solve this:**
+In a singly linked list, this would be hard! You'd need to traverse from the `head` to find the node *before* `X` to update its `next` pointer.
+With a DLL, it's easy! Node `X` already knows its `prev` and `next`. You just need to "stitch" its `prev` node to its `next` node.
+
+1.  Connect `X->prev->next` to `X->next`.
+2.  Connect `X->next->prev` to `X->prev`.
+3.  Then, delete `X`.
+
+*(Careful with edge cases: if X is the head, tail, or the only node!)*
+
+---
+
+### 🚀 Simple C++ Implementation
+
+Let's build a basic DLL with `insertAtFront`, `insertAtEnd`, `deleteNode`, and `print` functions.
+
+```cpp
+#include <iostream>
+
+// 1. Node Structure
+struct Node {
+    int data;
+    Node* next; // Pointer to the next node
+    Node* prev; // Pointer to the previous node (The "doubly" part!)
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// 2. Doubly Linked List Class
+class DoublyLinkedList {
+private:
+    Node* head; // Pointer to the first node
+    Node* tail; // Pointer to the last node
+
+public:
+    // Constructor
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // Destructor to free memory
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = nullptr;
+        tail = nullptr;
+    }
+
+    // --- Basic Operations ---
+
+    // Insert a node at the front of the list
+    void insertAtFront(int val) {
+        Node* newNode = new Node(val);
+        if (head == nullptr) { // List is empty
+            head = tail = newNode;
+        } else {
+            newNode->next = head;
+            head->prev = newNode; // Update old head's prev pointer
+            head = newNode;
+        }
+        std::cout << "Inserted " << val << " at front." << std::endl;
+    }
+
+    // Insert a node at the end of the list
+    void insertAtEnd(int val) {
+        Node* newNode = new Node(val);
+        if (tail == nullptr) { // List is empty
+            head = tail = newNode;
+        } else {
+            tail->next = newNode;
+            newNode->prev = tail; // Update new node's prev pointer
+            tail = newNode;
+        }
+        std::cout << "Inserted " << val << " at end." << std::endl;
+    }
+
+    // Delete a specific node given its pointer
+    void deleteNode(Node* nodeToDelete) {
+        if (nodeToDelete == nullptr) {
+            std::cout << "Cannot delete a null node." << std::endl;
+            return;
+        }
+        if (head == nullptr) {
+            std::cout << "List is empty, cannot delete." << std::endl;
+            return;
+        }
+
+        std::cout << "Attempting to delete node with data: " << nodeToDelete->data << std::endl;
+
+        // Case 1: Node to delete is the head
+        if (nodeToDelete == head) {
+            head = nodeToDelete->next;
+            if (head != nullptr) {
+                head->prev = nullptr;
+            } else { // List became empty
+                tail = nullptr;
+            }
+        }
+        // Case 2: Node to delete is the tail
+        else if (nodeToDelete == tail) {
+            tail = nodeToDelete->prev;
+            if (tail != nullptr) {
+                tail->next = nullptr;
+            } else { // This case implies head was also nodeToDelete, handled above
+                head = nullptr;
+            }
+        }
+        // Case 3: Node to delete is somewhere in the middle
+        else {
+            nodeToDelete->prev->next = nodeToDelete->next;
+            nodeToDelete->next->prev = nodeToDelete->prev;
+        }
+
+        delete nodeToDelete; // Free the memory
+        std::cout << "Node deleted successfully." << std::endl;
+    }
+    
+    // Find a node by value (utility for example)
+    Node* findNode(int val) {
+        Node* current = head;
+        while(current != nullptr) {
+            if (current->data == val) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr; // Not found
+    }
+
+    // Print the list from head to tail (forward)
+    void printForward() const {
+        std::cout << "List (Forward): ";
+        Node* current = head;
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->next;
+        }
+        std::cout << "nullptr" << std::endl;
+    }
+
+    // Print the list from tail to head (backward)
+    void printBackward() const {
+        std::cout << "List (Backward): ";
+        Node* current = tail;
+        while (current != nullptr) {
+            std::cout << current->data << " <-> ";
+            current = current->prev;
+        }
+        std::cout << "nullptr" << std::endl;
+    }
+};
+
+// --- Main function to demonstrate ---
+int main() {
+    DoublyLinkedList dll;
+
+    dll.printForward(); // Empty list
+
+    dll.insertAtFront(10); // List: 10
+    dll.insertAtEnd(20);   // List: 10 <-> 20
+    dll.insertAtFront(5);  // List: 5 <-> 10 <-> 20
+    dll.insertAtEnd(30);   // List: 5 <-> 10 <-> 20 <-> 30
+
+    dll.printForward();
+    dll.printBackward();
+    std::cout << std::endl;
+
+    // --- Demonstrate deleting a specific node (from our problem) ---
+    Node* nodeToDeletePtr = dll.findNode(10); // Find the node with data 10
+    if (nodeToDeletePtr != nullptr) {
+        dll.deleteNode(nodeToDeletePtr);
+    } else {
+        std::cout << "Node 10 not found!" << std::endl;
+    }
+
+    dll.printForward(); // Should be: 5 <-> 20 <-> 30
+    dll.printBackward();
+    std::cout << std::endl;
+
+    // Delete head
+    Node* headNode = dll.findNode(5);
+    dll.deleteNode(headNode);
+    dll.printForward(); // Should be: 20 <-> 30
+    dll.printBackward();
+    std::cout << std::endl;
+
+    // Delete tail
+    Node* tailNode = dll.findNode(30);
+    dll.deleteNode(tailNode);
+    dll.printForward(); // Should be: 20
+    dll.printBackward();
+    std::cout << std::endl;
+
+    // Delete the last remaining node
+    Node* lastNode = dll.findNode(20);
+    dll.deleteNode(lastNode);
+    dll.printForward(); // Empty
+    dll.printBackward();
+    std::cout << std::endl;
+
+    // Try deleting from an empty list
+    dll.deleteNode(nullptr);
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! Doubly Linked Lists are powerful for when you need that extra flexibility to move both ways. Keep practicing, and you'll master them in no time! 😊
+
+---
