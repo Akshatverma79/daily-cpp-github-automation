@@ -83799,3 +83799,197 @@ int main() {
 That's a quick and clear intro to Stacks! They're simple yet incredibly powerful. Keep practicing, and you'll master them in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-09-18 10:41:02
+
+Hey there, aspiring coder! 👋 Let's dive into the world of Queues.
+
+---
+
+### DSA Notes: Queues 🚢 (C++)
+
+#### 1. What's a Queue? (The Concept)
+
+Imagine a line at a ticket counter, or people waiting for a bus. The first person to arrive is the first person to be served or board. That's exactly how a Queue works!
+
+*   **Definition:** A Queue is a linear data structure that follows the **FIFO (First-In, First-Out)** principle.
+*   **Key Operations:**
+    *   `enqueue(element)`: Adds an element to the **rear** (back) of the queue.
+    *   `dequeue()`: Removes the element from the **front** of the queue.
+    *   `front()` / `peek()`: Returns the element at the front without removing it.
+    *   `isEmpty()`: Checks if the queue has any elements.
+    *   `getSize()`: Returns the number of elements in the queue.
+
+---
+
+#### 2. Why Queues Matter (Its Importance)
+
+Queues are super useful for managing tasks, handling data in order, and even in famous algorithms.
+
+*   **Task Scheduling:** Operating systems use queues to manage processes (e.g., print queue, CPU task scheduling).
+*   **Breadth-First Search (BFS):** A fundamental algorithm for traversing trees and graphs relies heavily on queues to explore nodes level by level.
+*   **Buffering:** Used in data streams (e.g., audio/video playback, network packets) to ensure data is processed in the correct sequence.
+*   **Simulations:** Modeling real-world scenarios like customer service lines.
+
+---
+
+#### 3. Example Problem (Small & Sweet)
+
+**Problem:** Simulate a simple customer service line. Customers arrive and wait in a queue. When a server is free, they serve the next customer in line.
+
+**Scenario:**
+1.  "Alice" arrives.
+2.  "Bob" arrives.
+3.  "Charlie" arrives.
+4.  Server serves a customer.
+5.  "David" arrives.
+6.  Server serves a customer.
+
+**Expected Output (Order of service):** Alice, Bob, Charlie, David.
+
+This perfectly illustrates `enqueue` (customers arriving) and `dequeue` (server serving).
+
+---
+
+#### 4. Simple C++ Implementation (Using Linked List)
+
+We'll build a basic Queue using a linked list. This allows dynamic resizing!
+
+```cpp
+#include <iostream>
+
+// --- 1. Node Structure ---
+// Each element in our queue will be a Node
+struct Node {
+    int data;     // The actual data our node holds
+    Node* next;   // Pointer to the next node in the sequence
+
+    Node(int val) : data(val), next(nullptr) {} // Constructor for easy creation
+};
+
+// --- 2. Queue Class ---
+class Queue {
+private:
+    Node* front; // Pointer to the front of the queue
+    Node* rear;  // Pointer to the rear of the queue
+    int count;   // To keep track of the number of elements
+
+public:
+    // Constructor: Initialize an empty queue
+    Queue() : front(nullptr), rear(nullptr), count(0) {}
+
+    // Destructor: Clean up memory when the queue is destroyed
+    ~Queue() {
+        while (!isEmpty()) {
+            dequeue(); // Dequeue all elements to free memory
+        }
+    }
+
+    // --- Operations ---
+
+    // Add an element to the rear of the queue
+    void enqueue(int val) {
+        Node* newNode = new Node(val);
+        if (isEmpty()) {
+            front = newNode;
+            rear = newNode;
+        } else {
+            rear->next = newNode;
+            rear = newNode;
+        }
+        count++;
+        std::cout << "Enqueued: " << val << std::endl;
+    }
+
+    // Remove an element from the front of the queue
+    void dequeue() {
+        if (isEmpty()) {
+            std::cout << "Queue is empty. Cannot dequeue." << std::endl;
+            return;
+        }
+        Node* temp = front;
+        front = front->next;
+        if (front == nullptr) { // If queue becomes empty after dequeue
+            rear = nullptr;
+        }
+        std::cout << "Dequeued: " << temp->data << std::endl;
+        delete temp; // Free the memory of the removed node
+        count--;
+    }
+
+    // Get the element at the front without removing it
+    int getFront() {
+        if (isEmpty()) {
+            std::cerr << "Queue is empty. No front element." << std::endl;
+            return -1; // Or throw an exception in a real application
+        }
+        return front->data;
+    }
+
+    // Check if the queue is empty
+    bool isEmpty() {
+        return front == nullptr; // Or return count == 0;
+    }
+
+    // Get the number of elements in the queue
+    int getSize() {
+        return count;
+    }
+};
+
+// --- Main function to test our Queue ---
+int main() {
+    Queue customerLine;
+
+    std::cout << "--- Initial State ---" << std::endl;
+    std::cout << "Is queue empty? " << (customerLine.isEmpty() ? "Yes" : "No") << std::endl;
+    std::cout << "Queue size: " << customerLine.getSize() << std::endl;
+    std::cout << std::endl;
+
+    // Simulate customers arriving (enqueue)
+    std::cout << "--- Customers Arriving ---" << std::endl;
+    customerLine.enqueue(101); // Alice
+    customerLine.enqueue(102); // Bob
+    customerLine.enqueue(103); // Charlie
+    std::cout << "Front customer: " << customerLine.getFront() << std::endl;
+    std::cout << "Queue size: " << customerLine.getSize() << std::endl;
+    std::cout << std::endl;
+
+    // Simulate server processing (dequeue)
+    std::cout << "--- Server Processing ---" << std::endl;
+    customerLine.dequeue(); // Serves Alice
+    std::cout << "Front customer after dequeue: " << customerLine.getFront() << std::endl;
+    std::cout << std::endl;
+
+    // Another customer arrives
+    std::cout << "--- Another Customer Arrives ---" << std::endl;
+    customerLine.enqueue(104); // David
+    std::cout << "Front customer: " << customerLine.getFront() << std::endl;
+    std::cout << "Queue size: " << customerLine.getSize() << std::endl;
+    std::cout << std::endl;
+
+    // Continue serving
+    std::cout << "--- Continue Serving ---" << std::endl;
+    customerLine.dequeue(); // Serves Bob
+    customerLine.dequeue(); // Serves Charlie
+    std::cout << "Queue size: " << customerLine.getSize() << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "--- Final Processing ---" << std::endl;
+    std::cout << "Is queue empty? " << (customerLine.isEmpty() ? "Yes" : "No") << std::endl;
+    customerLine.dequeue(); // Serves David
+    std::cout << "Is queue empty? " << (customerLine.isEmpty() ? "Yes" : "No") << std::endl;
+    customerLine.dequeue(); // Try to dequeue from empty queue
+
+    return 0;
+}
+```
+
+---
+
+That's your clean and simple dive into Queues! Keep practicing, and you'll master them in no time. Happy coding! ✨
+
+---
