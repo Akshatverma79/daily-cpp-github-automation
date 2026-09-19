@@ -84331,3 +84331,164 @@ Post-order Traversal (B C A): B C A
 And there you have it! Tree traversals are a foundational concept in DSA. Master these, and you'll be well on your way to conquering more complex tree algorithms! Keep practicing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Binary Search Tree  
+🕒 2026-09-19 16:49:43
+
+Hey there, future coding superstar! ✨ Let's dive into Binary Search Trees (BSTs) – they're super neat!
+
+---
+
+## Binary Search Tree (BST)
+
+### What is it? (The Concept)
+
+Imagine a normal tree, but with special rules for organizing its "branches" (nodes). A Binary Search Tree is a **binary tree** (each node has at most two children) with a strict ordering property:
+
+1.  The `data` in the **left child** (and all its descendants) is always **smaller** than the `data` in its **parent** node.
+2.  The `data` in the **right child** (and all its descendants) is always **larger** than the `data` in its **parent** node.
+3.  No duplicate values are typically allowed (or they're handled specifically, e.g., always going right for duplicates).
+
+**Think of it like:** A super organized filing cabinet where you always know if a file is to the left (smaller category) or to the right (larger category) of the current drawer you're looking at.
+
+### Why it Matters (Why it's Cool!)
+
+BSTs are awesome because they combine the best of both worlds:
+
+*   **Fast Searching:** Thanks to the ordering rule, you can quickly narrow down your search path. If you're looking for `7` and the current node is `10`, you *know* `7` must be in the left subtree (if it exists). This makes search operations super efficient!
+*   **Fast Insertion & Deletion:** Adding or removing elements also benefits from this ordered structure. You quickly find the right spot for a new element or the element you want to remove.
+*   **Time Complexity (Average Case):** For search, insertion, and deletion, BSTs typically achieve **O(log N)** time complexity. This is significantly faster than O(N) for unsorted arrays or linked lists, especially for large datasets.
+
+**In Short:** If you need to store data in a way that allows for quick lookups and modifications, a BST is a fantastic choice!
+
+### 1 Example Problem (Small)
+
+**Problem:** Given a BST and a `target` integer, determine if the `target` exists within the tree.
+
+**Let's say we have this simple BST:**
+
+```
+      8
+     / \
+    3   10
+   / \    \
+  1   6    14
+```
+
+*   **Search for `6`:**
+    1.  Start at `8`. Is `6 < 8`? Yes. Go Left.
+    2.  At `3`. Is `6 > 3`? Yes. Go Right.
+    3.  At `6`. Is `6 == 6`? Yes! Found it! Return `true`.
+
+*   **Search for `7`:**
+    1.  Start at `8`. Is `7 < 8`? Yes. Go Left.
+    2.  At `3`. Is `7 > 3`? Yes. Go Right.
+    3.  At `6`. Is `7 > 6`? Yes. Go Right.
+    4.  At `nullptr` (empty spot). `7` is not in the tree. Return `false`.
+
+### 1 Simple C++ Implementation
+
+Here's how you might set up the basic `Node` structure and implement `insert` and `search` functions for a BST in C++.
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+
+    // Constructor to make creating new nodes easy
+    Node(int val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+// Function to insert a new value into the BST
+// Returns the root of the modified tree
+Node* insert(Node* root, int value) {
+    // If the tree (or subtree) is empty, create a new node here
+    if (root == nullptr) {
+        return new Node(value);
+    }
+
+    // Otherwise, recursively find the correct spot
+    if (value < root->data) {
+        root->left = insert(root->left, value); // Go left
+    } else if (value > root->data) { // Assuming no duplicates for simplicity, or handle as per design
+        root->right = insert(root->right, value); // Go right
+    }
+    // If value == root->data, it's a duplicate. We typically do nothing or handle it differently.
+    // For this simple example, we'll just return the current root.
+
+    return root; // Return the (potentially updated) root
+}
+
+// Function to search for a value in the BST
+// Returns true if found, false otherwise
+bool search(Node* root, int target) {
+    // If the tree (or subtree) is empty, target is not found
+    if (root == nullptr) {
+        return false;
+    }
+
+    // If target matches current node's data, we found it!
+    if (root->data == target) {
+        return true;
+    }
+
+    // If target is smaller, search in the left subtree
+    if (target < root->data) {
+        return search(root->left, target);
+    } 
+    // If target is larger, search in the right subtree
+    else { // target > root->data
+        return search(root->right, target);
+    }
+}
+
+// Helper function to free up memory (important for C++)
+void deleteTree(Node* root) {
+    if (root == nullptr) {
+        return;
+    }
+    deleteTree(root->left);
+    deleteTree(root->right);
+    delete root;
+}
+
+
+int main() {
+    Node* root = nullptr; // Start with an empty tree
+
+    // Insert some values to build our BST
+    root = insert(root, 8);
+    root = insert(root, 3);
+    root = insert(root, 10);
+    root = insert(root, 1);
+    root = insert(root, 6);
+    root = insert(root, 14);
+
+    std::cout << "BST constructed: " << std::endl;
+    // Expected Tree Structure:
+    //       8
+    //      / \
+    //     3   10
+    //    / \    \
+    //   1   6    14
+
+    // Test the search function
+    std::cout << "Searching for 6: " << (search(root, 6) ? "Found!" : "Not Found.") << std::endl; // Expected: Found!
+    std::cout << "Searching for 7: " << (search(root, 7) ? "Found!" : "Not Found.") << std::endl; // Expected: Not Found.
+    std::cout << "Searching for 1: " << (search(root, 1) ? "Found!" : "Not Found.") << std::endl; // Expected: Found!
+    std::cout << "Searching for 15: " << (search(root, 15) ? "Found!" : "Not Found.") << std::endl; // Expected: Not Found.
+
+    // Clean up memory
+    deleteTree(root);
+
+    return 0;
+}
+```
+
+---
