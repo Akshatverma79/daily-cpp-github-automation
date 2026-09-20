@@ -84492,3 +84492,218 @@ int main() {
 ```
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graphs Basics  
+🕒 2026-09-20 10:46:08
+
+Alright, let's dive into the fascinating world of Graphs!
+
+---
+
+## Graphs Basics: Your Friendly Intro! 🌐
+
+Imagine a network of connected things. That's essentially what a graph is!
+
+---
+
+### 1. What's a Graph? 🧐
+
+Think of it like a map:
+*   **Cities** are your "points" or "dots".
+*   **Roads** connecting cities are your "lines".
+
+In DSA terms:
+*   A Graph `G` is a collection of **Nodes** (also called **Vertices**) and **Edges**.
+*   **Nodes:** The individual items in your network (e.g., a person on Facebook, a city).
+*   **Edges:** The connections between nodes (e.g., friends on Facebook, a road between cities).
+
+**Quick Types:**
+*   **Undirected Graph:** Edges go both ways (like a two-way street). If A is connected to B, then B is connected to A.
+*   **Directed Graph:** Edges have a direction (like a one-way street). If A is connected to B, B might *not* be connected to A.
+*   **Weighted Graph:** Edges have a "cost" or "value" (e.g., distance of a road, time taken).
+*   **Unweighted Graph:** Edges just represent a connection, no extra value.
+
+---
+
+### 2. Why Does It Matter? 🤔
+
+Graphs are everywhere! Seriously, once you see them, you can't unsee them.
+*   **Social Networks:** People are nodes, friendships are edges.
+*   **GPS/Navigation:** Locations are nodes, roads are edges (often weighted by distance/time).
+*   **Internet:** Computers/servers are nodes, network cables/Wi-Fi are edges.
+*   **Recommendation Systems:** Products/users are nodes, "bought together" or "liked" are edges.
+*   **Computer Networks:** How data flows.
+*   **Puzzles/Games:** Sudoku, shortest path in a maze.
+
+Understanding graphs helps you model and solve a massive range of real-world problems efficiently!
+
+---
+
+### 3. How Do We Store Them? (Representation) 📁
+
+Before we can use a graph, we need a way to store its information in our program. The most common ways are:
+
+1.  **Adjacency Matrix:** A 2D array where `matrix[i][j]` is `1` if node `i` and `j` are connected, `0` otherwise.
+    *   **Good for:** Checking if an edge exists quickly.
+    *   **Bad for:** Space, especially with many nodes but few edges (sparse graphs). `O(V^2)` space (V = number of vertices).
+
+2.  **Adjacency List:** An array (or vector) where each index `i` stores a list (or vector) of all nodes adjacent to node `i`.
+    *   **Good for:** Space-efficient for sparse graphs, easy to find all neighbors of a node.
+    *   **Bad for:** Checking if an edge exists between two *specific* nodes takes `O(degree of node)` time.
+    *   **Space:** `O(V + E)` space (E = number of edges).
+
+**For most problems (and definitely for basics!), the Adjacency List is preferred due to its flexibility and efficiency.** We'll use this!
+
+---
+
+### 4. Let's Solve a Tiny Problem! 🛣️
+
+**Problem:** Given an undirected graph, determine if two specific nodes (`start_node` and `target_node`) are connected (i.e., if there's a path between them).
+
+**Example:**
+Nodes: 0, 1, 2, 3, 4
+Edges: (0, 1), (0, 2), (1, 3), (2, 4)
+
+Are node 0 and node 3 connected? Yes (0 -> 1 -> 3)
+Are node 0 and node 4 connected? Yes (0 -> 2 -> 4)
+Are node 3 and node 4 connected? No (they are in different "components" of the graph).
+
+**Thinking Process:**
+We need to "explore" the graph starting from `start_node`. If we ever reach `target_node` during our exploration, they are connected! To avoid infinite loops in graphs with cycles, we must keep track of nodes we've already visited. A simple way to explore is using **Depth-First Search (DFS)**.
+
+1.  Start at `start_node`. Mark it as visited.
+2.  If `start_node` is `target_node`, we found it! Return `true`.
+3.  For each *unvisited* neighbor of `start_node`:
+    *   Recursively call our search function on that neighbor.
+    *   If the recursive call returns `true` (meaning `target_node` was found downstream), then we also return `true`.
+4.  If we've tried all neighbors and `target_node` wasn't found, return `false`.
+
+---
+
+### 5. C++ Time! 💻
+
+Let's implement the `areConnected` function using an Adjacency List and DFS.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list> // Could also use vector<vector<int>> for adj list, but list is typical
+
+// --- Graph Representation (Adjacency List) ---
+class Graph {
+private:
+    int numNodes;
+    std::vector<std::list<int>> adj; // adj[i] stores a list of nodes connected to node i
+
+public:
+    // Constructor
+    Graph(int V) : numNodes(V) {
+        adj.resize(V); // Initialize adjacency list for V nodes
+    }
+
+    // Function to add an undirected edge between u and v
+    void addEdge(int u, int v) {
+        adj[u].push_back(v); // Add v to u's list
+        adj[v].push_back(u); // Add u to v's list (because it's undirected)
+    }
+
+    // --- DFS for Connectivity Check ---
+    // Helper function for DFS
+    bool dfs_util(int u, int target, std::vector<bool>& visited) {
+        visited[u] = true; // Mark current node as visited
+
+        if (u == target) {
+            return true; // Found the target!
+        }
+
+        // Recur for all the vertices adjacent to this vertex
+        for (int v : adj[u]) {
+            if (!visited[v]) {
+                if (dfs_util(v, target, visited)) {
+                    return true; // If target found in a recursive call, propagate true
+                }
+            }
+        }
+        return false; // Target not found from this path
+    }
+
+    // Main function to check if two nodes are connected
+    bool areConnected(int start_node, int target_node) {
+        if (start_node < 0 || start_node >= numNodes || 
+            target_node < 0 || target_node >= numNodes) {
+            std::cout << "Error: Node out of bounds." << std::endl;
+            return false;
+        }
+        if (start_node == target_node) return true; // A node is always connected to itself
+
+        std::vector<bool> visited(numNodes, false); // Keep track of visited nodes
+        return dfs_util(start_node, target_node, visited);
+    }
+};
+
+int main() {
+    // Create a graph with 5 nodes (0 to 4)
+    Graph g(5);
+
+    // Add edges
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(1, 3);
+    g.addEdge(2, 4);
+
+    // Test cases
+    std::cout << "Is 0 connected to 3? " << (g.areConnected(0, 3) ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Is 0 connected to 4? " << (g.areConnected(0, 4) ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Is 3 connected to 4? " << (g.areConnected(3, 4) ? "Yes" : "No") << std::endl; // Expected: No
+    std::cout << "Is 1 connected to 1? " << (g.areConnected(1, 1) ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Is 0 connected to 5? " << (g.areConnected(0, 5) ? "Yes" : "No") << std::endl; // Expected: Error/No (out of bounds)
+
+    // Example of another disconnected component
+    Graph g2(7); // Nodes 0-6
+    g2.addEdge(0, 1);
+    g2.addEdge(1, 2);
+    g2.addEdge(3, 4); // Disconnected component
+    g2.addEdge(4, 5);
+
+    std::cout << "\n--- Graph 2 ---" << std::endl;
+    std::cout << "Is 0 connected to 2? " << (g2.areConnected(0, 2) ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Is 0 connected to 3? " << (g2.areConnected(0, 3) ? "Yes" : "No") << std::endl; // Expected: No
+    std::cout << "Is 3 connected to 5? " << (g2.areConnected(3, 5) ? "Yes" : "No") << std::endl; // Expected: Yes
+
+    return 0;
+}
+```
+
+**Explanation of the C++ Code:**
+
+1.  **`Graph` Class:**
+    *   `numNodes`: Stores the total number of vertices in the graph.
+    *   `adj`: This is our **adjacency list**. `std::vector<std::list<int>>` means `adj[i]` is a `std::list` containing all the nodes directly connected to node `i`.
+    *   **Constructor `Graph(int V)`:** Initializes the `numNodes` and resizes the `adj` vector to hold `V` empty lists.
+    *   **`addEdge(int u, int v)`:** Adds an edge between `u` and `v`. Since it's an *undirected* graph, we add `v` to `u`'s list AND `u` to `v`'s list.
+
+2.  **`dfs_util(int u, int target, std::vector<bool>& visited)`:**
+    *   This is the recursive helper for Depth-First Search.
+    *   `visited[u] = true;`: Marks the current node `u` as visited to prevent cycles and redundant work.
+    *   `if (u == target) return true;`: Base case: if we found the `target`, we're done!
+    *   `for (int v : adj[u])`: Iterates through all neighbors `v` of the current node `u`.
+    *   `if (!visited[v])`: If a neighbor hasn't been visited yet, explore it.
+    *   `if (dfs_util(v, target, visited)) return true;`: Recursively call `dfs_util` on the neighbor. If *any* of these recursive calls finds the `target`, we return `true` all the way up.
+    *   `return false;`: If we've explored all paths from `u` and didn't find `target`, then `target` is not reachable from `u` through this path.
+
+3.  **`areConnected(int start_node, int target_node)`:**
+    *   The public function to check connectivity.
+    *   Includes basic error checking for node bounds.
+    *   Handles the trivial case where `start_node == target_node`.
+    *   `std::vector<bool> visited(numNodes, false);`: Creates a `visited` array (all `false` initially) for each new connectivity check. This is crucial!
+    *   Calls `dfs_util` to start the actual search.
+
+---
+
+This covers the basics of what graphs are, why they're important, how to represent them (focusing on adjacency lists), and a simple problem solved with a fundamental graph traversal algorithm (DFS).
+
+**What's next?** Explore Breadth-First Search (BFS), weighted graphs, shortest path algorithms (Dijkstra's, Bellman-Ford), minimum spanning trees (Prim's, Kruskal's), and more! Happy coding! ✨
+
+---
