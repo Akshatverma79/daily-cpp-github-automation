@@ -85287,3 +85287,113 @@ Maximum value in knapsack with capacity 50: 240
 That's your quick dive into Greedy Algorithms! Keep practicing, and you'll master them in no time. Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Sliding Window Techniques  
+🕒 2026-09-22 17:46:29
+
+Hey there, future DSA wizard! 👋 Let's dive into a neat trick called **Sliding Window**.
+
+---
+
+## 🎯 DSA Notes: Sliding Window Techniques
+
+### What's the concept? 🕵️‍♂️
+
+Imagine you have a long array or string, and you're interested in a "window" (a contiguous sub-part) of a certain size. Instead of looking at every single possible window from scratch, the **Sliding Window** technique lets you "slide" this window across your data.
+
+As the window moves, an element leaves from one end, and a new element enters from the other. You only update your calculations based on these two changes, rather than re-calculating everything for the new window. It's like moving a physical windowpane!
+
+### Why does it matter? ✨
+
+It's super efficient! This technique often transforms a brute-force O(N²) solution (where N is the size of your array/string) into a much faster **O(N)** solution. It's perfect for problems asking about subarrays or substrings that need to satisfy a certain condition (like max sum, min length, number of distinct characters, etc.).
+
+### Let's see an example! 💡
+
+**Problem:** Find the maximum sum of any **contiguous subarray of size `K`**.
+
+**Example:**
+`nums = [1, 2, 3, 4, 5]`
+`K = 3`
+
+**How we'd slide:**
+1. **Window 1:** `[1, 2, 3]` -> Sum = 6
+2. **Slide Right:** Remove `1`, add `4`.
+   **Window 2:** `[2, 3, 4]` -> Sum = 9
+3. **Slide Right:** Remove `2`, add `5`.
+   **Window 3:** `[3, 4, 5]` -> Sum = 12
+
+The maximum sum found is `12`.
+
+### Simple C++ Implementation 🚀
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate (optional, but handy for first window)
+#include <algorithm> // For std::max
+
+// Function to find the maximum sum of a subarray of size K
+int maxSubarraySum(const std::vector<int>& nums, int k) {
+    int n = nums.size();
+
+    // Edge case: If K is larger than the array size or array is empty
+    if (n == 0 || k > n) {
+        return 0; // Or throw an error, depending on problem requirements
+    }
+
+    int currentWindowSum = 0;
+
+    // 1. Calculate the sum of the first window (from index 0 to k-1)
+    for (int i = 0; i < k; ++i) {
+        currentWindowSum += nums[i];
+    }
+
+    // Initialize maxSum with the sum of the first window
+    int maxSum = currentWindowSum;
+
+    // 2. Slide the window from the 'k-th' element to the end of the array
+    // 'i' represents the right end of our current window
+    for (int i = k; i < n; ++i) {
+        // Subtract the element that is leaving the window (at nums[i-k])
+        // Add the new element that is entering the window (at nums[i])
+        currentWindowSum = currentWindowSum - nums[i - k] + nums[i];
+
+        // Update maxSum if the current window's sum is greater
+        maxSum = std::max(maxSum, currentWindowSum);
+    }
+
+    return maxSum;
+}
+
+int main() {
+    std::vector<int> nums1 = {1, 2, 3, 4, 5};
+    int k1 = 3;
+    std::cout << "Max sum for [1,2,3,4,5] with K=3: " << maxSubarraySum(nums1, k1) << std::endl; // Expected: 12
+
+    std::vector<int> nums2 = {10, 4, 2, 5, 6, 8, 1};
+    int k2 = 4;
+    std::cout << "Max sum for [10,4,2,5,6,8,1] with K=4: " << maxSubarraySum(nums2, k2) << std::endl; // Expected: 21 (from [2,5,6,8])
+
+    std::vector<int> nums3 = {1, 1, 1, 1, 1};
+    int k3 = 2;
+    std::cout << "Max sum for [1,1,1,1,1] with K=2: " << maxSubarraySum(nums3, k3) << std::endl; // Expected: 2
+
+    std::vector<int> nums4 = {};
+    int k4 = 1;
+    std::cout << "Max sum for [] with K=1: " << maxSubarraySum(nums4, k4) << std::endl; // Expected: 0 (edge case)
+
+    std::vector<int> nums5 = {1, 2};
+    int k5 = 5;
+    std::cout << "Max sum for [1,2] with K=5: " << maxSubarraySum(nums5, k5) << std::endl; // Expected: 0 (edge case)
+
+    return 0;
+}
+```
+
+---
+
+That's the core idea of Sliding Window! Keep practicing, and you'll find it incredibly useful in many problems. Happy coding! 💻
+
+---
