@@ -85130,3 +85130,160 @@ int main() {
 And that's your quick dive into Knapsack Problems! Keep practicing, and you'll master this powerful DP technique!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Greedy Algorithms  
+🕒 2026-09-22 11:04:21
+
+Hey there, future algorithm master! 👋 Let's dive into Greedy Algorithms.
+
+---
+
+### 🧠 Greedy Algorithms: Your Quick Guide
+
+#### 🧐 What does it mean?
+
+Imagine you're making a series of decisions, and at each step, you pick the option that looks **best right now**, without worrying too much about future consequences. That's the essence of a Greedy Algorithm!
+
+You make a *locally optimal choice* with the hope that these choices will lead to a *globally optimal solution*.
+
+#### 🌟 Why does it matter?
+
+Greedy algorithms are super efficient and often quite simple to implement when they *do* work. This makes them a go-to for many optimization problems, especially when dynamic programming might be overkill or too complex. Think of tasks like finding the shortest path, scheduling events, or selecting items for a knapsack.
+
+**Important Note:** Greedy algorithms don't *always* find the best overall solution. They only work for specific types of problems where the "locally best" choice genuinely leads to the "globally best" choice.
+
+---
+
+#### 💡 Example Problem: Fractional Knapsack
+
+**Problem:** You have a knapsack with a maximum weight capacity `W`. You're given a list of items, each with its `weight` and `value`. Unlike the traditional knapsack, you can take *fractions* of items. Your goal is to maximize the total value of items you put into the knapsack.
+
+**Small Example:**
+*   Knapsack Capacity `W = 50`
+*   Items:
+    *   Item 1: Weight = 10, Value = 60
+    *   Item 2: Weight = 20, Value = 100
+    *   Item 3: Weight = 30, Value = 120
+
+**Greedy Approach:**
+What's the "best choice right now"? It's the item that gives you the most value *per unit of weight*.
+1.  Calculate **value-per-weight** for each item.
+2.  **Sort** the items in descending order based on their value-per-weight.
+3.  Iterate through the sorted items:
+    *   If the current item's weight is less than or equal to the remaining knapsack capacity, take the whole item.
+    *   If not, take a fraction of the item that fills the remaining capacity, and then stop.
+
+Let's apply it to our example:
+*   Item 1: Value/Weight = 60/10 = 6
+*   Item 2: Value/Weight = 100/20 = 5
+*   Item 3: Value/Weight = 120/30 = 4
+
+Sorted by value-per-weight (descending): Item 1 (6), Item 2 (5), Item 3 (4)
+
+1.  **Knapsack Capacity = 50**
+2.  Take **Item 1** (Weight 10, Value 60).
+    *   Remaining Capacity = 50 - 10 = 40
+    *   Total Value = 60
+3.  Take **Item 2** (Weight 20, Value 100).
+    *   Remaining Capacity = 40 - 20 = 20
+    *   Total Value = 60 + 100 = 160
+4.  Can't take full **Item 3** (Weight 30).
+    *   Take a fraction: We need 20kg more. Item 3 gives 4 value per kg.
+    *   Value from fraction = 20kg * 4 value/kg = 80
+    *   Remaining Capacity = 20 - 20 = 0 (Knapsack full!)
+    *   Total Value = 160 + 80 = **240**
+
+This is the maximum possible value!
+
+---
+
+#### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::sort
+
+// Structure to represent an item
+struct Item {
+    int weight;
+    int value;
+    double valuePerWeight; // To store the calculated ratio
+};
+
+// Custom comparison function for sorting items
+// We want to sort in descending order of valuePerWeight
+bool compareItems(const Item& a, const Item& b) {
+    return a.valuePerWeight > b.valuePerWeight;
+}
+
+// Function to solve the Fractional Knapsack problem using a greedy approach
+double fractionalKnapsack(int capacity, std::vector<Item>& items) {
+    // 1. Calculate value-per-weight for each item
+    for (Item& item : items) { // Use reference '&' to modify items in the vector
+        item.valuePerWeight = static_cast<double>(item.value) / item.weight;
+    }
+
+    // 2. Sort items based on their value-per-weight in descending order
+    std::sort(items.begin(), items.end(), compareItems);
+
+    double totalValue = 0.0;
+    int currentCapacity = capacity;
+
+    // 3. Iterate through sorted items and fill the knapsack
+    for (const Item& item : items) {
+        if (currentCapacity <= 0) {
+            break; // Knapsack is full, no more space
+        }
+
+        // If the entire item can fit
+        if (item.weight <= currentCapacity) {
+            totalValue += item.value;
+            currentCapacity -= item.weight;
+            std::cout << "Took whole item (W:" << item.weight << ", V:" << item.value << "). Remaining capacity: " << currentCapacity << std::endl;
+        } else {
+            // If only a fraction of the item can fit
+            double fraction = static_cast<double>(currentCapacity) / item.weight;
+            totalValue += fraction * item.value;
+            currentCapacity = 0; // Knapsack is now completely full
+            std::cout << "Took fraction of item (W:" << item.weight << ", V:" << item.value << "). Remaining capacity: " << currentCapacity << std::endl;
+        }
+    }
+
+    return totalValue;
+}
+
+int main() {
+    // Define items for our example
+    std::vector<Item> items = {
+        {10, 60, 0.0},  // Weight, Value, placeholder for valuePerWeight
+        {20, 100, 0.0},
+        {30, 120, 0.0}
+    };
+    int knapsackCapacity = 50;
+
+    double maxAchievedValue = fractionalKnapsack(knapsackCapacity, items);
+
+    std::cout << "\nMaximum value in knapsack with capacity "
+              << knapsackCapacity << ": " << maxAchievedValue << std::endl;
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Took whole item (W:10, V:60). Remaining capacity: 40
+Took whole item (W:20, V:100). Remaining capacity: 20
+Took fraction of item (W:30, V:120). Remaining capacity: 0
+
+Maximum value in knapsack with capacity 50: 240
+```
+
+---
+
+That's your quick dive into Greedy Algorithms! Keep practicing, and you'll master them in no time. Happy coding! 🚀
+
+---
