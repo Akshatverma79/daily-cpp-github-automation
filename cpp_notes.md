@@ -85397,3 +85397,125 @@ int main() {
 That's the core idea of Sliding Window! Keep practicing, and you'll find it incredibly useful in many problems. Happy coding! 💻
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Two Pointer Technique  
+🕒 2026-09-23 10:54:07
+
+Hey there, future DSA master! Let's get cozy with one of the handiest techniques: **Two Pointers**.
+
+---
+
+### 📍 Two Pointer Technique
+
+**What it means:**
+
+Imagine you have a line of items (like numbers in an array or characters in a string). The Two Pointer technique is about using **two pointers (indices)** to traverse, compare, or manipulate elements in that structure.
+
+Think of them as two markers you move around strategically.
+
+There are two main patterns:
+1.  **Pointers from opposite ends:** One pointer starts at the beginning, the other at the end. They move towards each other.
+2.  **Pointers moving in the same direction:** Both pointers start at the beginning (or near it), with one often moving faster than the other (slow and fast pointers).
+
+**Why it matters:**
+
+This technique is super powerful because it often allows you to solve problems that would typically take `O(N^2)` time in a much more efficient `O(N)` time complexity. Plus, it usually uses only `O(1)` extra space!
+
+It's particularly useful for:
+*   Working with **sorted arrays or lists**.
+*   Finding pairs, triplets, or subsequences with certain properties.
+*   Reversing arrays/strings in-place.
+*   Removing duplicates.
+*   Finding cycles in linked lists.
+
+---
+
+### 🎯 Example Problem: Two Sum for a Sorted Array
+
+**Problem:** Given a **sorted** array of integers `nums` and a target integer `target`, find two numbers in the array that add up to `target`. Return the **indices** of these two numbers.
+
+**Example:**
+`nums = [1, 3, 6, 8, 11]`
+`target = 9`
+
+**Expected Output:** `[1, 3]` (because `nums[1]` (which is 3) + `nums[3]` (which is 6) = 9)
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <vector> // Don't forget to include vector!
+
+// Function to find two numbers that sum up to the target
+std::vector<int> findTwoSum(const std::vector<int>& nums, int target) {
+    int left = 0;                  // Pointer starting from the beginning
+    int right = nums.size() - 1;   // Pointer starting from the end
+
+    // Loop as long as the left pointer is before the right pointer
+    while (left < right) {
+        int currentSum = nums[left] + nums[right]; // Calculate the sum of elements at both pointers
+
+        if (currentSum == target) {
+            // If we found the target sum, return their indices
+            // Note: Some problems ask for 0-indexed, some for 1-indexed. We'll stick to 0-indexed.
+            return {left, right}; 
+        } else if (currentSum < target) {
+            // If the current sum is too small, we need a larger number.
+            // Since the array is sorted, move the left pointer to the right to increase the sum.
+            left++;
+        } else { // currentSum > target
+            // If the current sum is too large, we need a smaller number.
+            // Since the array is sorted, move the right pointer to the left to decrease the sum.
+            right--;
+        }
+    }
+
+    // If no such pair is found after checking all possibilities, return an empty vector
+    return {}; 
+}
+
+/*
+// How you might test this function:
+#include <iostream>
+
+int main() {
+    std::vector<int> nums1 = {1, 3, 6, 8, 11};
+    int target1 = 9;
+    std::vector<int> result1 = findTwoSum(nums1, target1);
+    if (!result1.empty()) {
+        std::cout << "For nums1 and target1, indices are: [" << result1[0] << ", " << result1[1] << "]\n"; // Expected: [1, 3]
+    } else {
+        std::cout << "No pair found for nums1.\n";
+    }
+
+    std::vector<int> nums2 = {2, 7, 11, 15};
+    int target2 = 9;
+    std::vector<int> result2 = findTwoSum(nums2, target2);
+    if (!result2.empty()) {
+        std::cout << "For nums2 and target2, indices are: [" << result2[0] << ", " << result2[1] << "]\n"; // Expected: [0, 1]
+    } else {
+        std::cout << "No pair found for nums2.\n";
+    }
+
+    std::vector<int> nums3 = {1, 2, 3, 4};
+    int target3 = 10;
+    std::vector<int> result3 = findTwoSum(nums3, target3);
+    if (!result3.empty()) {
+        std::cout << "For nums3 and target3, indices are: [" << result3[0] << ", " << result3[1] << "]\n";
+    } else {
+        std::cout << "No pair found for nums3.\n"; // Expected: No pair found
+    }
+
+    return 0;
+}
+*/
+```
+
+---
+
+And that's a quick intro to Two Pointers! Keep practicing, and you'll find this technique popping up in many problems. Happy coding!
+
+---
