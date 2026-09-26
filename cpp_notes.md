@@ -86268,3 +86268,303 @@ Original: "a", Reversed: "a"
 That's it for the basics! You've just taken your first step into a super useful area of programming! Keep practicing! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Matching (KMP, Rabin-Karp)  
+🕒 2026-09-26 17:25:12
+
+Hey there, future algorithm master! 👋 Let's dive into the fascinating world of String Matching. It's like being a super-sleuth, finding tiny clues (patterns) within huge texts.
+
+---
+
+## **String Matching: Finding Needles in Haystacks**
+
+**What it means:**
+String matching is the task of finding one or more occurrences of a "pattern" string `P` within a larger "text" string `T`. Think of it like using Ctrl+F in a document.
+
+**Why it matters:**
+*   **Search Engines:** Finding your query in billions of web pages.
+*   **Bioinformatics:** Locating specific DNA sequences.
+*   **Text Editors:** "Find and Replace" functionality.
+*   **Plagiarism Detection:** Identifying copied text.
+
+There are many algorithms for this, but two popular and efficient ones are KMP and Rabin-Karp.
+
+---
+
+## **1. Knuth-Morris-Pratt (KMP) Algorithm**
+
+### **What it means:**
+KMP is a clever string matching algorithm that avoids redundant comparisons by pre-processing the *pattern* itself. When a mismatch occurs, instead of blindly shifting the pattern by one character, KMP uses information about the pattern's internal structure to know *exactly how much to shift* to continue the search effectively.
+
+The core idea is built around a "Longest Proper Prefix Suffix" (LPS) array (sometimes called a prefix function). This array for a pattern `P` at index `i` stores the length of the longest proper prefix of `P[0...i]` that is also a suffix of `P[0...i]`.
+
+**Analogy:** Imagine you're trying to fit a complex LEGO block (pattern) onto a long LEGO base (text). If a part of the block doesn't fit, KMP tells you, "Hey, this much of the block *could* still match if we slide it forward *this much*," instead of making you start all over.
+
+### **Why it matters:**
+*   **Efficiency:** It runs in linear time, O(N + M), where N is text length and M is pattern length. This is much faster than naive approaches (O(NM)) for most cases.
+*   **No Backtracking:** Unlike naive algorithms, the KMP algorithm never backs up in the text string; it only moves forward.
+*   **Deterministic:** Always provides the same result and performance for a given input.
+
+### **Example Problem:**
+**Text `T`:** `"ABABDABACDABABCABAB"`
+**Pattern `P`:** `"ABABCABAB"`
+
+1.  **First, compute the LPS array for `P`:**
+    *   `P`: `A B A B C A B A B`
+    *   `LPS`: `0 0 1 2 0 1 2 3 4`
+    *(Explanation for `LPS[8]`=4: For `P[0...8]` = "ABABCABAB", the longest proper prefix that is also a suffix is "ABAB" (length 4).)*
+
+2.  **Now, match `P` in `T`:**
+    *   `T`: `ABABDABACDABABCABAB`
+    *   `P`: `ABABCABAB` (Initial match)
+    *   ... (Match 'A', 'B', 'A', 'B')
+    *   `T`: `ABABDABACDABABCABAB`
+    *   `P`: `ABABCABAB`
+    *   Here, `T[4]` ('D') != `P[4]` ('C'). Mismatch!
+    *   Instead of shifting `P` by 1, KMP uses `LPS[3]` (since `P[0...3]` matched). `LPS[3]` is 2. So, we shift `P` such that `P[0...1]` ("AB") aligns with `T[2...3]` ("AB").
+    *   `T`: `ABABDABACDABABCABAB`
+    *   `P`: `  ABABCABAB` (Pattern shifted based on LPS[3]=2)
+    *   And so on, until a full match is found or the text ends.
+
+### **Simple C++ Implementation:**
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+
+// Function to compute the LPS array
+std::vector<int> computeLPSArray(const std::string& pattern) {
+    int M = pattern.length();
+    std::vector<int> lps(M, 0); // Initialize with zeros
+    int length = 0; // Length of the previous longest prefix suffix
+    int i = 1;
+
+    while (i < M) {
+        if (pattern[i] == pattern[length]) {
+            length++;
+            lps[i] = length;
+            i++;
+        } else { // (pattern[i] != pattern[length])
+            if (length != 0) {
+                length = lps[length - 1]; // Move to the previous longest prefix suffix
+            } else { // length == 0
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+    return lps;
+}
+
+// KMP Search function
+void KMPSearch(const std::string& text, const std::string& pattern) {
+    int N = text.length();
+    int M = pattern.length();
+
+    if (M == 0) {
+        std::cout << "Pattern is empty." << std::endl;
+        return;
+    }
+    if (N == 0) {
+        std::cout << "Text is empty." << std::endl;
+        return;
+    }
+    if (M > N) {
+        std::cout << "Pattern is longer than text. No match possible." << std::endl;
+        return;
+    }
+
+    std::vector<int> lps = computeLPSArray(pattern);
+
+    int i = 0; // index for text
+    int j = 0; // index for pattern
+
+    while (i < N) {
+        if (pattern[j] == text[i]) {
+            i++;
+            j++;
+        }
+
+        if (j == M) {
+            std::cout << "Found pattern at index " << i - j << std::endl;
+            // To find all occurrences, we need to shift the pattern
+            // using the LPS array.
+            j = lps[j - 1]; 
+        } else if (i < N && pattern[j] != text[i]) {
+            // Mismatch after j matches
+            if (j != 0) {
+                j = lps[j - 1]; // Don't match lps[0..j-1] characters, 
+                                 // shift pattern by lps[j-1]
+            } else {
+                i++; // No prefix to match, just move to the next char in text
+            }
+        }
+    }
+}
+
+/*
+int main() {
+    std::string text = "ABABDABACDABABCABAB";
+    std::string pattern = "ABABCABAB";
+    std::cout << "KMP Search:" << std::endl;
+    KMPSearch(text, pattern); // Expected: Found pattern at index 10
+
+    std::string text2 = "AAAAAA";
+    std::string pattern2 = "AAA";
+    std::cout << "\nKMP Search 2:" << std::endl;
+    KMPSearch(text2, pattern2); // Expected: Found pattern at index 0, 1, 2, 3
+
+    return 0;
+}
+*/
+```
+
+---
+
+## **2. Rabin-Karp Algorithm**
+
+### **What it means:**
+Rabin-Karp is another string matching algorithm that uses hashing to speed up the comparison process. Instead of comparing characters directly, it computes a hash value for the pattern and then computes hash values for all possible substrings (windows) of the text that have the same length as the pattern.
+
+If the hash values match, there *might* be an occurrence. To confirm, a character-by-character comparison is performed (because hash collisions can happen). If hashes don't match, we definitely know there's no match in that window, and we can quickly move to the next.
+
+**Key Idea: Rolling Hash**
+To avoid re-computing the hash for each text window from scratch (which would be slow), Rabin-Karp uses a "rolling hash" technique. It efficiently updates the hash of the previous window to get the hash of the next window in constant time.
+`hash(S[i+1...j+1]) = (hash(S[i...j]) - S[i] * d^(M-1)) * d + S[j+1]` (all modulo a prime `q`)
+where `d` is the number of characters in the alphabet (e.g., 256 for ASCII), and `M` is pattern length.
+
+**Analogy:** Imagine you're sorting books (text) and looking for a specific series (pattern). Instead of reading every book's title, you quickly check a "checksum" (hash) for groups of books. If the checksum matches, you then do a detailed check. If not, you slide to the next group of books.
+
+### **Why it matters:**
+*   **Average Case Efficiency:** On average, it runs in O(N + M) time.
+*   **Multiple Patterns:** It's especially effective when searching for *multiple patterns* in a text because you can pre-compute all pattern hashes and compare against them efficiently.
+*   **Simplicity:** Often simpler to implement than KMP for many.
+*   **Cryptographic Applications:** Hashing is fundamental in many security-related algorithms.
+
+### **Example Problem:**
+**Text `T`:** `"ABCDEF"`
+**Pattern `P`:** `"CDE"`
+
+Let's use `d = 10` (for simplicity, usually 256 for ASCII) and `q = 101` (a prime number).
+
+1.  **Calculate Pattern Hash `pHash`:**
+    *   `P = "CDE"`
+    *   `pHash = (C*10^2 + D*10^1 + E*10^0) % 101`
+    *   (Assuming 'A'=1, 'B'=2, etc., so 'C'=3, 'D'=4, 'E'=5)
+    *   `pHash = (3*100 + 4*10 + 5*1) % 101 = (300 + 40 + 5) % 101 = 345 % 101 = 42`
+
+2.  **Calculate Text Window Hashes `tHash`:** (Window size M=3)
+    *   **Window "ABC"**: `tHash = (1*100 + 2*10 + 3*1) % 101 = 123 % 101 = 22` (No match with `pHash=42`)
+    *   **Roll to "BCD"**:
+        *   Remove 'A' (`1*10^2`), add 'D' (`4`).
+        *   `tHash = ( (22 - (1*10^2)%101 + 101) * 10 + 4 ) % 101` (Add 101 to handle negative results before final modulo)
+        *   `tHash = ( (22 - 100%101 + 101) * 10 + 4 ) % 101 = ( (22 - (-1) + 101) * 10 + 4 ) % 101`
+        *   `tHash = ( (22 + 1 + 101) * 10 + 4 ) % 101 = (124 * 10 + 4) % 101 = (1240 + 4) % 101 = 1244 % 101 = 32` (No match)
+    *   **Roll to "CDE"**:
+        *   Remove 'B' (`2*10^2`), add 'E' (`5`).
+        *   `tHash = ( (32 - (2*10^2)%101 + 101) * 10 + 5 ) % 101`
+        *   `tHash = ( (32 - 200%101 + 101) * 10 + 5 ) % 101 = ( (32 - (-2) + 101) * 10 + 5 ) % 101`
+        *   `tHash = ( (32 + 2 + 101) * 10 + 5 ) % 101 = (135 * 10 + 5) % 101 = (1350 + 5) % 101 = 1355 % 101 = 42`
+    *   **Match!** `pHash (42) == tHash (42)`. Now, do character-by-character comparison of `T[2...4]` ("CDE") and `P` ("CDE"). They match! Found at index 2.
+
+### **Simple C++ Implementation:**
+
+```cpp
+#include <iostream>
+#include <string>
+#include <cmath> // For pow, or calculate it iteratively
+
+// Rabin-Karp Search function
+void RabinKarpSearch(const std::string& text, const std::string& pattern) {
+    int N = text.length();
+    int M = pattern.length();
+
+    if (M == 0) {
+        std::cout << "Pattern is empty." << std::endl;
+        return;
+    }
+    if (N == 0) {
+        std::cout << "Text is empty." << std::endl;
+        return;
+    }
+    if (M > N) {
+        std::cout << "Pattern is longer than text. No match possible." << std::endl;
+        return;
+    }
+
+    int q = 101; // A prime number
+    int d = 256; // Number of characters in the alphabet (ASCII)
+
+    int pHash = 0; // hash value for pattern
+    int tHash = 0; // hash value for text window
+    int h = 1;     // pow(d, M-1) % q
+
+    // Calculate h = d^(M-1) % q
+    for (int i = 0; i < M - 1; i++) {
+        h = (h * d) % q;
+    }
+
+    // Calculate initial hash for pattern and first text window
+    for (int i = 0; i < M; i++) {
+        pHash = (d * pHash + pattern[i]) % q;
+        tHash = (d * tHash + text[i]) % q;
+    }
+
+    // Slide the pattern over text one by one
+    for (int i = 0; i <= N - M; i++) {
+        // If hash values match, then check character by character
+        if (pHash == tHash) {
+            bool match = true;
+            for (int j = 0; j < M; j++) {
+                if (text[i + j] != pattern[j]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                std::cout << "Found pattern at index " << i << std::endl;
+            }
+        }
+
+        // Calculate hash for the next window if not the last
+        if (i < N - M) {
+            tHash = (d * (tHash - text[i] * h) + text[i + M]) % q;
+
+            // Handle negative values of tHash (C++ modulo can return negative)
+            if (tHash < 0) {
+                tHash = (tHash + q);
+            }
+        }
+    }
+}
+
+/*
+int main() {
+    std::string text = "ABCDEF";
+    std::string pattern = "CDE";
+    std::cout << "Rabin-Karp Search:" << std::endl;
+    RabinKarpSearch(text, pattern); // Expected: Found pattern at index 2
+
+    std::string text2 = "GEEKSFORGEEKS";
+    std::string pattern2 = "GEEK";
+    std::cout << "\nRabin-Karp Search 2:" << std::endl;
+    RabinKarpSearch(text2, pattern2); // Expected: Found pattern at index 0, 9
+
+    return 0;
+}
+*/
+```
+
+---
+
+## **Quick Summary**
+
+*   **KMP:** Great for single pattern matching, guarantees O(N+M) time complexity, never re-examines text characters. Ideal when worst-case performance is critical.
+*   **Rabin-Karp:** Also O(N+M) on average, but worst case can be O(NM) (due to many hash collisions). Very good for multiple pattern matching due to its hashing nature. Often simpler to grasp and implement for many.
+
+Choose wisely based on your specific problem! Happy coding! ✨
+
+---
