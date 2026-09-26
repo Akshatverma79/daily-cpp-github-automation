@@ -86168,3 +86168,103 @@ grape: 1
 And that's it! You've got the basics of Hashing and HashMaps. Remember its super speed for key-value lookups, and `std::unordered_map` is your go-to in C++! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: String Manipulation Basics  
+🕒 2026-09-26 10:55:24
+
+Hey there, aspiring coder! 👋 Let's break down String Manipulation Basics in C++.
+
+---
+
+## String Manipulation Basics (C++)
+
+### 1. What's the Concept?
+
+Imagine strings as sequences of characters – like words, sentences, or even just names. **String manipulation** is simply the art of working with these sequences: reading them, changing them, rearranging them, or finding specific parts within them.
+
+In C++, we primarily use `std::string` (from the `<string>` header) for this, which is super powerful and easy to use compared to older C-style character arrays.
+
+### 2. Why Does It Matter?
+
+Strings are EVERYWHERE!
+*   **User Input:** When someone types their name or a message.
+*   **Data Processing:** Reading text files, parsing logs, handling web data (URLs, JSON).
+*   **Display:** Formatting output, generating reports.
+*   **Algorithms:** Many problems involve processing textual data (e.g., finding palindromes, searching for patterns).
+
+Mastering string manipulation is a fundamental skill that opens up a huge range of problem-solving possibilities!
+
+### 3. Example Problem: Reverse a String
+
+**Problem:** Given a string, return a new string that is the reverse of the input.
+
+**Example:**
+*   Input: `"hello"`
+*   Output: `"olleh"`
+
+*   Input: `"world"`
+*   Output: `"dlrow"`
+
+### 4. Simple C++ Implementation
+
+For our example, we'll create a function that takes a string and builds its reverse character by character.
+
+```cpp
+#include <iostream> // For input/output operations (like std::cout)
+#include <string>   // For using std::string
+
+// Function to reverse a string
+std::string reverseString(const std::string& s) {
+    // 1. Create an empty string to store our reversed result
+    std::string reversed_s = "";
+
+    // 2. Loop from the last character of the original string to the first
+    //    s.length() gives the total number of characters.
+    //    Since strings are 0-indexed, the last character is at s.length() - 1.
+    for (int i = s.length() - 1; i >= 0; --i) {
+        // 3. Append the current character (s[i]) to our reversed string
+        reversed_s += s[i]; // The `+=` operator concatenates strings
+    }
+
+    // 4. Return the newly formed reversed string
+    return reversed_s;
+}
+
+int main() {
+    std::string original1 = "hello";
+    std::string reversed1 = reverseString(original1);
+    std::cout << "Original: \"" << original1 << "\", Reversed: \"" << reversed1 << "\"" << std::endl;
+
+    std::string original2 = "programming";
+    std::string reversed2 = reverseString(original2);
+    std::cout << "Original: \"" << original2 << "\", Reversed: \"" << reversed2 << "\"" << std::endl;
+
+    std::string original3 = "a";
+    std::string reversed3 = reverseString(original3);
+    std::cout << "Original: \"" << original3 << "\", Reversed: \"" << reversed3 << "\"" << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+**Output of the code:**
+```
+Original: "hello", Reversed: "olleh"
+Original: "programming", Reversed: "gnimmargorp"
+Original: "a", Reversed: "a"
+```
+
+**Quick Explanation:**
+
+*   `const std::string& s`: We take the string by `const` reference. `const` means we won't change the original string inside the function, and `&` means we're passing a reference (more efficient for large strings as it avoids copying the whole string).
+*   `s.length()`: A useful `std::string` method that tells us how many characters are in the string.
+*   `s[i]`: This is how you access a specific character at index `i` within the string. Remember, C++ strings are 0-indexed!
+*   `reversed_s += s[i]`: This is a clean way to append a character to the end of our `reversed_s` string.
+
+That's it for the basics! You've just taken your first step into a super useful area of programming! Keep practicing! ✨
+
+---
