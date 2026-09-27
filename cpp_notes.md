@@ -86568,3 +86568,143 @@ int main() {
 Choose wisely based on your specific problem! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Backtracking Basics  
+🕒 2026-09-27 11:31:36
+
+Let's get started with Backtracking! It's a fundamental technique in DSA, super useful for exploring possibilities.
+
+---
+
+### Backtracking Basics
+
+Imagine you're in a maze. You try a path, and if it leads to a dead end, you go back to the last crossroads and try another path. That's essentially Backtracking!
+
+#### 1. What is Backtracking?
+
+*   **Concept:** Backtracking is an algorithmic technique for solving problems recursively by trying to build a solution incrementally, one piece at a time.
+*   **The "Backtrack" Part:** If a partial solution (a path you've taken) leads to a dead end or doesn't satisfy the problem's constraints, you "backtrack" (undo your last choice) and try a different option.
+*   **Systematic Search:** It explores all potential paths to find all possible solutions or the best solution. Think of it as exploring a "decision tree."
+
+#### 2. Why Does It Matter?
+
+*   **Solving Complex Puzzles:** Many classic problems like N-Queens, Sudoku Solver, generating permutations/combinations, finding paths in a maze, etc., are naturally solved with backtracking.
+*   **Exhaustive Search:** It's perfect when you need to explore *all* possible configurations or sequences to find valid answers.
+*   **Optimization:** While it can be slow for large inputs (due to exploring many paths), it's often the most straightforward way to tackle problems with many choices at each step.
+
+#### 3. How It Works (The Recursive Structure)
+
+A typical backtracking algorithm involves:
+
+1.  **Base Case:** Define when a solution is found or when a path is invalid/dead-end.
+2.  **Make a Choice:** At each step, try one of the available options.
+3.  **Explore:** Recursively call the function with the new choice.
+4.  **Backtrack (Undo Choice):** After the recursive call returns (meaning that path was fully explored), undo the choice you just made so you can try other options from the same previous state.
+
+---
+
+### Example Problem: Generate Subsets
+
+**Problem:** Given a set of distinct integers, `nums`, return all possible subsets (the power set).
+
+**Example:**
+Input: `nums = [1, 2, 3]`
+Output: `[ [], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3] ]`
+
+**Thinking Backwards:**
+For each number in the input array, we have two choices:
+1.  **Include** it in the current subset.
+2.  **Exclude** it from the current subset.
+
+We'll systematically explore both choices for every number.
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // Not strictly needed for this example, but good practice
+
+// Helper function to print a vector of vectors (for better output)
+void printSubsets(const std::vector<std::vector<int>>& subsets) {
+    std::cout << "[\n";
+    for (const auto& subset : subsets) {
+        std::cout << "  [";
+        for (size_t i = 0; i < subset.size(); ++i) {
+            std::cout << subset[i] << (i == subset.size() - 1 ? "" : ", ");
+        }
+        std::cout << "]\n";
+    }
+    std::cout << "]\n";
+}
+
+// The core backtracking function
+void backtrackGenerateSubsets(
+    const std::vector<int>& nums,                 // Original input numbers
+    int index,                                   // Current index to consider in nums
+    std::vector<int>& currentSubset,             // The subset being built
+    std::vector<std::vector<int>>& allSubsets   // Stores all generated subsets
+) {
+    // Base Case: If we've considered all numbers (reached past the last index)
+    // then the 'currentSubset' is complete, so add it to our results.
+    if (index == nums.size()) {
+        allSubsets.push_back(currentSubset);
+        return; // Stop this path, go back up the recursion tree
+    }
+
+    // --- Choice 1: Include the current number ---
+    currentSubset.push_back(nums[index]); // Make the choice: add nums[index]
+    // Recurse: Move to the next number, exploring with this choice
+    backtrackGenerateSubsets(nums, index + 1, currentSubset, allSubsets);
+    currentSubset.pop_back();              // BACKTRACK: Undo the choice
+                                           // This is crucial! It removes nums[index]
+                                           // so that the *next* recursive call
+                                           // (Choice 2) starts from a state *without* nums[index]
+
+    // --- Choice 2: Exclude the current number ---
+    // No change to currentSubset. We simply move to the next number,
+    // effectively skipping nums[index].
+    backtrackGenerateSubsets(nums, index + 1, currentSubset, allSubsets);
+}
+
+// Wrapper function to start the backtracking process
+std::vector<std::vector<int>> generateSubsets(const std::vector<int>& nums) {
+    std::vector<std::vector<int>> allSubsets; // Stores the final list of subsets
+    std::vector<int> currentSubset;          // Temporary vector to build each subset
+    // Start backtracking from the first element (index 0)
+    backtrackGenerateSubsets(nums, 0, currentSubset, allSubsets);
+    return allSubsets;
+}
+
+int main() {
+    std::vector<int> nums1 = {1, 2, 3};
+    std::cout << "Generating subsets for: [1, 2, 3]\n";
+    std::vector<std::vector<int>> result1 = generateSubsets(nums1);
+    printSubsets(result1);
+    std::cout << "\n";
+
+    std::vector<int> nums2 = {5, 6};
+    std::cout << "Generating subsets for: [5, 6]\n";
+    std::vector<std::vector<int>> result2 = generateSubsets(nums2);
+    printSubsets(result2);
+    std::cout << "\n";
+
+    std::vector<int> nums3 = {};
+    std::cout << "Generating subsets for: []\n";
+    std::vector<std::vector<int>> result3 = generateSubsets(nums3);
+    printSubsets(result3);
+    std::cout << "\n";
+
+    return 0;
+}
+```
+
+---
+
+**Key Takeaway:** The magic of backtracking often lies in the `pop_back()` (or equivalent undo operation) after a recursive call. It allows you to explore one path, then "reset" your state to explore other paths from the same decision point.
+
+---
