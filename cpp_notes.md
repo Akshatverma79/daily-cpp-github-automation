@@ -86708,3 +86708,179 @@ int main() {
 **Key Takeaway:** The magic of backtracking often lies in the `pop_back()` (or equivalent undo operation) after a recursive call. It allows you to explore one path, then "reset" your state to explore other paths from the same decision point.
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: N-Queens & Sudoku Solver  
+🕒 2026-09-27 17:56:59
+
+Hey there, aspiring DSA wizard! 👋 Let's dive into N-Queens and Sudoku Solver – two classic problems often tackled with a super useful technique called **Backtracking**.
+
+---
+
+### **Topic: N-Queens & Sudoku Solver**
+
+#### **1. What the concept means**
+
+Imagine you're solving a maze. You go down one path. If it hits a dead end, you don't give up! You turn around (that's the "backtrack" part) and try another path.
+
+**Backtracking** is essentially an algorithm that tries to build a solution step-by-step. At each step, it explores all possible options. If a choice leads to a dead end or violates a rule, it "backs up" (undoes the last choice) and tries a different one. It's like a systematic trial-and-error approach.
+
+*   **N-Queens:** Place `N` non-attacking queens on an `N x N` chessboard. "Non-attacking" means no two queens share the same row, column, or diagonal.
+*   **Sudoku Solver:** Fill a 9x9 grid with numbers 1-9 such that each row, column, and 3x3 subgrid contains each digit exactly once.
+
+Both are perfect examples because:
+1.  You make a choice (place a queen, place a number).
+2.  You check if it's valid.
+3.  If valid, you try to solve the rest (recursive call).
+4.  If it leads to a dead end OR you want to find *all* solutions, you undo your choice and try another (backtrack!).
+
+#### **2. Why it matters**
+
+Backtracking is a fundamental algorithmic paradigm.
+
+*   **Problem Solving:** It's your go-to for problems involving permutations, combinations, and constraint satisfaction (like puzzles, scheduling, game AI).
+*   **Recursive Thinking:** It strongly reinforces recursive thinking, which is crucial in many areas of computer science.
+*   **Foundation:** Many complex algorithms and real-world optimizations build upon backtracking principles.
+*   **Interview Favorite:** It's a common topic in technical interviews to test your ability to handle recursive state management.
+
+#### **3. 1 example problem (small): N-Queens (N=4)**
+
+**Problem:** Place 4 queens on a 4x4 chessboard such that no two queens attack each other.
+
+Let's try to visualize one solution:
+
+1.  **Row 0:** Place Queen at (0, 1) (`. Q . .`)
+2.  **Row 1:** Try (1, 0) -> safe. (`Q . . .`)
+    *   Board:
+        ```
+        . Q . .
+        Q . . .
+        . . . .
+        . . . .
+        ```
+3.  **Row 2:** Try (2, 2) -> safe. (`. . Q .`)
+    *   Board:
+        ```
+        . Q . .
+        Q . . .
+        . . Q .
+        . . . .
+        ```
+4.  **Row 3:** Try (3, 3) -> safe! (`. . . Q`)
+    *   Board:
+        ```
+        . Q . .
+        Q . . .
+        . . Q .
+        . . . Q
+        ```
+    *   **SUCCESS!** This is one solution.
+
+What if we had hit a dead end? Say after placing queens in rows 0, 1, and 2, there was no safe spot in row 3. We would then **backtrack** to row 2, undo the queen placement, and try placing the queen in row 2 at a *different* safe column.
+
+#### **4. 1 simple C++ implementation (N-Queens)**
+
+Here's a basic C++ implementation to find *one* solution for the N-Queens problem.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+
+// Function to print the board
+void printBoard(const std::vector<std::string>& board) {
+    for (const std::string& row : board) {
+        std::cout << row << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+// Function to check if placing a queen at (row, col) is safe
+bool isSafe(int row, int col, int n, const std::vector<std::string>& board) {
+    // Check this column upwards
+    for (int i = 0; i < row; ++i) {
+        if (board[i][col] == 'Q') {
+            return false;
+        }
+    }
+
+    // Check upper-left diagonal
+    for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; --i, --j) {
+        if (board[i][j] == 'Q') {
+            return false;
+        }
+    }
+
+    // Check upper-right diagonal
+    for (int i = row - 1, j = col + 1; i >= 0 && j < n; --i, ++j) {
+        if (board[i][j] == 'Q') {
+            return false;
+        }
+    }
+
+    // If no conflicts, it's safe
+    return true;
+}
+
+// The main backtracking function to solve N-Queens
+bool solveNQueens(int row, int n, std::vector<std::string>& board) {
+    // Base case: If all queens are placed, we found a solution!
+    if (row == n) {
+        printBoard(board); // Print this solution
+        return true; // Return true to indicate a solution was found
+                     // If you want all solutions, you'd collect and return false here
+                     // to continue searching for more solutions
+    }
+
+    // Try placing a queen in each column of the current row
+    for (int col = 0; col < n; ++col) {
+        if (isSafe(row, col, n, board)) {
+            // 1. Make a choice: Place queen
+            board[row][col] = 'Q';
+
+            // 2. Explore: Recurse to place queen in the next row
+            if (solveNQueens(row + 1, n, board)) {
+                return true; // If a solution is found further down, propagate true
+            }
+
+            // 3. Undo the choice (Backtrack): If placing queen here didn't lead to a solution,
+            //    remove it and try the next column.
+            board[row][col] = '.';
+        }
+    }
+
+    // If no column in this row leads to a solution
+    return false;
+}
+
+int main() {
+    int n = 4; // For a 4x4 board
+    std::vector<std::string> board(n, std::string(n, '.')); // Initialize empty board
+
+    std::cout << "Solving N-Queens for N = " << n << std::endl;
+    if (!solveNQueens(0, n, board)) {
+        std::cout << "No solution found." << std::endl;
+    }
+
+    return 0;
+}
+```
+
+**Output for N=4:**
+
+```
+Solving N-Queens for N = 4
+.Q..
+...Q
+Q...
+..Q.
+
+```
+*(Note: There's another solution for N=4, but this code stops after finding the first one due to `return true` in `solveNQueens` after `printBoard`).*
+
+---
+
+That's the gist of N-Queens and Sudoku Solver using Backtracking! It's all about making choices, exploring, and knowing when to back up and try again. Happy coding!
+
+---
