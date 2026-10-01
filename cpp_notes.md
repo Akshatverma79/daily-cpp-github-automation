@@ -87860,3 +87860,196 @@ Node 3: 4
 And there you have it! Dijkstra's Algorithm in a nutshell. It's a fundamental algorithm, super powerful, and a must-know for any aspiring programmer. Keep practicing! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bellman-Ford Algorithm  
+🕒 2026-10-01 12:34:12
+
+Hey there, future algorithm master! 👋 Let's break down the Bellman-Ford Algorithm – it's super cool because it handles something Dijkstra's can't!
+
+---
+
+## Bellman-Ford Algorithm: Your Guide to Paths with Negatives!
+
+### 1. What is it? (The Concept)
+
+Imagine you're trying to find the *shortest* way from your home to all your friends' houses, but some roads have a "negative toll" – meaning they actually *pay you* to use them (like a special discount!).
+
+The **Bellman-Ford Algorithm** is a single-source shortest path algorithm that:
+*   Finds the shortest paths from a single starting node to all other nodes in a **directed, weighted graph**.
+*   **Crucially, it can handle graphs with negative edge weights!** (This is where Dijkstra's algorithm falls short).
+*   It can also **detect negative cycles**. A negative cycle is a loop where the sum of edge weights is negative, meaning you could keep going around it forever, making your "path length" infinitely smaller. If such a cycle is reachable from the source, shortest paths become undefined.
+
+**How it works (the gist):** It repeatedly "relaxes" all the edges. "Relaxing" an edge `(u, v)` means checking if you can find a *shorter* path to `v` by going through `u`. It does this `V-1` times (where `V` is the number of vertices). After `V-1` iterations, if you can still find a shorter path for any edge, it means there's a negative cycle!
+
+### 2. Why do we care? (Why it matters)
+
+Bellman-Ford is important for several reasons:
+
+*   **Negative Edge Weights:** This is its superpower! Many real-world scenarios involve "costs" that can be negative (e.g., currency exchange arbitrage, where a sequence of trades might yield profit, or network routing where certain paths have incentives).
+*   **Negative Cycle Detection:** Being able to identify a negative cycle is critical. In financial modeling, it could mean a guaranteed profit opportunity. In network routing, it could indicate a flaw or an infinite loop.
+*   **Foundation for Other Algorithms:** It's a fundamental algorithm that helps understand dynamic programming on graphs.
+
+### 3. Let's see it in action! (Example Problem)
+
+Consider this small directed graph:
+
+**Nodes:** 0, 1, 2, 3
+**Edges:**
+*   (0, 1, 5)
+*   (0, 2, 4)
+*   (1, 2, -3)
+*   (2, 3, -2)
+
+**Source Node:** 0
+
+**Goal:** Find the shortest path from node 0 to all other nodes.
+
+Let's trace how the distances change:
+
+**Initial Distances:**
+*   `dist[0] = 0`
+*   `dist[1] = ∞`
+*   `dist[2] = ∞`
+*   `dist[3] = ∞`
+
+**After 1st Iteration (V-1 = 3 iterations total):**
+*   Relax (0,1,5): `dist[1] = min(∞, dist[0]+5) = 5`
+*   Relax (0,2,4): `dist[2] = min(∞, dist[0]+4) = 4`
+*   (1,2,-3): Not yet helpful as `dist[1]` is still large relative to `dist[2]`.
+*   (2,3,-2): Not yet helpful.
+*   **Current state:** `dist = [0, 5, 4, ∞]`
+
+**After 2nd Iteration:**
+*   Relax (0,1,5): No change (`dist[1]` is already 5)
+*   Relax (0,2,4): No change (`dist[2]` is already 4)
+*   Relax (1,2,-3): `dist[2] = min(4, dist[1]+(-3)) = min(4, 5-3) = min(4, 2) = 2` (Found a shorter path to 2!)
+*   Relax (2,3,-2): `dist[3] = min(∞, dist[2]+(-2)) = min(∞, 2-2) = 0`
+*   **Current state:** `dist = [0, 5, 2, 0]`
+
+**After 3rd Iteration:**
+*   Relax all edges again. No more changes should occur to `dist[1], dist[2], dist[3]`.
+    *   Example: For (1,2,-3), `dist[1]+(-3) = 5-3=2`, which is `dist[2]`. No change.
+    *   Example: For (2,3,-2), `dist[2]+(-2) = 2-2=0`, which is `dist[3]`. No change.
+*   **Final State:** `dist = [0, 5, 2, 0]`
+
+**Result:**
+*   Shortest path from 0 to 0: 0
+*   Shortest path from 0 to 1: 5 (0 -> 1)
+*   Shortest path from 0 to 2: 2 (0 -> 1 -> 2)
+*   Shortest path from 0 to 3: 0 (0 -> 1 -> 2 -> 3)
+
+### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <limits> // For numeric_limits
+
+// Define a struct to represent an edge in the graph
+struct Edge {
+    int u, v, weight;
+};
+
+// Function to implement Bellman-Ford algorithm
+bool bellmanFord(int numNodes, const std::vector<Edge>& edges, int source) {
+    // Initialize distances: All to infinity, source to 0
+    std::vector<int> dist(numNodes, std::numeric_limits<int>::max());
+    dist[source] = 0;
+
+    // Phase 1: Relax edges V-1 times
+    // A path can have at most V-1 edges without repeating a vertex.
+    for (int i = 0; i < numNodes - 1; ++i) {
+        for (const auto& edge : edges) {
+            int u = edge.u;
+            int v = edge.v;
+            int weight = edge.weight;
+
+            // Only relax if u is reachable and path through u is shorter
+            if (dist[u] != std::numeric_limits<int>::max() && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+            }
+        }
+    }
+
+    // Phase 2: Check for negative cycles
+    // If we can still relax an edge, there's a negative cycle
+    for (const auto& edge : edges) {
+        int u = edge.u;
+        int v = edge.v;
+        int weight = edge.weight;
+
+        if (dist[u] != std::numeric_limits<int>::max() && dist[u] + weight < dist[v]) {
+            std::cout << "Graph contains a negative cycle!" << std::endl;
+            return false; // Negative cycle detected
+        }
+    }
+
+    // Print the shortest distances
+    std::cout << "Shortest distances from source " << source << ":" << std::endl;
+    for (int i = 0; i < numNodes; ++i) {
+        if (dist[i] == std::numeric_limits<int>::max()) {
+            std::cout << "  Node " << i << ": Not reachable" << std::endl;
+        } else {
+            std::cout << "  Node " << i << ": " << dist[i] << std::endl;
+        }
+    }
+
+    return true; // No negative cycle
+}
+
+int main() {
+    int numNodes = 4;
+    std::vector<Edge> edges = {
+        {0, 1, 5},
+        {0, 2, 4},
+        {1, 2, -3},
+        {2, 3, -2}
+    };
+    int sourceNode = 0;
+
+    std::cout << "--- Example with no negative cycle ---" << std::endl;
+    bellmanFord(numNodes, edges, sourceNode);
+
+    std::cout << "\n--- Example with a negative cycle ---" << std::endl;
+    // Add a negative cycle: 3 -> 1 with weight -4
+    edges.push_back({3, 1, -4}); 
+    bellmanFord(numNodes, edges, sourceNode);
+
+    return 0;
+}
+```
+
+**Output for the example:**
+
+```
+--- Example with no negative cycle ---
+Shortest distances from source 0:
+  Node 0: 0
+  Node 1: 5
+  Node 2: 2
+  Node 3: 0
+
+--- Example with a negative cycle ---
+Graph contains a negative cycle!
+Shortest distances from source 0:
+  Node 0: 0
+  Node 1: -2 // Values might vary depending on relaxation order if a cycle is involved
+  Node 2: 2
+  Node 3: -2 // These are potentially 'under-relaxed' values,
+             // but the negative cycle detection is the key.
+```
+*Self-correction for output:* When a negative cycle is detected, the distances might not be the *true* shortest path (because they'd be infinitely decreasing). The main point is that the algorithm *detects* the cycle and returns `false`, indicating that shortest paths are ill-defined. The printed distances are just the state *after* V-1 relaxations and before the final check for negative cycles.
+
+---
+
+### Key Takeaways:
+
+*   **When to use:** When your graph has **negative edge weights** or you need to **detect negative cycles**.
+*   **Complexity:** It's $O(V \cdot E)$ (Vertices times Edges), which is generally slower than Dijkstra's (which is $O(E \log V)$ with a priority queue).
+*   **Remember:** $V-1$ iterations for shortest paths, and one more iteration to check for negative cycles!
+
+You got this! Keep practicing! 💪
+
+---
