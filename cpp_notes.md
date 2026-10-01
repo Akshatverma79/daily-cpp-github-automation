@@ -88053,3 +88053,167 @@ Shortest distances from source 0:
 You got this! Keep practicing! 💪
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Floyd-Warshall Algorithm  
+🕒 2026-10-01 19:04:48
+
+Here's a clean and simple note on the Floyd-Warshall Algorithm!
+
+---
+
+## 🗺️ Floyd-Warshall Algorithm: Finding All Paths
+
+Imagine you have a map with several cities and roads between them, each road having a "cost" (distance, time, fuel, etc.). You want to find the *shortest path* from *every single city* to *every other single city*. That's exactly what Floyd-Warshall helps you do!
+
+### 🎯 What it means (The Concept)
+
+The Floyd-Warshall algorithm is an **All-Pairs Shortest Path (APSP)** algorithm. It finds the shortest path between all possible pairs of vertices in a weighted graph.
+
+*   **Key Idea:** It systematically checks every possible intermediate node (`k`) to see if going through `k` provides a shorter path between two nodes `i` and `j`.
+*   **Dynamic Programming:** It's a classic example of dynamic programming. It builds up solutions for larger problems by using solutions to smaller subproblems.
+*   **Graph Types:** Works for both directed and undirected graphs. It can handle graphs with **negative edge weights** but *not* negative cycles (a path that goes back to itself and makes the total cost infinitely negative).
+
+### ✨ Why it matters (The Importance)
+
+1.  **Comprehensive Solutions:** When you need to know the optimal path between *any* two points in a system (e.g., navigation systems, network routing, traffic analysis).
+2.  **Handles Negative Weights:** Unlike Dijkstra's algorithm (which needs positive weights), Floyd-Warshall can handle negative-weight edges, as long as there are no negative cycles.
+3.  **Simplicity:** The core logic, once understood, is quite elegant and easy to implement with three nested loops.
+
+### 🚶 How it works (The Logic)
+
+The algorithm works in phases. In each phase `k`, it considers all paths that can use node `k` as an intermediate point.
+
+For every pair of nodes `(i, j)`, it updates the shortest distance `dist[i][j]` by checking if going from `i` to `k` and then `k` to `j` is shorter than the current shortest path from `i` to `j`.
+
+The formula is:
+`dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])`
+
+The loops must be in this specific order:
+1.  **`k` (intermediate node):** Outermost loop, iterates from `0` to `V-1`.
+2.  **`i` (starting node):** Middle loop, iterates from `0` to `V-1`.
+3.  **`j` (ending node):** Innermost loop, iterates from `0` to `V-1`.
+
+### 🧩 1 Example Problem (Small)
+
+Let's find all-pairs shortest paths for this tiny graph:
+
+**Nodes:** A, B, C (let's use 0, 1, 2)
+**Edges with weights:**
+*   0 → 1 (weight 3)
+*   1 → 2 (weight -1)
+*   0 → 2 (weight 7)
+*   2 → 0 (weight 2)
+
+**Initial Distance Matrix (`dist`)**:
+(Use `INF` for no direct path, `0` for self-loop)
+
+```
+       0   1   2
+   0   0   3   7
+   1 INF   0  -1
+   2   2 INF   0
+```
+
+**Let's trace a bit for `k=0` (node A):**
+
+We check if going through node 0 makes any path shorter.
+For example, consider `dist[1][2]` (path from B to C):
+*   Current `dist[1][2]` = `-1`
+*   Path through `0`: `dist[1][0] + dist[0][2]` = `INF + 7` = `INF`
+*   `min(-1, INF)` is `-1`. No change.
+
+Consider `dist[2][1]` (path from C to B):
+*   Current `dist[2][1]` = `INF`
+*   Path through `0`: `dist[2][0] + dist[0][1]` = `2 + 3` = `5`
+*   `min(INF, 5)` is `5`. So, `dist[2][1]` becomes `5`.
+
+After `k=0`, `k=1`, and `k=2` iterations, the final matrix would show all shortest paths.
+
+**Final Shortest Path Matrix (after all iterations):**
+
+```
+       0   1   2
+   0   0   3   2   (0->1=3, 0->2=7, but 0->1->2 = 3+(-1)=2. So 0->2 becomes 2)
+   1   1   0  -1   (1->0 = INF, but 1->2->0 = -1+2=1. So 1->0 becomes 1)
+   2   2   5   0   (2->1 = INF, but 2->0->1 = 2+3=5. So 2->1 becomes 5)
+```
+
+### 💻 1 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+
+const int INF = 1e9; // A large value representing infinity
+
+void floydWarshall(std::vector<std::vector<int>>& dist, int V) {
+    // k is the intermediate vertex
+    for (int k = 0; k < V; ++k) {
+        // i is the source vertex
+        for (int i = 0; i < V; ++i) {
+            // j is the destination vertex
+            for (int j = 0; j < V; ++j) {
+                // If i->k and k->j paths exist (are not INF)
+                // and the path i->k->j is shorter than i->j
+                if (dist[i][k] != INF && dist[k][j] != INF) {
+                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+    }
+}
+
+void printSolution(const std::vector<std::vector<int>>& dist, int V) {
+    std::cout << "Shortest path distances between all pairs of vertices:\n";
+    for (int i = 0; i < V; ++i) {
+        for (int j = 0; j < V; ++j) {
+            if (dist[i][j] == INF) {
+                std::cout << "INF\t";
+            } else {
+                std::cout << dist[i][j] << "\t";
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
+int main() {
+    int V = 3; // Number of vertices
+
+    // Initialize the distance matrix
+    // Use INF for non-existent edges, 0 for self-loops
+    std::vector<std::vector<int>> dist = {
+        {0,   3,   7},
+        {INF, 0,  -1},
+        {2,   INF, 0}
+    };
+
+    std::cout << "Initial Distance Matrix:\n";
+    printSolution(dist, V);
+    std::cout << "\n";
+
+    floydWarshall(dist, V);
+
+    std::cout << "Final Shortest Path Matrix:\n";
+    printSolution(dist, V);
+
+    /* Expected Output:
+    Shortest path distances between all pairs of vertices:
+    0       3       7
+    INF     0       -1
+    2       INF     0
+
+    Final Shortest Path Matrix:
+    0       3       2
+    1       0       -1
+    2       5       0
+    */
+
+    return 0;
+}
+```
+
+---
