@@ -88440,3 +88440,218 @@ int main() {
 And there you have it! Minimum Spanning Trees are a fundamental concept in graph theory, showing how greedy algorithms can efficiently solve complex optimization problems. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Topological Sort (Kahn's Algorithm)  
+🕒 2026-10-02 18:44:23
+
+Hey there, future algorithm master! 👋 Let's dive into Topological Sort with Kahn's Algorithm – it's super neat for handling dependencies!
+
+---
+
+## 🧭 Topological Sort (Kahn's Algorithm)
+
+### ❓ What is it?
+
+Imagine you have a bunch of tasks, and some tasks *must* be completed before others (like making coffee: brew before pouring!). Topological Sort is a way to linearly order these tasks so that if task A must come before task B, then A always appears before B in the sorted list.
+
+**Key Idea:** It only works for **Directed Acyclic Graphs (DAGs)**. "Directed" means arrows (dependencies), "Acyclic" means no cycles (you can't have A depends on B, and B depends on A, forming a loop!).
+
+**Kahn's Algorithm** specifically finds this order by repeatedly finding "starting points" (tasks with no pending prerequisites).
+
+### ✨ Why does it matter?
+
+This isn't just a fancy academic exercise! Topological Sort is used everywhere:
+
+*   **Scheduling:** Ordering tasks in a build system (like `make`), project management, or even course prerequisites for college.
+*   **Dependency Resolution:** Figuring out the correct order to install software packages.
+*   **Data Processing:** Planning the execution flow in data pipelines where some steps depend on the output of others.
+
+### 💡 How Kahn's Algorithm Works (The Core Idea)
+
+1.  **Count Prerequisites:** For every task/node, count how many incoming dependencies it has (its "in-degree").
+2.  **Find Starting Points:** Any task with *zero* incoming dependencies can be done first. Put all such tasks into a queue.
+3.  **Process and Update:**
+    *   Take a task `u` from the queue and add it to your sorted list.
+    *   For every task `v` that `u` was a prerequisite for (i.e., `u` points to `v`):
+        *   Decrement `v`'s in-degree (since `u` is now done).
+        *   If `v`'s in-degree becomes zero, it means all of `v`'s prerequisites are now met, so `v` becomes a new "starting point" – add `v` to the queue.
+4.  **Repeat:** Keep doing step 3 until the queue is empty.
+5.  **Cycle Check:** If your sorted list doesn't contain all original tasks, it means there was a cycle in the dependencies, and a topological sort isn't possible!
+
+---
+
+### 📝 Example Problem: Course Prerequisites
+
+Let's say we have 5 courses (0 to 4) and some prerequisites:
+
+*   Course 0 must be taken before Course 1.
+*   Course 0 must be taken before Course 2.
+*   Course 1 must be taken before Course 3.
+*   Course 2 must be taken before Course 3.
+*   Course 3 must be taken before Course 4.
+
+**Dependencies (Edges):**
+(0 -> 1), (0 -> 2), (1 -> 3), (2 -> 3), (3 -> 4)
+
+**Let's trace Kahn's:**
+
+1.  **Initial In-degrees:**
+    *   Course 0: 0
+    *   Course 1: 1 (from 0)
+    *   Course 2: 1 (from 0)
+    *   Course 3: 2 (from 1, 2)
+    *   Course 4: 1 (from 3)
+
+2.  **Queue:** `[0]` (Only Course 0 has 0 in-degree)
+
+3.  **Process:**
+
+    *   Dequeue `0`. `Result: [0]`
+        *   `0` points to `1` and `2`.
+        *   Decrement in-degree of `1`: now 0. Enqueue `1`.
+        *   Decrement in-degree of `2`: now 0. Enqueue `2`.
+        *   `Queue: [1, 2]`
+
+    *   Dequeue `1`. `Result: [0, 1]`
+        *   `1` points to `3`.
+        *   Decrement in-degree of `3`: now 1.
+        *   `Queue: [2]` (3's in-degree is not 0 yet)
+
+    *   Dequeue `2`. `Result: [0, 1, 2]`
+        *   `2` points to `3`.
+        *   Decrement in-degree of `3`: now 0. Enqueue `3`.
+        *   `Queue: [3]`
+
+    *   Dequeue `3`. `Result: [0, 1, 2, 3]`
+        *   `3` points to `4`.
+        *   Decrement in-degree of `4`: now 0. Enqueue `4`.
+        *   `Queue: [4]`
+
+    *   Dequeue `4`. `Result: [0, 1, 2, 3, 4]`
+        *   `4` points to nothing.
+        *   `Queue: []`
+
+4.  **Queue empty.** Result contains all 5 courses. No cycles!
+
+**One possible Topological Order:** `[0, 1, 2, 3, 4]`
+(Another valid one could be `[0, 2, 1, 3, 4]` because 1 and 2 are independent after 0 is done).
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <map> // Using map for friendlier course names in example, but vector<int> is standard for nodes 0..N-1
+
+// Function to perform Topological Sort using Kahn's Algorithm
+std::vector<int> topologicalSort(int numNodes, const std::vector<std::vector<int>>& edges) {
+    // 1. Build Adjacency List (graph representation)
+    //    adj[u] will store all nodes v such that there is an edge u -> v
+    std::vector<std::vector<int>> adj(numNodes);
+
+    // 2. Calculate In-degrees for all nodes
+    //    inDegree[v] will store the count of incoming edges to node v
+    std::vector<int> inDegree(numNodes, 0);
+
+    for (const auto& edge : edges) {
+        int u = edge[0]; // Prerequisite course
+        int v = edge[1]; // Dependent course
+        adj[u].push_back(v);
+        inDegree[v]++;   // Increment in-degree for the dependent course
+    }
+
+    // 3. Initialize a queue and add all nodes with 0 in-degree
+    std::queue<int> q;
+    for (int i = 0; i < numNodes; ++i) {
+        if (inDegree[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    // 4. Process nodes from the queue
+    std::vector<int> result;
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        result.push_back(u); // Add current node to the topological order
+
+        // For each neighbor 'v' of 'u'
+        for (int v : adj[u]) {
+            inDegree[v]--; // Decrement in-degree of 'v'
+            // If 'v' has no more prerequisites, add it to the queue
+            if (inDegree[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    // 5. Check for cycles
+    // If the size of the result vector is not equal to the total number of nodes,
+    // it means there was a cycle in the graph, and a topological sort is not possible.
+    if (result.size() != numNodes) {
+        std::cout << "Error: Cycle detected! Cannot perform topological sort." << std::endl;
+        return {}; // Return an empty vector to indicate failure
+    }
+
+    return result;
+}
+
+int main() {
+    int numCourses = 5;
+    // Edges represent prerequisites: {u, v} means u must be taken before v
+    std::vector<std::vector<int>> prerequisites = {
+        {0, 1}, // 0 -> 1
+        {0, 2}, // 0 -> 2
+        {1, 3}, // 1 -> 3
+        {2, 3}, // 2 -> 3
+        {3, 4}  // 3 -> 4
+    };
+
+    std::cout << "Courses (0-indexed): 0, 1, 2, 3, 4" << std::endl;
+    std::cout << "Prerequisites: " << std::endl;
+    for (const auto& edge : prerequisites) {
+        std::cout << "  Course " << edge[0] << " before Course " << edge[1] << std::endl;
+    }
+
+    std::vector<int> sortedOrder = topologicalSort(numCourses, prerequisites);
+
+    if (!sortedOrder.empty()) {
+        std::cout << "\nOne possible course order (Topological Sort): " << std::endl;
+        for (int course : sortedOrder) {
+            std::cout << "Course " << course << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    // Example with a cycle (uncomment to test)
+    /*
+    std::cout << "\n--- Testing with a cycle ---" << std::endl;
+    std::vector<std::vector<int>> cyclePrerequisites = {
+        {0, 1},
+        {1, 2},
+        {2, 0} // Cycle: 0 -> 1 -> 2 -> 0
+    };
+    int numCycleCourses = 3;
+    std::vector<int> cycleSortedOrder = topologicalSort(numCycleCourses, cyclePrerequisites);
+    if (!cycleSortedOrder.empty()) {
+        std::cout << "Sorted order for cycle: ";
+        for (int course : cycleSortedOrder) {
+            std::cout << course << " ";
+        }
+        std::cout << std::endl;
+    }
+    */
+
+    return 0;
+}
+
+```
+
+That's it! Topological Sort with Kahn's Algorithm is a powerful tool for ordering dependent tasks. Keep practicing, and you'll master it in no time! Happy coding! 🚀
+
+---
