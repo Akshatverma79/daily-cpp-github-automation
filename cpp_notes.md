@@ -88850,3 +88850,208 @@ int main() {
 And there you have it! A quick dive into Strongly Connected Components. They're pretty neat for breaking down complex directed graphs into manageable parts. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bridges and Articulation Points  
+🕒 2026-10-03 17:38:55
+
+Hey there, fellow coder! 👋
+
+Let's demystify **Bridges and Articulation Points** in graphs. They sound fancy, but the idea is quite intuitive!
+
+---
+
+### What are Bridges and Articulation Points?
+
+Imagine your graph as a network of roads (edges) and cities (nodes).
+
+1.  **🌉 Bridge (Cut Edge):**
+    *   An edge in a connected graph whose removal **increases the number of connected components**.
+    *   Think of it as a critical road. If that road is closed, some parts of the network become completely cut off from others.
+
+2.  **📍 Articulation Point (Cut Vertex):**
+    *   A vertex in a connected graph whose removal (along with all incident edges) **increases the number of connected components**.
+    *   Think of it as a critical city/hub. If that city is gone, parts of the network can no longer reach each other.
+
+---
+
+### Why Do They Matter?
+
+These concepts are super useful for analyzing network robustness and finding "single points of failure."
+
+*   **Network Design:** Identifying critical servers (APs) or crucial cable links (Bridges) in a computer network.
+*   **Social Networks:** Finding influential people (APs) or relationships (Bridges) that hold communities together.
+*   **Infrastructure:** Spotting critical points in power grids, water supply, or transportation systems.
+*   **Vulnerability Analysis:** Understanding where a system is most susceptible to disruption.
+
+---
+
+### The Super-Secret Sauce: DFS with Low-Link Values
+
+The most common and efficient way to find Bridges and Articulation Points is by using a **Depth First Search (DFS)** coupled with two special arrays: `discovery time` and `low-link value`.
+
+*   `disc[u]`: The time (or order) at which node `u` was first visited during DFS.
+*   `low[u]`: The lowest `disc` value reachable from node `u` (including `u` itself) through `u`'s subtree in the DFS tree, *and at most one back-edge*. This is the magic! A back-edge connects a node to an already visited ancestor (not its immediate parent).
+
+**How it works (in a nutshell):**
+
+During DFS, for each node `u` and its neighbor `v`:
+
+1.  If `v` is `u`'s parent, skip it.
+2.  If `v` is already visited (`disc[v] != -1`), it means we found a back-edge to an ancestor. Update `low[u] = min(low[u], disc[v])`. This means `u` can reach at least `disc[v]` (or lower) through this back-edge.
+3.  If `v` is not visited, recursively call `dfs(v, u)`. After `dfs(v, u)` returns:
+    *   Update `low[u] = min(low[u], low[v])`. This means `u` can reach whatever `v` can reach.
+    *   **Bridge Condition:** If `low[v] > disc[u]`, then the edge `(u, v)` is a Bridge. Why? Because `v` and its subtree can't reach `u` or any ancestor of `u` through any path *other than* the `(u,v)` edge itself. If you remove `(u,v)`, `v`'s subtree gets cut off.
+    *   **Articulation Point Condition:**
+        *   **For the DFS Root:** If the root has more than one child in the DFS tree, it's an AP.
+        *   **For other nodes `u`:** If `low[v] >= disc[u]`, then `u` is an Articulation Point. Why? It means `v` and its subtree can't reach any ancestor of `u` *without passing through `u` itself*. If `u` is removed, `v`'s subtree gets cut off. The `>=` handles cases where `v` can only reach `u` directly.
+
+---
+
+### Example Problem
+
+Let's consider a simple graph:
+
+```
+    0 -- 1 -- 2
+    |  / |
+    3 -- 4
+```
+
+**Nodes:** 0, 1, 2, 3, 4
+**Edges:** (0,1), (0,3), (1,2), (1,4), (3,4)
+
+**Expected Output:**
+*   **Bridges:** (1,2)
+*   **Articulation Points:** 1
+
+**Explanation for (1,2) being a Bridge:** If we remove (1,2), node 2 becomes isolated from the rest of the graph (0,1,3,4).
+**Explanation for 1 being an AP:** If we remove node 1, node 2 becomes isolated. Also, the path between 0 and 4 might become longer or restricted. (Specifically, 2 is completely cut off from the rest).
+
+---
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <set>       // To store unique articulation points
+
+// Global variables for simplicity in competitive programming context
+const int MAXN = 100005; // Maximum number of nodes
+std::vector<int> adj[MAXN];
+int disc[MAXN]; // Discovery time of node
+int low[MAXN];  // Lowest discovery time reachable from node u
+int timer;      // Global timer for discovery times
+std::set<int> articulation_points; // Using a set for unique APs
+std::vector<std::pair<int, int>> bridges;
+
+void find_bridges_and_aps_dfs(int u, int p = -1) {
+    disc[u] = low[u] = timer++; // Set discovery time and initial low-link value
+    
+    int children_count = 0; // Count children in DFS tree for root check
+
+    for (int v : adj[u]) {
+        if (v == p) { // Skip parent in DFS tree
+            continue;
+        }
+
+        if (disc[v] != -1) { // v is visited, it's a back-edge
+            low[u] = std::min(low[u], disc[v]);
+        } else { // v is not visited, explore it
+            find_bridges_and_aps_dfs(v, u);
+            children_count++; // Increment child count for current node u
+
+            low[u] = std::min(low[u], low[v]); // Update low-link value for u
+
+            // Bridge Condition
+            if (low[v] > disc[u]) {
+                bridges.push_back({u, v});
+            }
+
+            // Articulation Point Condition (for non-root nodes)
+            // If v's subtree cannot reach an ancestor of u (including u)
+            // without passing through u, then u is an AP.
+            if (p != -1 && low[v] >= disc[u]) {
+                articulation_points.insert(u);
+            }
+        }
+    }
+
+    // Articulation Point Condition (for root node)
+    // Root is an AP if it has more than one child in the DFS tree
+    if (p == -1 && children_count > 1) {
+        articulation_points.insert(u);
+    }
+}
+
+void solve(int n) {
+    timer = 0;
+    articulation_points.clear();
+    bridges.clear();
+    for (int i = 0; i < n; ++i) {
+        disc[i] = -1; // Initialize discovery times to -1 (unvisited)
+        // No need to clear adj[] if it's reused, usually you build it new per test case
+        // If reusing adj, clear each vector: for(int i=0; i<n; ++i) adj[i].clear();
+    }
+
+    // Iterate through all nodes to handle disconnected graphs
+    for (int i = 0; i < n; ++i) {
+        if (disc[i] == -1) { // If node 'i' hasn't been visited yet
+            find_bridges_and_aps_dfs(i);
+        }
+    }
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+
+    int n = 5; // Number of nodes (0-indexed)
+    int m = 5; // Number of edges
+
+    // Clear adjacency list for potential multiple test cases or re-runs
+    for(int i=0; i<n; ++i) adj[i].clear();
+
+    // Example graph setup
+    adj[0].push_back(1); adj[1].push_back(0);
+    adj[0].push_back(3); adj[3].push_back(0);
+    adj[1].push_back(2); adj[2].push_back(1);
+    adj[1].push_back(4); adj[4].push_back(1);
+    adj[3].push_back(4); adj[4].push_back(3);
+
+    solve(n);
+
+    std::cout << "Articulation Points: ";
+    if (articulation_points.empty()) {
+        std::cout << "None\n";
+    } else {
+        for (int ap : articulation_points) {
+            std::cout << ap << " ";
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << "Bridges: ";
+    if (bridges.empty()) {
+        std::cout << "None\n";
+    } else {
+        for (const auto& bridge : bridges) {
+            // Ensure consistent order for output (e.g., smaller node first)
+            std::cout << "(" << std::min(bridge.first, bridge.second) 
+                      << ", " << std::max(bridge.first, bridge.second) << ") ";
+        }
+        std::cout << "\n";
+    }
+
+    return 0;
+}
+```
+
+---
+
+And that's it! With this DFS-based approach, you can efficiently find these critical points in any graph. Keep coding! ✨
+
+---
