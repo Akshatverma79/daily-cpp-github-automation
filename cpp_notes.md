@@ -88655,3 +88655,198 @@ int main() {
 That's it! Topological Sort with Kahn's Algorithm is a powerful tool for ordering dependent tasks. Keep practicing, and you'll master it in no time! Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Strongly Connected Components  
+🕒 2026-10-03 11:12:30
+
+Hey there! Let's demystify Strongly Connected Components (SCCs) in directed graphs.
+
+---
+
+## **Strongly Connected Components (SCCs)**
+
+### 1. What's the Idea? (The Concept)
+
+Imagine a directed graph where roads only go one way.
+A **Strongly Connected Component** is like a "club" of nodes where *every member can reach every other member*, and vice-versa, by following the directed roads. It's the largest possible such club.
+
+**Key properties:**
+*   It's for **directed graphs**.
+*   Within an SCC, for any two nodes `u` and `v`, there's a path from `u` to `v` AND a path from `v` to `u`.
+*   They are **maximal** – you can't add any more nodes to an SCC and still maintain the property.
+
+Think of it: If you condense each SCC into a single "super-node," your entire graph turns into a **Directed Acyclic Graph (DAG)**. This "condensation graph" is super useful!
+
+### 2. Why Does It Matter?
+
+SCCs are a fundamental concept with powerful applications:
+
+*   **Simplifying Complex Graphs:** Reducing a messy directed graph into a simpler DAG (the condensation graph) helps analyze its structure. Many algorithms are easier on DAGs (like topological sort).
+*   **Reachability Analysis:** If two nodes are in the same SCC, you know they can reach each other.
+*   **Dependency Resolution:** Useful in task scheduling or build systems where tasks might have circular dependencies. SCCs help identify these cycles.
+*   **2-SAT Problems:** A classic application in logic and satisfiability.
+*   **Network Analysis:** Identifying groups in networks that are tightly interconnected.
+
+### 3. Let's See an Example!
+
+Consider this small directed graph:
+
+```
+Nodes: A, B, C, D, E, F
+Edges:
+A -> B
+B -> C
+C -> A
+C -> D
+D -> E
+E -> D
+F -> B
+```
+
+What are the SCCs?
+
+1.  **{A, B, C}**: You can go A->B->C->A. Everyone can reach everyone else here.
+2.  **{D, E}**: You can go D->E->D. Everyone can reach everyone else here.
+3.  **{F}**: F is by itself. It can reach B (and then A, C), but nothing can reach F back.
+
+So, the SCCs are **{A, B, C}**, **{D, E}**, and **{F}**.
+
+If we collapse these, the condensation graph would look like:
+`{F} -> {A,B,C}` (because F->B)
+`{A,B,C} -> {D,E}` (because C->D)
+This is now a DAG!
+
+### 4. Simple C++ Implementation (Tarjan's Algorithm)
+
+Tarjan's algorithm is a popular and efficient way to find SCCs using a single Depth-First Search (DFS). It tracks discovery times (`disc`) and the lowest reachable ancestor (`low`) for each node, along with a stack to keep track of nodes in the current DFS path.
+
+**The Magic Sauce:**
+When a node `u` finishes its DFS and `low[u] == disc[u]`, it means `u` is the "root" of an SCC. All nodes on the stack from `u` upwards form this SCC.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::min
+#include <stack>     // For the DFS stack
+
+const int MAXN = 100005; // Maximum number of nodes
+std::vector<int> adj[MAXN]; // Adjacency list for the graph
+int disc[MAXN];             // Discovery time of each node
+int low[MAXN];              // Low-link value of each node
+bool onStack[MAXN];         // Is node currently on the SCC stack?
+std::stack<int> scc_stack;  // Stack for finding SCCs
+int timer;                  // Global timer for discovery times
+int scc_count;              // Number of SCCs found
+
+// Store the actual SCCs if needed
+std::vector<std::vector<int>> sccs_found;
+
+void findSCCsDFS(int u) {
+    // Set discovery and low-link value for u
+    disc[u] = low[u] = timer++;
+    scc_stack.push(u);
+    onStack[u] = true;
+
+    // Explore neighbors
+    for (int v : adj[u]) {
+        if (disc[v] == -1) { // If v hasn't been visited
+            findSCCsDFS(v);
+            low[u] = std::min(low[u], low[v]); // Update low-link based on child
+        } else if (onStack[v]) { // If v is visited and on current DFS stack (back-edge or cross-edge)
+            low[u] = std::min(low[u], disc[v]); // Update low-link based on ancestor
+        }
+    }
+
+    // If u is the root of an SCC
+    if (low[u] == disc[u]) {
+        scc_count++;
+        std::vector<int> current_scc;
+        int node;
+        do {
+            node = scc_stack.top();
+            scc_stack.pop();
+            onStack[node] = false;
+            current_scc.push_back(node);
+        } while (node != u);
+        sccs_found.push_back(current_scc);
+    }
+}
+
+void solve(int n_nodes) {
+    // Initialize
+    for (int i = 0; i < n_nodes; ++i) {
+        disc[i] = -1; // -1 means not visited
+        low[i] = -1;
+        onStack[i] = false;
+        // adj[i].clear(); // Clear adjacency list if running multiple test cases
+    }
+    while(!scc_stack.empty()) scc_stack.pop(); // Clear stack
+    sccs_found.clear();
+    timer = 0;
+    scc_count = 0;
+
+    // Call DFS for any unvisited node to cover disconnected components
+    for (int i = 0; i < n_nodes; ++i) {
+        if (disc[i] == -1) {
+            findSCCsDFS(i);
+        }
+    }
+
+    std::cout << "Total SCCs found: " << scc_count << std::endl;
+    for (int i = 0; i < sccs_found.size(); ++i) {
+        std::cout << "SCC " << i + 1 << ": ";
+        for (int node : sccs_found[i]) {
+            std::cout << node << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main() {
+    int N = 6; // Number of nodes (0-indexed: 0, 1, 2, 3, 4, 5)
+
+    // Clear adjacency list (important if running multiple graphs)
+    for(int i=0; i<N; ++i) adj[i].clear();
+
+    // Add edges for the example:
+    // SCC1: {0, 1, 2} (A, B, C)
+    adj[0].push_back(1); // A -> B
+    adj[1].push_back(2); // B -> C
+    adj[2].push_back(0); // C -> A
+
+    // SCC2: {3, 4} (D, E)
+    adj[3].push_back(4); // D -> E
+    adj[4].push_back(3); // E -> D
+
+    // Connections between SCCs and standalone node
+    adj[2].push_back(3); // C -> D
+    adj[5].push_back(1); // F -> B (F is node 5)
+
+    // Expected Output (nodes are 0-indexed):
+    // SCCs: {0, 1, 2}, {3, 4}, {5}
+    // (The order of discovery might vary, but the content of each SCC will be consistent)
+
+    std::cout << "Finding SCCs for the example graph:" << std::endl;
+    solve(N);
+
+    // Another small example
+    N = 4;
+    for(int i=0; i<N; ++i) adj[i].clear();
+    adj[0].push_back(1);
+    adj[1].push_back(2);
+    adj[2].push_back(0);
+    adj[2].push_back(3);
+    std::cout << "\nFinding SCCs for another graph:" << std::endl;
+    solve(N); // Expected SCCs: {0,1,2}, {3}
+
+    return 0;
+}
+```
+
+---
+
+And there you have it! A quick dive into Strongly Connected Components. They're pretty neat for breaking down complex directed graphs into manageable parts. Happy coding!
+
+---
