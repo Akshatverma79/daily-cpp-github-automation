@@ -89055,3 +89055,141 @@ int main() {
 And that's it! With this DFS-based approach, you can efficiently find these critical points in any graph. Keep coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Longest Common Subsequence (LCS)  
+🕒 2026-10-04 11:52:10
+
+Hey there, future DSA master! 👋 Let's dive into a fundamental concept: **Longest Common Subsequence (LCS)**.
+
+---
+
+## 💡 Longest Common Subsequence (LCS) - Your Friendly Guide!
+
+Ever wondered how "diff" tools compare two versions of a file and show you what changed? Or how bioinformatics tools align DNA sequences? A lot of that magic often involves the Longest Common Subsequence!
+
+### 🔍 What does "LCS" mean?
+
+Let's break it down:
+
+1.  **Subsequence:** A sequence that can be derived from another sequence by deleting some or no elements, *without changing the order of the remaining elements*.
+    *   Example: For "ABCDE", "ACE" is a subsequence. "ADC" is NOT (C comes after D).
+2.  **Common:** It means the subsequence must exist in *both* of the input sequences.
+3.  **Longest:** Among all possible common subsequences, we want the one with the maximum length.
+
+**In simple words:** LCS finds the longest possible string that can be formed by characters present in both original strings, maintaining their original relative order.
+
+**Example:**
+*   `S1 = "ABCBDAB"`
+*   `S2 = "BDCABA"`
+
+Common subsequences include: "ABA", "BDAB", "BCBA"
+The **Longest Common Subsequence (LCS)** here could be "BDAB" or "BCBA". Both have a length of 4.
+
+---
+
+### 🌟 Why does LCS matter?
+
+LCS is not just a theoretical concept; it has many real-world applications:
+
+*   **Diff Utilities:** Comparing two files (like in Git) to show changes.
+*   **Bioinformatics:** Aligning DNA or protein sequences to find similarities and evolutionary relationships.
+*   **Plagiarism Detection:** Identifying similarities between documents.
+*   **Spell Checkers & Auto-correct:** Suggesting corrections by finding the closest known word.
+*   **Data Compression:** Some algorithms use LCS to find repeated patterns.
+
+---
+
+### 📝 Example Problem (Small & Sweet!)
+
+**Problem:** Find the length of the Longest Common Subsequence for:
+*   `text1 = "ABC"`
+*   `text2 = "AXBYC"`
+
+**Thinking it through:**
+*   'A' is common.
+*   'B' is common, and it appears after 'A' in both.
+*   'C' is common, and it appears after 'B' in both.
+*   So, "ABC" is a common subsequence. Can we do better? No!
+
+**Expected Output:** The length of the LCS is 3 (the subsequence is "ABC").
+
+---
+
+### 💻 Simple C++ Implementation (Dynamic Programming)
+
+LCS is a classic Dynamic Programming (DP) problem. We'll build a 2D table (`dp`) where `dp[i][j]` stores the length of the LCS of the first `i` characters of `text1` and the first `j` characters of `text2`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm> // For std::max
+
+// Function to find the length of the Longest Common Subsequence
+int longestCommonSubsequence(std::string text1, std::string text2) {
+    int m = text1.length();
+    int n = text2.length();
+
+    // Create a 2D DP table.
+    // dp[i][j] will store the length of LCS of text1[0...i-1] and text2[0...j-1]
+    // We add 1 to dimensions to handle empty string cases (0th row/column)
+    std::vector<std::vector<int>> dp(m + 1, std::vector<int>(n + 1, 0));
+
+    // Fill the dp table
+    for (int i = 1; i <= m; ++i) {
+        for (int j = 1; j <= n; ++j) {
+            // If characters match, extend the LCS from the diagonal
+            if (text1[i - 1] == text2[j - 1]) {
+                dp[i][j] = 1 + dp[i - 1][j - 1];
+            } else {
+                // If characters don't match, take the maximum LCS
+                // from either ignoring the character in text1 (dp[i-1][j])
+                // or ignoring the character in text2 (dp[i][j-1])
+                dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+    }
+
+    // The bottom-right cell contains the LCS length for the full strings
+    return dp[m][n];
+}
+
+int main() {
+    // Example 1: Our small problem
+    std::string s1_ex1 = "ABC";
+    std::string s2_ex1 = "AXBYC";
+    int lcs_len_ex1 = longestCommonSubsequence(s1_ex1, s2_ex1);
+    std::cout << "LCS of \"" << s1_ex1 << "\" and \"" << s2_ex1 << "\" is: " << lcs_len_ex1 << std::endl; // Expected: 3
+
+    // Example 2: A slightly more complex one
+    std::string s1_ex2 = "AGGTAB";
+    std::string s2_ex2 = "GXTXAYB";
+    int lcs_len_ex2 = longestCommonSubsequence(s1_ex2, s2_ex2);
+    std::cout << "LCS of \"" << s1_ex2 << "\" and \"" << s2_ex2 << "\" is: " << lcs_len_ex2 << std::endl; // Expected: 4 ("GTAB" or "GTXB")
+
+    // Example 3: No common characters
+    std::string s1_ex3 = "ABC";
+    std::string s2_ex3 = "DEF";
+    int lcs_len_ex3 = longestCommonSubsequence(s1_ex3, s2_ex3);
+    std::cout << "LCS of \"" << s1_ex3 << "\" and \"" << s2_ex3 << "\" is: " << lcs_len_ex3 << std::endl; // Expected: 0
+
+    return 0;
+}
+```
+
+**Explanation of the DP Logic:**
+
+*   **Initialization:** `dp` table is filled with zeros. `dp[0][j]` and `dp[i][0]` are 0 because an empty string can't have a common subsequence with any other string (its length is 0).
+*   **`text1[i-1] == text2[j-1]` (Match!):** If the current characters being considered from `text1` and `text2` are the same, it means we found one more character for our common subsequence. So, we add `1` to the LCS length of the *previous* subproblems (`dp[i-1][j-1]`).
+*   **`text1[i-1] != text2[j-1]` (No Match):** If the characters don't match, we can't extend the common subsequence with the current characters. We have two choices:
+    1.  Ignore `text1[i-1]` and find the LCS of `text1[0...i-2]` and `text2[0...j-1]` (represented by `dp[i-1][j]`).
+    2.  Ignore `text2[j-1]` and find the LCS of `text1[0...i-1]` and `text2[0...j-2]` (represented by `dp[i][j-1]`).
+    We take the maximum of these two options because we want the *Longest* Common Subsequence.
+
+---
+
+That's it! You've just grasped the core of LCS. It's a fantastic problem that beautifully demonstrates the power of Dynamic Programming. Keep practicing!
+
+---
