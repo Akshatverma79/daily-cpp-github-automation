@@ -89509,3 +89509,120 @@ int main() {
 Matrix Chain Multiplication is a fantastic way to understand the power of Dynamic Programming. It shows how breaking a problem into smaller, overlapping subproblems and storing their results can lead to incredibly efficient solutions, saving you tons of computational cost! Keep up the great work!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: DP on Trees  
+🕒 2026-10-05 21:24:50
+
+Hey there, future tree master! 👋 Let's break down "DP on Trees" in a super friendly way.
+
+---
+
+### 🌳 DP on Trees: The Concept
+
+**What it means:**
+Imagine you have a tree structure (like a family tree, or a file system). "DP on Trees" is simply applying Dynamic Programming techniques to problems on these trees.
+
+Instead of solving the whole problem at once, you:
+1.  **Break it down:** Treat each node's subtree as a smaller, independent problem.
+2.  **Solve children first:** Usually, you start from the "leaves" (nodes with no children) and work your way up to the "root".
+3.  **Combine results:** A parent node calculates its answer by combining the solutions it gets from its children's subtrees.
+
+This pattern almost always involves a **Depth-First Search (DFS)** recursion, where the recursive calls handle the children, and the current node processes their returned values.
+
+---
+
+### 💡 Why it Matters
+
+1.  **Efficiency:** Trees are inherently recursive! DP ensures you don't re-calculate the same thing for a subtree multiple times (though in many simple tree DP problems, plain recursion *is* DP because each subtree is visited once).
+2.  **Structured Thinking:** It's a powerful way to approach a huge class of tree problems, from finding the diameter of a tree to optimizing resource allocation in a hierarchical system.
+3.  **Natural Fit:** Many real-world problems can be modeled as trees, and DP on trees provides an elegant solution.
+
+---
+
+### 🎯 Example Problem: Maximum Depth of a Binary Tree
+
+**Problem:** Given the `root` of a binary tree, return its maximum depth.
+
+**What is maximum depth?** It's the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+**How DP applies:**
+*   The maximum depth of an empty tree is 0.
+*   The maximum depth of a non-empty tree is 1 (for the current node) plus the maximum depth of its left or right subtree (whichever is greater).
+*   `depth(node) = 1 + max(depth(node->left), depth(node->right))`
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <algorithm> // For std::max
+
+// --- 1. Define the Tree Node Structure ---
+struct TreeNode {
+    int val;
+    TreeNode* left;
+    TreeNode* right;
+
+    // Constructor to easily create new nodes
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+};
+
+// --- 2. The DP Function (using DFS) ---
+int maxDepth(TreeNode* root) {
+    // Base case: If the node is null, it contributes 0 to the depth.
+    // This is like an empty tree or beyond a leaf node.
+    if (root == nullptr) {
+        return 0;
+    }
+
+    // Recursively get the maximum depth of the left subtree
+    int leftSubtreeDepth = maxDepth(root->left);
+
+    // Recursively get the maximum depth of the right subtree
+    int rightSubtreeDepth = maxDepth(root->right);
+
+    // The current node contributes 1 to the depth.
+    // We add it to the maximum depth found in its children's subtrees.
+    return 1 + std::max(leftSubtreeDepth, rightSubtreeDepth);
+}
+
+// --- 3. Example Usage ---
+int main() {
+    // Let's build a sample tree:
+    //         3
+    //        / \
+    //       9  20
+    //         /  \
+    //        15   7
+    
+    TreeNode* root = new TreeNode(3);
+    root->left = new TreeNode(9);
+    root->right = new TreeNode(20);
+    root->right->left = new TreeNode(15);
+    root->right->right = new TreeNode(7);
+
+    // Calculate and print the max depth
+    std::cout << "Maximum depth of the tree: " << maxDepth(root) << std::endl; // Expected output: 3
+
+    // --- Clean up allocated memory (important in C++!) ---
+    // In a real application, you'd usually have a destructor or smart pointers
+    // For this simple example, manual deletion works.
+    delete root->right->left;
+    delete root->right->right;
+    delete root->left;
+    delete root->right;
+    delete root;
+
+    return 0;
+}
+```
+
+---
+
+**Quick Recap:**
+DP on Trees is all about using recursion (often DFS) to solve subproblems (subtrees) and combining their results to build the solution for the whole tree. It's a fundamental pattern for efficiently tackling many tree-based challenges! Happy coding! 🚀
+
+---
