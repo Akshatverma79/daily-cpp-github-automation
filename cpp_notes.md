@@ -89866,3 +89866,104 @@ So the code is correct, my manual example input/output was just a bit off. Apolo
 That's DP on Bitmasks! A powerful tool for when `N` is small and you need to keep track of subsets. Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Bit Manipulation Basics  
+🕒 2026-10-06 19:07:51
+
+## Bit Manipulation Basics: Playing with Bits! 🎮
+
+Hey there, future DSA wizard! Let's dive into the fascinating world of Bit Manipulation. It's like looking at the DNA of your numbers!
+
+---
+
+### 💡 What the Concept Means
+
+Bit manipulation is about working directly with the individual **bits** (0s and 1s) that make up numbers in a computer's memory. Instead of treating a number like `5`, you'd think of its binary representation: `101`. We use special operators to read, set, clear, or flip these tiny little switches.
+
+Think of it as micro-managing your data at the lowest level!
+
+---
+
+### 🚀 Why It Matters
+
+1.  **Speed Demon**: Bitwise operations are often *extremely fast* because CPUs are designed to perform them directly. They can be quicker than arithmetic operations (like multiplication or division) for certain tasks.
+2.  **Memory Saver**: You can pack multiple "boolean" flags (true/false states) into a single integer, saving memory.
+3.  **Algorithmic Power**: Essential for many advanced algorithms in areas like graphics, cryptography, data compression, and especially in competitive programming (e.g., dynamic programming with bitmasks).
+4.  **Interview Favorite**: Shows a deeper understanding of how computers work, which interviewers love!
+
+---
+
+### 🎯 Example Problem: Is the K-th Bit Set?
+
+Let's pick a classic: Given a number `n` and an integer `k` (0-indexed from the right), determine if the `k`-th bit of `n` is `1` (set) or `0` (not set).
+
+**Example:**
+*   `n = 13` (which is `1101` in binary)
+*   `k = 2` (check the 3rd bit from the right)
+    *   `1101`
+    *   `^ ^ ^ ^`
+    *   `3 2 1 0` (bit indices)
+*   The `2`-nd bit is `1`. So, the answer should be `true`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+To check the `k`-th bit, we can use two core bitwise operators:
+1.  **Left Shift (`<<`)**: `1 << k` creates a "mask" with a `1` at the `k`-th position and `0`s everywhere else.
+    *   e.g., `k=2`: `1 << 2` results in `0100` (binary `4`)
+2.  **Bitwise AND (`&`)**: `n & mask` will return a non-zero value *only if* the `k`-th bit of `n` was also `1`. Otherwise, it will be `0`.
+
+```cpp
+#include <iostream>
+
+// Function to check if the k-th bit of a number 'n' is set
+bool isKthBitSet(int n, int k) {
+    // 1. Create a mask:
+    //    We want a '1' at the k-th position and '0's everywhere else.
+    //    '1' shifted k times to the left achieves this.
+    //    Example: if k=2, mask will be 0000...0100 (binary 4)
+    int mask = (1 << k); 
+
+    // 2. Perform Bitwise AND:
+    //    If the k-th bit of 'n' is 1, then (n & mask) will be non-zero (equal to mask).
+    //    If the k-th bit of 'n' is 0, then (n & mask) will be zero.
+    return (n & mask) != 0; 
+}
+
+int main() {
+    int num = 13; // Binary: 1101
+
+    // Test Case 1: k=2 (expected: true, as 1101 has 1 at 2nd index)
+    int k1 = 2; 
+    if (isKthBitSet(num, k1)) {
+        std::cout << "The " << k1 << "-th bit of " << num << " IS set." << std::endl;
+    } else {
+        std::cout << "The " << k1 << "-th bit of " << num << " IS NOT set." << std::endl;
+    }
+
+    // Test Case 2: k=1 (expected: false, as 1101 has 0 at 1st index)
+    int k2 = 1;
+    if (isKthBitSet(num, k2)) {
+        std::cout << "The " << k2 << "-th bit of " << num << " IS set." << std::endl;
+    } else {
+        std::cout << "The " << k2 << "-th bit of " << num << " IS NOT set." << std::endl;
+    }
+
+    return 0;
+}
+```
+
+**Output:**
+```
+The 2-th bit of 13 IS set.
+The 1-th bit of 13 IS NOT set.
+```
+
+---
+
+Bit manipulation might seem a bit tricky at first, but with a little practice (pun intended!), you'll unlock some powerful, efficient ways to solve problems. Keep exploring those bits! ✨
+
+---
