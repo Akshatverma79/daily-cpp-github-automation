@@ -90109,3 +90109,158 @@ int main() {
 That's a quick intro to GCD and Primes! These concepts are fundamental. Keep practicing and you'll master them in no time. Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Game Theory Basics  
+🕒 2026-10-07 19:35:47
+
+Let's dive into Game Theory, where strategy is key! ♟️
+
+---
+
+### Game Theory Basics: Your First Strategic Moves!
+
+#### 🎲 What Game Theory Means
+
+Imagine you're playing a game, and your opponent is just as smart (or even smarter!) than you. Game Theory is the study of **strategic decision-making** in such scenarios. It's about predicting outcomes when multiple "rational" players interact, each trying to maximize their own advantage.
+
+Think of it as the "math of strategy" – analyzing player moves, potential outcomes, and determining the *best* move for each player assuming everyone plays optimally.
+
+#### 🌟 Why It Matters
+
+1.  **Beyond Games:** It's not just for Chess or Poker! Game theory helps analyze situations in economics, political science, AI design, and even everyday negotiations.
+2.  **DSA Problem Solving:** In competitive programming, you'll encounter problems where two players take turns making moves. Game theory helps you determine if the first player (or the second) can win, draw, or force a specific outcome, assuming optimal play from both sides.
+3.  **Optimal Play Mindset:** It trains you to think about all possible future states and how your current move affects your opponent's options. This often leads to solutions using **recursion**, **memoization (Dynamic Programming)**, or **graph traversal**.
+
+#### 🎯 Key Concept: Optimal Play
+
+In most DSA game theory problems, we assume **perfect information** (everyone knows all moves) and **optimal play**. This means:
+*   A player will always choose a move that leads to a winning state if available.
+*   If no winning move is available, they will choose a move that leads to a draw state.
+*   If only losing states are available, they will pick a move that leads to the "least bad" loss (though for simple win/loss games, any losing move is just a loss).
+
+We often determine if a state is a "winning state" or "losing state" for the current player.
+
+*   A state is a **Winning State** if the current player can make *at least one move* that leads to a **Losing State** for the *opponent*.
+*   A state is a **Losing State** if *all possible moves* for the current player lead to a **Winning State** for the *opponent*.
+
+---
+
+#### 🎮 Example Problem: "The Stone Game I"
+
+You have `N` stones in a single pile. Two players, Player 1 and Player 2, take turns. Each player can remove `1`, `2`, or `3` stones from the pile. The player who takes the **last stone wins**. If you are Player 1, can you win?
+
+**Let's analyze small `N` values:**
+
+*   **`N = 0`:** It's your turn, but there are no stones. You can't move. You lose. (Losing State)
+*   **`N = 1`:** You can take 1 stone. The pile becomes 0. Opponent faces `N=0` (a losing state for them). So, you win! (Winning State)
+*   **`N = 2`:** You can take 1 stone (opponent faces `N=1`, which is a winning state for them) OR take 2 stones (opponent faces `N=0`, which is a losing state for them). You pick the move that makes your opponent lose. Take 2 stones and win! (Winning State)
+*   **`N = 3`:** You can take 1 (opponent faces `N=2`, winning), 2 (opponent faces `N=1`, winning), OR 3 (opponent faces `N=0`, losing). You take 3 and win! (Winning State)
+*   **`N = 4`:**
+    *   Take 1 stone: Opponent faces `N=3`. We know `N=3` is a winning state for the opponent. (Bad for us)
+    *   Take 2 stones: Opponent faces `N=2`. We know `N=2` is a winning state for the opponent. (Bad for us)
+    *   Take 3 stones: Opponent faces `N=1`. We know `N=1` is a winning state for the opponent. (Bad for us)
+    Since ALL your moves lead to a state where your opponent can win, no matter what you do, your opponent will play optimally and win. So, `N=4` is a **Losing State** for you.
+
+Notice a pattern? If `N` is a multiple of `4` (`N=0`, `N=4`), it seems to be a losing state for the current player. This particular game has a simple mathematical solution (`N % 4 != 0`). However, for more complex games, we need a general approach!
+
+---
+
+#### 💻 Simple C++ Implementation (Recursive with Memoization)
+
+This approach uses recursion with memoization (Dynamic Programming) to store the results of subproblems. `memo[i]` will store whether the current player can win from a pile of `i` stones.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <map> // Could also use std::map if N is very large and sparse
+
+// Use a global vector for memoization for simplicity in this example
+// For a class or larger scope, pass it around or make it a member.
+std::vector<int> memo; // 0: unknown, 1: can win, -1: cannot win (lose)
+
+// Function to determine if the current player can win starting with 'n' stones
+bool canWin(int n) {
+    // Base case: If there are no stones left, the current player has no moves
+    // and thus loses. (The previous player took the last stone)
+    if (n <= 0) {
+        return false;
+    }
+
+    // Check if we've already computed this state
+    if (memo[n] != 0) {
+        return memo[n] == 1; // Convert 1 to true, -1 to false
+    }
+
+    // Try all possible moves (taking 1, 2, or 3 stones)
+    // If ANY of these moves leads to a state where the *opponent CANNOT WIN* (i.e., opponent loses),
+    // then the current player CAN WIN from the current state 'n'.
+
+    // Try taking 1 stone
+    if (!canWin(n - 1)) { // If taking 1 stone makes the opponent lose
+        memo[n] = 1;      // Current player wins
+        return true;
+    }
+
+    // Try taking 2 stones (only if enough stones are available)
+    if (n >= 2 && !canWin(n - 2)) { // If taking 2 stones makes the opponent lose
+        memo[n] = 1;                // Current player wins
+        return true;
+    }
+
+    // Try taking 3 stones (only if enough stones are available)
+    if (n >= 3 && !canWin(n - 3)) { // If taking 3 stones makes the opponent lose
+        memo[n] = 1;                // Current player wins
+        return true;
+    }
+
+    // If none of the above moves lead to a state where the opponent loses,
+    // then no matter what the current player does, the opponent will win.
+    // Thus, the current player loses from state 'n'.
+    memo[n] = -1; // Current player loses
+    return false;
+}
+
+// Wrapper function for the first player
+bool canFirstPlayerWinStoneGame(int N) {
+    // Initialize memoization table for N+1 states (from 0 to N)
+    memo.assign(N + 1, 0); // All states initially unknown (0)
+    return canWin(N);
+}
+
+int main() {
+    std::cout << "Stone Game - Can First Player Win?\n";
+
+    for (int i = 0; i <= 10; ++i) {
+        if (canFirstPlayerWinStoneGame(i)) {
+            std::cout << "N = " << i << ": First Player CAN WIN\n";
+        } else {
+            std::cout << "N = " << i << ": First Player WILL LOSE\n";
+        }
+    }
+
+    std::cout << "\nTesting a larger N:\n";
+    int largeN = 100; // Expected: First Player WILL LOSE (100 is a multiple of 4)
+    if (canFirstPlayerWinStoneGame(largeN)) {
+        std::cout << "N = " << largeN << ": First Player CAN WIN\n";
+    } else {
+        std::cout << "N = " << largeN << ": First Player WILL LOSE\n";
+    }
+
+    int largeN2 = 101; // Expected: First Player CAN WIN (101 % 4 != 0)
+    if (canFirstPlayerWinStoneGame(largeN2)) {
+        std::cout << "N = " << largeN2 << ": First Player CAN WIN\n";
+    } else {
+        std::cout << "N = " << largeN2 << ": First Player WILL LOSE\n";
+    }
+
+    return 0;
+}
+```
+
+---
+
+This example shows a very basic "impartial game" (where available moves depend only on the state, not on which player is moving). Many game theory problems in DSA follow this recursive, minimax-like pattern with memoization! Keep practicing, and you'll become a strategic master! 💪
+
+---
