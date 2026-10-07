@@ -89967,3 +89967,145 @@ The 1-th bit of 13 IS NOT set.
 Bit manipulation might seem a bit tricky at first, but with a little practice (pun intended!), you'll unlock some powerful, efficient ways to solve problems. Keep exploring those bits! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Math for DSA (GCD, Primes)  
+🕒 2026-10-07 12:46:21
+
+Hey there, future DSA wizard! 🚀
+
+Let's demystify some essential math concepts that pop up *all the time* in Data Structures and Algorithms. We'll keep it clean and simple!
+
+---
+
+## 1. Greatest Common Divisor (GCD)
+
+### What it means
+The **Greatest Common Divisor (GCD)** of two or more integers (not all zero) is the largest positive integer that divides each of the integers without leaving a remainder. Think of it as the biggest common factor they share!
+
+*Example:* GCD of 12 and 18 is 6. (Factors of 12: 1, 2, 3, 4, **6**, 12. Factors of 18: 1, 2, 3, **6**, 9, 18).
+
+### Why it matters
+GCD is super useful!
+*   **Simplifying Fractions:** The most basic use.
+*   **Number Theory Problems:** Many problems related to modular arithmetic, finding Least Common Multiple (LCM), or properties of integers involve GCD.
+*   **Euclidean Algorithm:** The standard way to find GCD is incredibly efficient and a classic algorithm every programmer should know.
+
+### Example Problem
+What is the GCD of 48 and 18?
+
+*   Factors of 48: 1, 2, 3, 4, **6**, 8, 12, 16, 24, 48
+*   Factors of 18: 1, 2, 3, **6**, 9, 18
+*   The greatest common factor is **6**.
+
+### Simple C++ Implementation (Euclidean Algorithm)
+
+```cpp
+#include <iostream> // For input/output
+#include <numeric>  // In C++17+, this header provides std::gcd
+
+// Function to calculate GCD using the Euclidean algorithm
+// This is the classic recursive implementation
+int calculateGCD(int a, int b) {
+    // Base case: if b is 0, then a is the GCD
+    if (b == 0) {
+        return a;
+    }
+    // Recursive step: GCD(a, b) is the same as GCD(b, a % b)
+    return calculateGCD(b, a % b);
+}
+
+int main() {
+    int num1 = 48;
+    int num2 = 18;
+
+    std::cout << "--- GCD Example ---" << std::endl;
+    std::cout << "GCD of " << num1 << " and " << num2 << " is: "
+              << calculateGCD(num1, num2) << std::endl; // Should be 6
+
+    // C++17 provides std::gcd! (Just for your info, you can use it directly)
+    // std::cout << "Using std::gcd: " << std::gcd(num1, num2) << std::endl;
+
+    return 0;
+}
+```
+
+---
+
+## 2. Prime Numbers
+
+### What it means
+A **prime number** is a natural number greater than 1 that has no positive divisors other than 1 and itself.
+
+*Example:* 2, 3, 5, 7, 11, 13, 17...
+*Non-example:* 4 is not prime (divisible by 2), 6 is not prime (divisible by 2, 3).
+
+### Why it matters
+Primes are like the "building blocks" of integers!
+*   **Fundamental Theorem of Arithmetic:** Every integer greater than 1 is either a prime number itself or can be represented as a unique product of prime numbers (prime factorization). This is huge!
+*   **Cryptography:** Modern encryption (like RSA) heavily relies on the difficulty of factoring large numbers into their prime components.
+*   **Hashing & Data Structures:** Sometimes used in designing hash functions or other algorithms.
+*   **Competitive Programming:** Many problems involve primality testing or finding prime factors.
+
+### Example Problem
+Is 17 a prime number?
+
+To check, we try dividing 17 by numbers from 2 up to its square root (which is roughly 4.12).
+*   17 % 2 != 0
+*   17 % 3 != 0
+*   17 % 4 != 0 (no need to check beyond `sqrt(17)`)
+
+Since no number between 2 and `sqrt(17)` divides 17 evenly, yes, **17 is a prime number!**
+
+### Simple C++ Implementation (Primality Test)
+
+```cpp
+#include <iostream> // For input/output
+#include <cmath>    // For sqrt()
+
+// Function to check if a number is prime
+bool isPrime(int n) {
+    // 0 and 1 are not prime numbers
+    if (n <= 1) {
+        return false;
+    }
+    // 2 is the only even prime number
+    if (n == 2) {
+        return true;
+    }
+    // All other even numbers are not prime
+    if (n % 2 == 0) {
+        return false;
+    }
+    // Check for divisibility from 3 up to sqrt(n)
+    // We only need to check odd numbers because we already handled even numbers
+    for (int i = 3; i * i <= n; i += 2) {
+        if (n % i == 0) {
+            return false; // Found a divisor, so not prime
+        }
+    }
+    return true; // No divisors found, it's prime
+}
+
+int main() {
+    int numA = 17;
+    int numB = 12;
+    int numC = 2;
+    int numD = 1;
+
+    std::cout << "\n--- Prime Numbers Example ---" << std::endl;
+    std::cout << numA << " is prime? " << (isPrime(numA) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << numB << " is prime? " << (isPrime(numB) ? "Yes" : "No") << std::endl; // No
+    std::cout << numC << " is prime? " << (isPrime(numC) ? "Yes" : "No") << std::endl; // Yes
+    std::cout << numD << " is prime? " << (isPrime(numD) ? "Yes" : "No") << std::endl; // No
+
+    return 0;
+}
+```
+
+---
+
+That's a quick intro to GCD and Primes! These concepts are fundamental. Keep practicing and you'll master them in no time. Happy coding! ✨
+
+---
