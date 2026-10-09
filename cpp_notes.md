@@ -90460,3 +90460,114 @@ int main() {
 Arrays are your first step into understanding how data is structured and efficiently accessed. Master them, and you'll have a solid foundation for many more exciting DSA topics! Happy coding!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Time and Space Complexity  
+🕒 2026-10-09 12:41:30
+
+Hey there, aspiring coder! 👋 Let's break down Time and Space Complexity – it's super important for writing efficient code!
+
+---
+
+## ⏱️ 공간 및 시간 복잡도 (Time & Space Complexity)
+
+Imagine your code is a chef.
+*   **Time Complexity** is how long it takes the chef to cook a meal based on how many guests you have.
+*   **Space Complexity** is how much kitchen counter space (memory) the chef needs for those guests.
+
+We use **Big O Notation** (like `O(N)`, `O(log N)`, `O(1)`) to describe these trends. It tells us how the performance *scales* as the input grows.
+
+### 🤔 왜 중요한가요? (Why it Matters)
+
+It's not just about getting the *right* answer, but getting it *efficiently*!
+*   **Performance:** A slow algorithm might take seconds for small inputs, but hours or days for large ones. No one likes waiting!
+*   **Scalability:** Good complexity allows your solution to handle massive amounts of data without crashing or becoming unusable.
+*   **Resource Usage:** Efficient algorithms use less CPU and memory, saving costs and making users happy.
+*   **Job Interviews:** This is a fundamental concept in DSA and a common interview topic!
+
+### ⏰ 시간 복잡도 (Time Complexity)
+
+How the *runtime* of your algorithm scales with the size of its input (`N`).
+
+*   **`O(1)` - Constant:** The time taken is always the same, regardless of input size. (e.g., accessing an array element by index).
+*   **`O(log N)` - Logarithmic:** The time taken decreases with each step. Often seen in algorithms that divide the problem space in half (e.g., binary search).
+*   **`O(N)` - Linear:** The time taken grows directly proportional to the input size. (e.g., iterating through an array once).
+*   **`O(N log N)` - Linearithmic:** Common in efficient sorting algorithms (e.g., Merge Sort, Quick Sort).
+*   **`O(N^2)` - Quadratic:** The time taken grows as the square of the input size. Often involves nested loops. (e.g., simple bubble sort).
+*   **`O(2^N)` - Exponential:** Very slow, usually for brute-force solutions to complex problems.
+
+### 🏠 공간 복잡도 (Space Complexity)
+
+How much *extra memory* your algorithm needs (beyond the input itself) as the input size (`N`) grows.
+
+*   This also uses Big O notation: `O(1)`, `O(N)`, `O(N^2)`, etc.
+*   It accounts for things like new arrays, variables, or data structures created *within* your algorithm.
+
+---
+
+### 💡 예시 문제: 배열의 합 (Example Problem: Sum of Array)
+
+**문제:** 주어진 정수 배열의 모든 요소의 합을 계산하는 함수를 작성하세요.
+
+**Input:** `std::vector<int> nums = {1, 2, 3, 4, 5};`
+**Output:** `15`
+
+### 💻 C++ 구현 & 분석 (C++ Implementation & Analysis)
+
+```cpp
+#include <iostream> // For input/output
+#include <vector>   // For std::vector
+
+long long sumArrayElements(const std::vector<int>& arr) {
+    // Space Complexity:
+    // 'total' variable takes constant extra space.
+    // Regardless of 'arr' size, 'total' is just one variable.
+    // So, Space Complexity is O(1).
+    long long total = 0; 
+
+    // Time Complexity:
+    // The loop runs 'N' times, where 'N' is the number of elements in 'arr'.
+    // Inside the loop, 'total += num;' is a constant time operation (O(1)).
+    // Therefore, the total time complexity is proportional to 'N'.
+    // So, Time Complexity is O(N).
+    for (int num : arr) {
+        total += num;
+    }
+
+    return total;
+}
+
+int main() {
+    std::vector<int> myNumbers = {10, 20, 30, 40, 50};
+    long long result = sumArrayElements(myNumbers);
+    std::cout << "The sum of elements is: " << result << std::endl; // Output: 150
+
+    std::vector<int> emptyNumbers = {};
+    long long emptyResult = sumArrayElements(emptyNumbers);
+    std::cout << "The sum of empty array elements is: " << emptyResult << std::endl; // Output: 0
+
+    std::vector<int> largeNumbers(1000000); // A million elements
+    // For simplicity, let's fill it with 1s
+    for(int i=0; i < largeNumbers.size(); ++i) {
+        largeNumbers[i] = 1;
+    }
+    long long largeResult = sumArrayElements(largeNumbers);
+    std::cout << "The sum of a million '1's is: " << largeResult << std::endl; // Output: 1000000
+    // Notice for 1 million elements, it's still very fast because it's O(N).
+
+    return 0;
+}
+```
+
+---
+
+### 🚀 요약 (Quick Summary)
+
+*   **Time Complexity:** How fast your code runs with increasing input.
+*   **Space Complexity:** How much extra memory your code uses with increasing input.
+*   **Big O:** The language we use to describe these scaling behaviors.
+
+Mastering this helps you write awesome, efficient code that performs well no matter the size of the challenge! Keep coding! ✨
+
+---
