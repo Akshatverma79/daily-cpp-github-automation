@@ -90675,3 +90675,97 @@ After swap: num1 = 10, num2 = 5
 Pointers give you direct control over memory, enabling powerful and efficient programming. Mastering them is a crucial step towards understanding advanced data structures and algorithms in C++. Just remember: `&` for address, `*` for value!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Basics  
+🕒 2026-10-10 12:00:54
+
+Hey there, future coding wizard! 👋 Let's dive into **Recursion Basics** – it's a super cool and fundamental concept in DSA.
+
+---
+
+### 🧠 Recursion Basics
+
+#### 1. What the Concept Means
+
+Recursion is simply when a function calls **itself** to solve a problem. Think of it like a set of Russian nesting dolls: each doll contains a smaller, identical version of itself, until you get to the tiny one that can't be broken down further.
+
+In programming, this means breaking down a big problem into smaller, identical versions of itself until you reach a very simple case that you can solve directly.
+
+**Two essential parts of any recursive function:**
+
+1.  **Base Case:** The condition that tells the function *when to stop* calling itself. This is crucial! Without it, your function would call itself forever (and crash!).
+2.  **Recursive Step:** The part where the function calls itself with a *modified* (usually smaller or simpler) input, moving closer to the base case.
+
+#### 2. Why It Matters
+
+Recursion is powerful and elegant for certain problems:
+
+*   **Elegance & Readability:** For problems that naturally define themselves in terms of smaller versions of themselves (like factorials, Fibonacci, tree traversals), recursive solutions can be much cleaner and easier to understand than iterative ones.
+*   **Problem-Solving Tool:** It's fundamental for algorithms like:
+    *   Traversing tree and graph data structures.
+    *   Divide and Conquer algorithms (e.g., Merge Sort, Quick Sort).
+    *   Backtracking algorithms.
+
+#### 3. Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a non-negative integer `n`.
+The factorial of `n` (written as `n!`) is the product of all positive integers less than or equal to `n`.
+
+*   `5! = 5 * 4 * 3 * 2 * 1 = 120`
+*   `0! = 1` (by definition)
+
+Notice the pattern: `n! = n * (n-1)!` This is a perfect candidate for recursion!
+
+**Breaking it down:**
+*   **Base Case:** When `n` is `0` or `1`, the factorial is `1`. This is our stopping condition.
+*   **Recursive Step:** For any `n > 1`, `n!` is `n` multiplied by `(n-1)!`. We call the `factorial` function again with `n-1`.
+
+#### 4. Simple C++ Implementation
+
+```cpp
+#include <iostream> // For input/output operations
+
+// Function to calculate factorial using recursion
+int factorial(int n) {
+    // 1. Base Case: When to stop
+    if (n == 0 || n == 1) {
+        return 1; // Factorial of 0 and 1 is 1
+    }
+    // Handle negative numbers (optional, for robustness)
+    else if (n < 0) {
+        std::cout << "Factorial is not defined for negative numbers." << std::endl;
+        return -1; // Or throw an exception
+    }
+    // 2. Recursive Step: Break down the problem
+    else {
+        // n! = n * (n-1)!
+        return n * factorial(n - 1); // Calls itself with a smaller n
+    }
+}
+
+int main() {
+    int num1 = 5;
+    std::cout << "Factorial of " << num1 << " is: " << factorial(num1) << std::endl; // Output: 120
+
+    int num2 = 0;
+    std::cout << "Factorial of " << num2 << " is: " << factorial(num2) << std::endl; // Output: 1
+
+    int num3 = 1;
+    std::cout << "Factorial of " << num3 << " is: " << factorial(num3) << std::endl; // Output: 1
+
+    int num4 = -3;
+    std::cout << "Factorial of " << num4 << " is: " << factorial(num4) << std::endl; // Output: (Error message) -1
+
+    return 0;
+}
+```
+
+---
+
+**Quick Tip:** Every time a recursive function calls itself, a new "frame" is added to the **call stack**. Once a base case is hit, the results start unwinding back up the stack, until the initial call gets its final answer. If you don't have a base case, the stack will keep growing until it overflows – that's a "Stack Overflow Error"!
+
+Keep practicing, and recursion will feel like second nature! Happy coding! ✨
+
+---
