@@ -90769,3 +90769,102 @@ int main() {
 Keep practicing, and recursion will feel like second nature! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Recursion Problems  
+🕒 2026-10-10 18:04:05
+
+Hey there, future coding wizard! 👋 Let's dive into one of DSA's coolest concepts: **Recursion**.
+
+---
+
+### Quick DSA Note: Recursion
+
+**What it means:**
+Imagine you have a big task, and instead of doing it all yourself, you tell a mini-version of yourself to do a slightly smaller, identical task, and then combine their result with your part. You keep doing this until the task is so small and simple that it can be solved directly.
+
+In programming terms: **Recursion is when a function calls itself, directly or indirectly, to solve a problem.** It's like breaking a problem down into smaller, identical sub-problems until you reach a "base case" that can be solved without further recursion.
+
+**Why it matters:**
+1.  **Elegance & Readability:** For certain problems (like tree traversals, graph algorithms, or mathematical sequences), recursive solutions can be much cleaner and easier to read than iterative ones.
+2.  **Problem-Solving Paradigm:** It's a powerful way to think about complex problems, breaking them into smaller, manageable chunks.
+3.  **Foundation:** Many advanced algorithms and data structures (like Divide & Conquer, Backtracking, Dynamic Programming) heavily rely on recursion.
+4.  **Interview Essential:** Recursion is a common topic in technical interviews.
+
+---
+
+### Example Problem: Factorial Calculation
+
+Let's calculate the factorial of a number `n` (denoted as `n!`).
+`n! = n * (n-1) * (n-2) * ... * 1`
+
+**How does recursion fit?**
+Notice that `n! = n * (n-1)!`
+This is the key! To find `n!`, we need `(n-1)!`. To find `(n-1)!`, we need `(n-2)!`, and so on.
+
+**The Base Case:** What's the simplest factorial we know?
+`0! = 1`
+`1! = 1`
+This is our stopping condition – we don't need to break it down any further.
+
+---
+
+### C++ Implementation
+
+```cpp
+#include <iostream>
+
+// Function to calculate factorial recursively
+int factorial(int n) {
+    // 1. Base Case: The stopping condition
+    // If n is 0 or 1, the factorial is 1.
+    // This prevents infinite recursion.
+    if (n <= 1) {
+        return 1;
+    } 
+    // 2. Recursive Step: The function calls itself
+    // It breaks the problem into a smaller sub-problem: factorial(n-1)
+    // and then combines the result with 'n'.
+    else {
+        return n * factorial(n - 1);
+    }
+}
+
+int main() {
+    int num = 5;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Expected: 120
+
+    num = 0;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Expected: 1
+
+    num = 1;
+    std::cout << "Factorial of " << num << " is: " << factorial(num) << std::endl; // Expected: 1
+    
+    return 0;
+}
+
+/*
+Breakdown for factorial(5):
+factorial(5) -> 5 * factorial(4)
+               -> 5 * (4 * factorial(3))
+                      -> 5 * (4 * (3 * factorial(2)))
+                             -> 5 * (4 * (3 * (2 * factorial(1))))
+                                    -> 5 * (4 * (3 * (2 * 1)))  // Base case hit! factorial(1) returns 1
+                                    -> 5 * (4 * (3 * 2))
+                                    -> 5 * (4 * 6)
+                                    -> 5 * 24
+                                    -> 120
+*/
+```
+
+---
+
+### Quick Reminder:
+
+*   **Always have a Base Case!** Without it, your function will call itself infinitely, leading to a "Stack Overflow" error (your program runs out of memory for function calls).
+*   **The Recursive Step must make progress towards the Base Case.** Each recursive call should simplify the problem.
+
+Happy coding! Keep practicing, and recursion will start feeling intuitive. ✨
+
+---
