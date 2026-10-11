@@ -91020,3 +91020,198 @@ LinkedList memory freed.
 And there you have it! That's the core idea of a Linked List. It's a powerful and flexible data structure that you'll encounter a lot in your DSA journey. Keep practicing, and you'll master it in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Doubly Linked List  
+🕒 2026-10-11 18:29:15
+
+Hey there, future DSA master! Let's get cozy with Doubly Linked Lists.
+
+---
+
+### Doubly Linked List - Your Bidirectional Buddy!
+
+Ever felt restricted moving only *forward*? Say hello to Doubly Linked Lists (DLLs) – they let you go both ways!
+
+---
+
+#### 1. What the Concept Means
+
+Imagine a train where each car (a **Node**) not only knows which car is *next* in line but also which car was *previous*. That's exactly what a Doubly Linked List is!
+
+In a standard Singly Linked List, each node only points to the next one. But with a DLL, each node gets an extra pointer:
+
+*   **`data`**: The actual value stored in the node.
+*   **`next`**: A pointer to the *next* node in the sequence.
+*   **`prev`**: A pointer to the *previous* node in the sequence.
+
+**Visual:**
+`NULL <- [Prev | Data | Next] <-> [Prev | Data | Next] <-> [Prev | Data | Next] -> NULL`
+
+---
+
+#### 2. Why It Matters (Why It's Useful!)
+
+DLLs are super handy for a few key reasons:
+
+*   **Bidirectional Traversal:** This is the big one! You can easily move forward or backward through the list. No more always starting from the head to find what's behind you.
+*   **Efficient Deletion:** Deleting a specific node is much simpler. Because you have `prev` and `next` pointers within the node itself, you don't need to "look back" from the head to find the node *before* the one you want to delete. You can directly update its neighbors.
+*   **Flexibility:** Many real-world applications benefit from this two-way navigation.
+
+**Common Use Cases:**
+*   **Browser History:** Moving "back" and "forward" between pages.
+*   **Music Playlists:** "Next song" and "Previous song."
+*   **Undo/Redo Functionality:** In text editors or graphic design software.
+
+---
+
+#### 3. A Small Example Problem
+
+**Problem Scenario:**
+You're building a simple "undo/redo" feature for a basic drawing application. When the user draws something, it's a new "state."
+
+*   **Undo:** Moves you to the *previous* state of the drawing.
+*   **Redo:** Moves you to the *next* state (if you've undone something).
+
+**How DLL Helps:**
+Each "state" of your drawing can be a node in a Doubly Linked List. If your current state is `current_node`:
+*   To **undo**, you simply move to `current_node->prev`.
+*   To **redo**, you move to `current_node->next`.
+
+This perfectly leverages the `prev` and `next` pointers to navigate through your history of changes!
+
+---
+
+#### 4. Simple C++ Implementation
+
+Let's build a basic Doubly Linked List with methods to insert nodes at the head and tail, and print the list both forwards and backwards.
+
+```cpp
+#include <iostream>
+
+// 1. Define the Node structure
+struct Node {
+    int data;
+    Node* next; // Pointer to the next node
+    Node* prev; // Pointer to the previous node
+
+    // Constructor to easily create a new node
+    Node(int val) : data(val), next(nullptr), prev(nullptr) {}
+};
+
+// 2. Define the Doubly Linked List class
+class DoublyLinkedList {
+public:
+    Node* head; // Pointer to the first node
+    Node* tail; // Pointer to the last node (handy for O(1) tail operations!)
+
+    // Constructor for the list
+    DoublyLinkedList() : head(nullptr), tail(nullptr) {}
+
+    // --- Basic Operations ---
+
+    // Insert a node at the beginning of the list
+    void insertAtHead(int val) {
+        Node* newNode = new Node(val);
+        if (!head) { // If the list is empty
+            head = newNode;
+            tail = newNode;
+        } else {
+            newNode->next = head; // New node points to the current head
+            head->prev = newNode; // Current head points back to the new node
+            head = newNode;       // Update head to be the new node
+        }
+        std::cout << "Inserted " << val << " at head." << std::endl;
+    }
+
+    // Insert a node at the end of the list
+    void insertAtTail(int val) {
+        Node* newNode = new Node(val);
+        if (!tail) { // If the list is empty
+            head = newNode;
+            tail = newNode;
+        } else {
+            newNode->prev = tail; // New node points back to the current tail
+            tail->next = newNode; // Current tail points to the new node
+            tail = newNode;       // Update tail to be the new node
+        }
+        std::cout << "Inserted " << val << " at tail." << std::endl;
+    }
+
+    // Print the list from head to tail
+    void printForward() {
+        Node* current = head;
+        std::cout << "List (Forward): NULL <-> ";
+        while (current) {
+            std::cout << current->data << " <-> ";
+            current = current->next;
+        }
+        std::cout << "NULL" << std::endl;
+    }
+
+    // Print the list from tail to head
+    void printBackward() {
+        Node* current = tail;
+        std::cout << "List (Backward): NULL <-> ";
+        while (current) {
+            std::cout << current->data << " <-> ";
+            current = current->prev;
+        }
+        std::cout << "NULL" << std::endl;
+    }
+
+    // --- Destructor for memory cleanup (IMPORTANT!) ---
+    // This ensures no memory leaks when the list object is destroyed
+    ~DoublyLinkedList() {
+        Node* current = head;
+        while (current) {
+            Node* nextNode = current->next;
+            delete current; // Free the memory for the current node
+            current = nextNode; // Move to the next node
+        }
+        head = nullptr; // Ensure head and tail are null after cleanup
+        tail = nullptr;
+        std::cout << "Doubly Linked List destroyed and memory freed." << std::endl;
+    }
+};
+
+// --- Main function to test our DLL ---
+int main() {
+    DoublyLinkedList dll;
+
+    dll.insertAtHead(10); // List: NULL <-> 10 <-> NULL
+    dll.insertAtTail(20); // List: NULL <-> 10 <-> 20 <-> NULL
+    dll.insertAtHead(5);  // List: NULL <-> 5 <-> 10 <-> 20 <-> NULL
+    dll.insertAtTail(30); // List: NULL <-> 5 <-> 10 <-> 20 <-> 30 <-> NULL
+
+    std::cout << "\n--- Printing ---" << std::endl;
+    dll.printForward();
+    dll.printBackward();
+    std::cout << "-----------------" << std::endl;
+
+    // The destructor will automatically be called when 'dll' goes out of scope here.
+
+    return 0;
+}
+```
+
+**Output of the C++ code:**
+```
+Inserted 10 at head.
+Inserted 20 at tail.
+Inserted 5 at head.
+Inserted 30 at tail.
+
+--- Printing ---
+List (Forward): NULL <-> 5 <-> 10 <-> 20 <-> 30 <-> NULL
+List (Backward): NULL <-> 30 <-> 20 <-> 10 <-> 5 <-> NULL
+-----------------
+Doubly Linked List destroyed and memory freed.
+```
+
+---
+
+You've just conquered Doubly Linked Lists! They're super powerful for tasks needing two-way street access. Keep coding, you're doing great!
+
+---
