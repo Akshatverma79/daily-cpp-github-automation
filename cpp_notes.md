@@ -90868,3 +90868,155 @@ factorial(5) -> 5 * factorial(4)
 Happy coding! Keep practicing, and recursion will start feeling intuitive. ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Linked List Basics  
+🕒 2026-10-11 12:13:10
+
+Hey there, aspiring coder! Let's dive into the fascinating world of Linked Lists. They're a fundamental concept in DSA, offering a cool alternative to arrays.
+
+---
+
+### ⛓️ Linked List Basics
+
+**What is a Linked List?**
+
+Imagine a treasure hunt where each clue (a **Node**) tells you where to find the *next* clue. That's pretty much a Linked List!
+
+*   Instead of storing data in a single, contiguous block of memory (like an array), a Linked List stores data in separate "nodes."
+*   Each **Node** contains two things:
+    1.  The actual **data** (e.g., a number, a character).
+    2.  A **pointer** (or "link") to the *next* node in the sequence.
+*   The very first node is called the **Head**. If the list is empty, the Head is `nullptr`.
+*   The very last node's pointer points to `nullptr`, indicating the end of the list.
+
+Think of it like a chain: each link (node) holds some info and is connected to the next link.
+
+**Why Does It Matter?**
+
+Linked Lists shine in scenarios where arrays might be a bit clunky:
+
+1.  **Dynamic Size:** Unlike arrays, you don't need to specify the size of a Linked List beforehand. It can grow or shrink as needed, using memory only for the nodes it currently has. Super flexible!
+2.  **Easy Insertions & Deletions:** Adding or removing elements in the middle of a Linked List is super efficient (O(1) if you know the preceding node). You just need to change a few pointers, no shifting of elements like you'd have to do with arrays.
+3.  **Memory Management:** Nodes can be scattered anywhere in memory, making efficient use of available space.
+
+**A Small Example Problem:**
+
+Let's say we want to:
+1.  Create a Linked List.
+2.  Add new numbers to the **front** of the list.
+3.  Print all the numbers in the list.
+
+**Example Flow:**
+*   Start: Empty List (`head` is `nullptr`)
+*   Add 10: List is `10 -> nullptr` (`head` points to 10)
+*   Add 20: List is `20 -> 10 -> nullptr` (`head` points to 20)
+*   Add 5: List is `5 -> 20 -> 10 -> nullptr` (`head` points to 5)
+*   Print: `5 -> 20 -> 10 -> nullptr`
+
+---
+
+**Simple C++ Implementation:**
+
+```cpp
+#include <iostream>
+
+// 1. Define what a Node looks like
+struct Node {
+    int data;     // The actual value this node holds
+    Node* next;   // Pointer to the next Node in the list
+
+    // Constructor to easily create a new Node
+    Node(int val) : data(val), next(nullptr) {}
+};
+
+// 2. Define our Linked List class
+class LinkedList {
+private:
+    Node* head; // The 'head' pointer, points to the first node
+
+public:
+    // Constructor for the LinkedList
+    LinkedList() : head(nullptr) {} // An empty list starts with head pointing to nothing
+
+    // --- Method 1: Add a new node to the front (beginning) of the list ---
+    void addFront(int newData) {
+        // Step 1: Create a brand new node with the given data
+        Node* newNode = new Node(newData);
+
+        // Step 2: Make the new node point to the current head
+        // (The new node now becomes the new beginning)
+        newNode->next = head;
+
+        // Step 3: Update the head to point to our new node
+        // (Our list now officially starts with newNode)
+        head = newNode;
+
+        std::cout << "Added " << newData << " to the front.\n";
+    }
+
+    // --- Method 2: Print all elements in the list ---
+    void printList() {
+        // Start from the head of the list
+        Node* current = head;
+
+        std::cout << "List: ";
+        // Traverse the list until we hit a nullptr (the end)
+        while (current != nullptr) {
+            std::cout << current->data << " -> ";
+            // Move to the next node
+            current = current->next;
+        }
+        std::cout << "nullptr\n"; // Indicate the end of the list
+    }
+
+    // --- Important: Destructor to free memory ---
+    // Good practice to avoid memory leaks when the LinkedList object is destroyed
+    ~LinkedList() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next; // Store next node before deleting current
+            delete current;                 // Free memory of the current node
+            current = nextNode;             // Move to the next node
+        }
+        head = nullptr; // Ensure head is null after cleanup
+        std::cout << "LinkedList memory freed.\n";
+    }
+};
+
+int main() {
+    LinkedList myList; // Create an empty linked list
+
+    myList.printList(); // Should print: List: nullptr
+
+    myList.addFront(10);
+    myList.addFront(20);
+    myList.addFront(5);
+    myList.addFront(99);
+
+    myList.printList(); // Expected: List: 99 -> 5 -> 20 -> 10 -> nullptr
+
+    return 0;
+}
+```
+
+---
+
+**Output of the C++ Code:**
+
+```
+List: nullptr
+Added 10 to the front.
+Added 20 to the front.
+Added 5 to the front.
+Added 99 to the front.
+List: 99 -> 5 -> 20 -> 10 -> nullptr
+LinkedList memory freed.
+```
+
+---
+
+And there you have it! That's the core idea of a Linked List. It's a powerful and flexible data structure that you'll encounter a lot in your DSA journey. Keep practicing, and you'll master it in no time!
+
+---
