@@ -91420,3 +91420,165 @@ int main() {
 And there you have it! Stacks are fundamental, versatile, and not nearly as intimidating as they might seem. Keep practicing with them, and you'll find them invaluable in your coding journey! Happy stacking! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Queues Implementation  
+🕒 2026-10-12 21:53:00
+
+Alright, let's dive into Queues!
+
+---
+
+## DSA Learning Note: Queues Implementation (C++)
+
+Hey there, future coding rockstar! Let's get cozy with Queues.
+
+### 1. What's a Queue? (The Concept)
+
+Imagine standing in line at a coffee shop. The person who arrived *first* gets served *first*, right? That's exactly how a Queue works!
+
+*   **Definition:** A Queue is a linear data structure that follows the **FIFO (First-In, First-Out)** principle.
+*   **How it works:**
+    *   New elements are added to the **rear** (or back) of the queue. This is called **Enqueue**.
+    *   Elements are removed from the **front** of the queue. This is called **Dequeue**.
+
+Think of it like a pipeline: stuff goes in one end, and comes out the other in the same order it went in.
+
+### 2. Why Does It Matter? (Importance)
+
+Queues are super useful in many real-world and coding scenarios because they ensure fairness and order:
+
+*   **Task Scheduling:** Operating systems use queues to manage processes waiting for the CPU.
+*   **Print Spoolers:** Documents waiting to be printed are often in a queue.
+*   **Breadth-First Search (BFS):** A fundamental graph traversal algorithm relies heavily on queues.
+*   **Request Handling:** Servers often use queues to manage incoming client requests.
+*   **Buffering:** When streaming data, a queue can hold incoming data chunks until they're processed.
+
+### 3. Key Queue Operations
+
+Before we jump into code, here are the main things you can do with a queue:
+
+*   `push()` or `enqueue()`: Add an element to the back.
+*   `pop()` or `dequeue()`: Remove the element from the front.
+*   `front()` or `peek()`: Look at the element at the front without removing it.
+*   `empty()`: Check if the queue is empty.
+*   `size()`: Get the number of elements in the queue.
+
+### 4. Example Problem: Simple Print Queue
+
+Let's simulate a tiny print queue. We want to add some documents and then "print" them in the order they were added.
+
+**Scenario:**
+1.  Add "Report.pdf" to the print queue.
+2.  Add "Image.jpg" to the print queue.
+3.  Add "Letter.docx" to the print queue.
+4.  Print the next two documents.
+5.  What's currently waiting in the queue?
+
+**Expected Outcome:**
+*   "Report.pdf" prints.
+*   "Image.jpg" prints.
+*   "Letter.docx" remains in the queue.
+
+### 5. C++ Implementation using `std::queue`
+
+C++ provides a standard library container adapter `std::queue` that makes working with queues a breeze! It's built on top of other containers (like `std::deque` by default) for efficiency.
+
+```cpp
+#include <iostream> // For input/output operations
+#include <queue>    // For using the std::queue container
+#include <string>   // For using std::string to store document names
+
+int main() {
+    // 1. Create a queue to hold document names (strings)
+    std::queue<std::string> printQueue;
+
+    std::cout << "--- Initializing Print Queue ---\n";
+
+    // 2. Add documents to the print queue (Enqueue operation)
+    printQueue.push("Report.pdf");
+    std::cout << "Added: Report.pdf\n";
+    printQueue.push("Image.jpg");
+    std::cout << "Added: Image.jpg\n";
+    printQueue.push("Letter.docx");
+    std::cout << "Added: Letter.docx\n";
+
+    std::cout << "\nCurrent queue size: " << printQueue.size() << "\n";
+    if (!printQueue.empty()) {
+        std::cout << "Next document to print (front): " << printQueue.front() << "\n";
+    }
+
+    std::cout << "\n--- Processing Print Jobs ---\n";
+
+    // 3. Print the next two documents (Dequeue operation)
+    if (!printQueue.empty()) {
+        std::string doc1 = printQueue.front(); // Get the front element
+        printQueue.pop();                     // Remove the front element
+        std::cout << "Printing: " << doc1 << "\n";
+    } else {
+        std::cout << "Print queue is empty!\n";
+    }
+
+    if (!printQueue.empty()) {
+        std::string doc2 = printQueue.front();
+        printQueue.pop();
+        std::cout << "Printing: " << doc2 << "\n";
+    } else {
+        std::cout << "Print queue is empty!\n";
+    }
+
+    std::cout << "\n--- Print Queue Status ---\n";
+    // 4. What's left in the queue?
+    if (!printQueue.empty()) {
+        std::cout << "Documents remaining in queue: " << printQueue.size() << "\n";
+        std::cout << "Next up: " << printQueue.front() << "\n";
+    } else {
+        std::cout << "Print queue is now empty. All documents printed!\n";
+    }
+    
+    // Example of popping all remaining
+    if (!printQueue.empty()) {
+        std::cout << "\nPrinting final document:\n";
+        std::string finalDoc = printQueue.front();
+        printQueue.pop();
+        std::cout << "Printing: " << finalDoc << "\n";
+    }
+    
+    std::cout << "Final queue size: " << printQueue.size() << "\n";
+    std::cout << "Is queue empty? " << (printQueue.empty() ? "Yes" : "No") << "\n";
+
+
+    return 0;
+}
+```
+
+**Output of the code:**
+```
+--- Initializing Print Queue ---
+Added: Report.pdf
+Added: Image.jpg
+Added: Letter.docx
+
+Current queue size: 3
+Next document to print (front): Report.pdf
+
+--- Processing Print Jobs ---
+Printing: Report.pdf
+Printing: Image.jpg
+
+--- Print Queue Status ---
+Documents remaining in queue: 1
+Next up: Letter.docx
+
+Printing final document:
+Printing: Letter.docx
+Final queue size: 0
+Is queue empty? Yes
+```
+
+---
+
+And that's your quick and friendly guide to Queues! Keep practicing, and you'll master them in no time! Happy coding!
+
+---
