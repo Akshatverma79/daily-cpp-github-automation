@@ -92080,3 +92080,145 @@ int main() {
 That's the core of Binary Search Trees! They're simple in concept but incredibly powerful for keeping data organized and easily accessible. Keep practicing, and you'll master them in no time!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Graphs Basics  
+🕒 2026-10-14 18:11:13
+
+Hey there, future algorithm master! 👋 Let's dive into the fascinating world of **Graphs**!
+
+---
+
+## 🗺️ Graphs Basics: Connecting the Dots
+
+Think of a graph as a super flexible way to model relationships between things.
+
+### 💡 What is a Graph?
+
+At its core, a **Graph** is a collection of:
+1.  **Nodes (or Vertices):** These are the "items" or "points" in your graph.
+2.  **Edges:** These are the "connections" or "links" between the nodes.
+
+**Imagine:**
+*   **Nodes:** Cities
+*   **Edges:** Roads connecting those cities
+
+That's a graph! Simple, right?
+
+### 🤔 Why Do Graphs Matter?
+
+Graphs are incredibly powerful because they can represent almost *any* kind of relationship. They're everywhere!
+
+*   **Social Networks:** People are nodes, friendships are edges.
+*   **GPS/Navigation:** Locations are nodes, roads/paths are edges (with distances as weights!).
+*   **Computer Networks:** Computers are nodes, network cables/Wi-Fi links are edges.
+*   **Recommendation Systems:** Products/users are nodes, "bought together" or "liked by" are edges.
+*   **Task Scheduling:** Tasks are nodes, dependencies ("task A must finish before task B") are edges.
+
+Understanding graphs lets you solve complex problems involving connections and pathways!
+
+### ⚙️ How to Represent a Graph (in Code)?
+
+Before we solve problems, we need a way to store our graph in memory. Two common ways:
+
+1.  **Adjacency Matrix:** A 2D array `matrix[N][N]` where `matrix[i][j] = 1` (or `true`) if there's an edge between node `i` and node `j`, and `0` (or `false`) otherwise. Good for dense graphs (many edges), but can use a lot of memory for sparse graphs (few edges).
+2.  **Adjacency List:** An array (or vector) where each element `i` contains a list (or vector) of all nodes that node `i` is connected to. This is generally more memory-efficient for sparse graphs and very common!
+
+We'll focus on the **Adjacency List** for our example as it's often preferred.
+
+### 🌟 Example Problem: Building a Social Network
+
+Let's say you want to represent a tiny social network where you know who is friends with whom.
+
+**Problem:** Given `N` people (numbered 0 to N-1) and `M` friendships, build a graph representation of these friendships and then print out who each person is friends with. Friendships are mutual (if A is friends with B, B is friends with A).
+
+**Input:**
+```
+4 3  // N=4 people, M=3 friendships
+0 1  // Person 0 is friends with Person 1
+1 2  // Person 1 is friends with Person 2
+0 3  // Person 0 is friends with Person 3
+```
+
+**Expected Output:**
+```
+Person 0 is friends with: 1 3
+Person 1 is friends with: 0 2
+Person 2 is friends with: 1
+Person 3 is friends with: 0
+```
+
+### 🛠️ Simple C++ Implementation (Adjacency List)
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list> // We'll use std::vector for simplicity, but std::list is also common
+
+// Function to add an edge to the graph
+// u and v are the nodes connected by the edge
+// adj is the adjacency list
+void addEdge(std::vector<std::vector<int>>& adj, int u, int v) {
+    adj[u].push_back(v); // Add v to u's list
+    adj[v].push_back(u); // Add u to v's list (since friendships are mutual/undirected)
+}
+
+// Function to print the graph
+void printGraph(const std::vector<std::vector<int>>& adj) {
+    for (int i = 0; i < adj.size(); ++i) {
+        std::cout << "Person " << i << " is friends with: ";
+        for (int neighbor : adj[i]) {
+            std::cout << neighbor << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main() {
+    int numPeople; // N: Number of people (nodes)
+    int numFriendships; // M: Number of friendships (edges)
+
+    std::cout << "Enter the number of people (nodes): ";
+    std::cin >> numPeople;
+
+    std::cout << "Enter the number of friendships (edges): ";
+    std::cin >> numFriendships;
+
+    // Create an Adjacency List
+    // It's a vector of vectors. Each inner vector stores the neighbors of a person.
+    // We size it to numPeople, so people can be numbered 0 to numPeople-1
+    std::vector<std::vector<int>> adj(numPeople);
+
+    std::cout << "Enter the " << numFriendships << " friendships (e.g., '0 1' for person 0 and 1):" << std::endl;
+    for (int i = 0; i < numFriendships; ++i) {
+        int person1, person2;
+        std::cin >> person1 >> person2;
+        addEdge(adj, person1, person2);
+    }
+
+    std::cout << "\n--- Social Network Friendships ---" << std::endl;
+    printGraph(adj);
+
+    return 0;
+}
+```
+
+**How the code works:**
+1.  We use `std::vector<std::vector<int>> adj;` to create our adjacency list. `adj[i]` will be a vector holding all the people that `i` is friends with.
+2.  `addEdge(adj, u, v)`: For each friendship `(u, v)`, we add `v` to `u`'s list and `u` to `v`'s list because friendships are usually two-way (undirected graph).
+3.  `printGraph(adj)`: It simply iterates through each person (node) and prints their index, then iterates through their list of friends (neighbors) and prints them.
+
+---
+
+### What's Next?
+
+This is just the very first step! From here, you'd learn about:
+*   **Directed vs. Undirected Graphs:** One-way streets vs. two-way streets.
+*   **Weighted Graphs:** Edges having costs or values (e.g., distance between cities).
+*   **Graph Traversal Algorithms:** How to systematically visit every node (like Breadth-First Search (BFS) and Depth-First Search (DFS)).
+*   **Pathfinding Algorithms:** Finding the shortest path (Dijkstra's Algorithm).
+
+Keep exploring, graphs are a fundamental and super exciting part of DSA! Happy coding! 🚀
+
+---
