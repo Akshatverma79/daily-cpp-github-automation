@@ -92792,3 +92792,132 @@ Maximum value in knapsack: $7
 Hope this makes Knapsack problems a bit clearer and more approachable! Happy coding! ✨
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Greedy Algorithms  
+🕒 2026-10-16 17:42:30
+
+Let's dive into Greedy Algorithms! They're like making quick, smart decisions on the go.
+
+---
+
+## DSA Notes: Greedy Algorithms
+
+### What is a Greedy Algorithm?
+
+Imagine you're faced with a series of choices, and at each step, you pick the ***best immediate option*** without thinking too much about future consequences. That's essentially a Greedy Algorithm!
+
+It makes a **locally optimal choice** (the best choice right now) with the hope that these local choices will lead to a **globally optimal solution** (the best overall solution).
+
+### Why Do They Matter?
+
+*   **Simplicity:** Often easier to design and implement than more complex algorithms (like Dynamic Programming).
+*   **Efficiency:** When they work, they tend to be very efficient, often running in linear or `O(N log N)` time due to sorting.
+*   **Common Use Cases:** They apply to a surprising number of optimization problems, from scheduling tasks to finding shortest paths.
+
+**Important Note:** Greedy algorithms don't work for *all* problems. It's crucial to prove that a greedy approach is correct for a specific problem, otherwise, you might end up with a sub-optimal solution!
+
+### Example Problem: Activity Selection
+
+**Problem:** You have a list of activities, each with a start time and an end time. You want to attend as many activities as possible, but you can only attend one at a time. Find the maximum number of activities you can attend.
+
+**Example Input:**
+Activities: `[(1, 4), (3, 5), (0, 6), (5, 7), (3, 9), (5, 9), (6, 10), (8, 11), (8, 12), (2, 14), (12, 16)]`
+(Start time, End time)
+
+**Greedy Approach:**
+
+Which activity should we pick first?
+*   Earliest start time? (e.g., (0,6)) - Might block many future activities.
+*   Shortest duration? - Not always optimal.
+*   **Earliest finish time?** This seems promising! If we finish an activity as early as possible, we leave the maximum amount of time available for subsequent activities.
+
+**Steps:**
+1.  **Sort** all activities by their **finish times** in ascending order.
+2.  Select the **first activity** (which finishes earliest).
+3.  Then, for the remaining activities, pick the next activity whose **start time is greater than or equal to the finish time of the previously selected activity.**
+4.  Repeat step 3 until no more activities can be selected.
+
+**Applying to Example:**
+
+Sorted by finish time:
+`[(1, 4), (3, 5), (0, 6), (5, 7), (3, 9), (5, 9), (6, 10), (8, 11), (8, 12), (2, 14), (12, 16)]`
+
+1.  Pick **(1, 4)**. Current finish time = 4. Count = 1.
+2.  Next activity starting >= 4? **(5, 7)**. Pick it. Current finish time = 7. Count = 2.
+3.  Next activity starting >= 7? **(8, 11)**. Pick it. Current finish time = 11. Count = 3.
+4.  Next activity starting >= 11? **(12, 16)**. Pick it. Current finish time = 16. Count = 4.
+5.  No more activities can be picked.
+
+Maximum activities: **4**
+
+### Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::sort
+
+// Structure to represent an activity
+struct Activity {
+    int start;
+    int end;
+};
+
+// Custom comparison function for sorting activities by their finish times
+bool compareActivities(const Activity& a, const Activity& b) {
+    return a.end < b.end;
+}
+
+// Function to find the maximum number of activities that can be performed
+int maxActivities(std::vector<Activity>& activities) {
+    // If there are no activities, return 0
+    if (activities.empty()) {
+        return 0;
+    }
+
+    // Step 1: Sort activities by their finish times
+    std::sort(activities.begin(), activities.end(), compareActivities);
+
+    int count = 1; // We can always perform at least the first activity
+    int lastFinishTime = activities[0].end; // Finish time of the first selected activity
+
+    // Step 2: Iterate through the sorted activities and pick compatible ones
+    for (size_t i = 1; i < activities.size(); ++i) {
+        // If the current activity's start time is greater than or equal
+        // to the finish time of the previously selected activity,
+        // then it's compatible.
+        if (activities[i].start >= lastFinishTime) {
+            count++; // Increment the count of selected activities
+            lastFinishTime = activities[i].end; // Update the last finish time
+        }
+    }
+
+    return count;
+}
+
+int main() {
+    std::vector<Activity> activities = {
+        {1, 4}, {3, 5}, {0, 6}, {5, 7}, {3, 9}, {5, 9}, {6, 10},
+        {8, 11}, {8, 12}, {2, 14}, {12, 16}
+    };
+
+    int max_count = maxActivities(activities);
+    std::cout << "Maximum activities that can be performed: " << max_count << std::endl; // Expected: 4
+
+    std::vector<Activity> activities2 = {
+        {10, 20}, {12, 25}, {20, 30}
+    };
+    int max_count2 = maxActivities(activities2);
+    std::cout << "Maximum activities that can be performed: " << max_count2 << std::endl; // Expected: 2 (10,20), (20,30)
+
+    return 0;
+}
+```
+
+---
+
+**Key Takeaway:** Greedy algorithms are about making the best *local* choice, hoping it leads to the best *global* outcome. They are simple and efficient when they work, but remember to always verify their correctness for a given problem!
+
+---
