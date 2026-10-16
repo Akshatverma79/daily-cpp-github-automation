@@ -92660,3 +92660,135 @@ Dynamic Programming is not about finding new algorithms; it's about **optimizing
 Happy coding! 🚀
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Knapsack Problems  
+🕒 2026-10-16 10:50:28
+
+Hey there, future algorithm master! 👋 Let's dive into one of the coolest classic problems in DSA: **Knapsack Problems**.
+
+---
+
+### What is the Knapsack Problem?
+
+Imagine you have a backpack (your "knapsack") with a limited weight capacity. You're presented with a bunch of items, each having its own weight and a value. Your goal? **Fill your knapsack with items such that the total value is maximized, without exceeding the knapsack's weight capacity.**
+
+*   **0/1 Knapsack:** This is the most common version. You can either take an item completely (1) or leave it completely (0). You can't take fractions of an item. (This is what we'll focus on!)
+*   **Analogy:** You're packing for a trip. You have limited luggage space and want to bring the most important (valuable) things!
+
+---
+
+### Why Does It Matter?
+
+Knapsack problems are super important because:
+
+1.  **Real-world applications:** Resource allocation (e.g., allocating budget to projects), cargo loading, investment portfolio optimization, selecting which advertisements to show.
+2.  **Dynamic Programming Foundation:** It's a cornerstone problem for understanding **Dynamic Programming (DP)**. Solving Knapsack helps you grasp how to break down complex problems into smaller, overlapping subproblems and build up a solution.
+3.  **Optimization thinking:** It teaches you to think about trade-offs and making optimal choices under constraints.
+
+---
+
+### Example Problem (0/1 Knapsack)
+
+Let's say you have a knapsack with a **capacity of 5 kg**.
+You have 3 items:
+
+| Item | Weight (kg) | Value ($) |
+| :--- | :---------- | :-------- |
+| A    | 2           | 3         |
+| B    | 3           | 4         |
+| C    | 4           | 5         |
+
+**What's the maximum value you can carry?**
+
+Let's try some combinations:
+*   Only A: Weight 2, Value 3
+*   Only B: Weight 3, Value 4
+*   Only C: Weight 4, Value 5
+*   A + B: Weight 2+3=5, Value 3+4=7 (This fits perfectly!)
+*   A + C: Weight 2+4=6 (Too heavy!)
+*   B + C: Weight 3+4=7 (Too heavy!)
+
+The maximum value you can achieve is **7** by taking items A and B.
+
+---
+
+### Simple C++ Implementation (0/1 Knapsack using DP)
+
+We'll use a 1D DP array. `dp[w]` will store the maximum value you can get with a knapsack of capacity `w`.
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> // For std::max
+
+// Function to solve the 0/1 Knapsack problem
+int solveKnapsack(int capacity, const std::vector<int>& weights, const std::vector<int>& values, int n) {
+    // dp[w] will store the maximum value that can be obtained
+    // with a knapsack of exactly 'w' capacity.
+    std::vector<int> dp(capacity + 1, 0);
+
+    // Iterate through each item available
+    for (int i = 0; i < n; ++i) {
+        int current_weight = weights[i];
+        int current_value = values[i];
+
+        // Iterate through the knapsack capacity from right to left
+        // Why reverse? To ensure each item is considered only once (0/1 property).
+        // If we went left-to-right, dp[w - current_weight] might already contain
+        // the current item, effectively allowing us to take it multiple times.
+        for (int w = capacity; w >= current_weight; --w) {
+            // Option 1: Don't include the current item.
+            //           The value is simply whatever max value we had for capacity 'w' before considering this item.
+            // Option 2: Include the current item.
+            //           The value is (value of current item) + (max value for remaining capacity 'w - current_weight').
+            
+            dp[w] = std::max(dp[w], dp[w - current_weight] + current_value);
+        }
+    }
+
+    // The answer is the maximum value for the full knapsack capacity.
+    return dp[capacity];
+}
+
+int main() {
+    // Our example problem data
+    int knapsackCapacity = 5;
+    std::vector<int> itemWeights = {2, 3, 4}; // Item A, B, C weights
+    std::vector<int> itemValues = {3, 4, 5};  // Item A, B, C values
+    int numberOfItems = itemWeights.size();   // Should be 3
+
+    int maxAchievedValue = solveKnapsack(knapsackCapacity, itemWeights, itemValues, numberOfItems);
+
+    std::cout << "Knapsack Capacity: " << knapsackCapacity << " kg" << std::endl;
+    std::cout << "Items available:" << std::endl;
+    for (int i = 0; i < numberOfItems; ++i) {
+        std::cout << "  Item " << static_cast<char>('A' + i) 
+                  << ": Weight = " << itemWeights[i] 
+                  << " kg, Value = $" << itemValues[i] << std::endl;
+    }
+    std::cout << "------------------------------------------" << std::endl;
+    std::cout << "Maximum value in knapsack: $" << maxAchievedValue << std::endl; // Expected output: $7
+
+    return 0;
+}
+```
+
+**Output of the code:**
+
+```
+Knapsack Capacity: 5 kg
+Items available:
+  Item A: Weight = 2 kg, Value = $3
+  Item B: Weight = 3 kg, Value = $4
+  Item C: Weight = 4 kg, Value = $5
+------------------------------------------
+Maximum value in knapsack: $7
+```
+
+---
+
+Hope this makes Knapsack problems a bit clearer and more approachable! Happy coding! ✨
+
+---
