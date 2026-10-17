@@ -92921,3 +92921,133 @@ int main() {
 **Key Takeaway:** Greedy algorithms are about making the best *local* choice, hoping it leads to the best *global* outcome. They are simple and efficient when they work, but remember to always verify their correctness for a given problem!
 
 ---
+
+
+# 📘 DSA Learning Note  
+### 🧠 Topic: Sliding Window Techniques  
+🕒 2026-10-17 10:14:46
+
+Hey there, future DSA pro! 👋 Let's unlock a super cool and incredibly useful technique: **Sliding Window**.
+
+---
+
+## 🔍 Sliding Window Technique: Scan Subarrays Like a Pro!
+
+### 🎯 What it Means: The Concept
+
+Imagine you have a long array (or string) and you need to look at all its **contiguous subarrays** (or substrings) of a certain size, or maybe even those that meet a specific condition.
+
+Instead of re-calculating everything for each subarray, the Sliding Window technique lets you maintain a "window" of elements. This window then "slides" across the array, adding new elements from one end and removing old elements from the other.
+
+Think of it like a physical window on a train: as the train moves, the scenery changes, but you only see a fixed portion of it at a time, constantly updating what's in view without having to rebuild the entire window.
+
+### 💡 Why it Matters: The Magic of Efficiency
+
+This technique is a **game-changer for efficiency!**
+
+*   **Avoids Redundant Work:** Instead of nested loops (which often lead to `O(N^2)` or `O(N*K)` complexity), you typically process each element only a few times.
+*   **Time Complexity Boost:** It often reduces the time complexity for many problems from `O(N^2)` or `O(N*K)` down to a much faster `O(N)` (linear time), where `N` is the size of the array/string.
+*   **Common Optimization:** It's a go-to pattern for optimizing problems involving arrays, strings, and lists where you're looking for something within a *contiguous* segment.
+
+---
+
+### 🚀 Example Problem: Maximum Sum Subarray of Fixed Size K
+
+Let's start with a classic:
+Given an array of positive integers `arr` and an integer `k`, find the maximum sum of any contiguous subarray of size `k`.
+
+**Example:**
+`arr = [1, 2, 3, 4, 5]`
+`k = 3`
+
+**Expected Output:** `12` (from the subarray `[3, 4, 5]`)
+
+**How it works (step-by-step for the example):**
+
+1.  **Initial Window `[1, 2, 3]`**: Sum = `1 + 2 + 3 = 6`
+2.  **Slide Right:**
+    *   Remove `1` (the leftmost element)
+    *   Add `4` (the new rightmost element)
+    *   New Window `[2, 3, 4]`: Sum = `6 - 1 + 4 = 9`
+3.  **Slide Right:**
+    *   Remove `2`
+    *   Add `5`
+    *   New Window `[3, 4, 5]`: Sum = `9 - 2 + 5 = 12`
+
+Comparing the sums (`6`, `9`, `12`), the maximum is `12`.
+
+---
+
+### 💻 Simple C++ Implementation
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <numeric> // For std::accumulate (optional, but good for initial sum)
+#include <algorithm> // For std::max
+
+// Function to find the maximum sum of a subarray of fixed size k
+int maxSubarraySum(const std::vector<int>& arr, int k) {
+    // 0. Handle edge cases: If k is larger than array size or array is empty
+    if (k <= 0 || arr.empty() || k > arr.size()) {
+        std::cout << "Invalid input: k or array size." << std::endl;
+        return 0; // Or throw an exception, depending on requirements
+    }
+
+    int window_sum = 0; // This will hold the sum of the current window
+    int max_sum = 0;    // This will hold the maximum sum found so far
+
+    // 1. Calculate the sum of the first window (size k)
+    for (int i = 0; i < k; ++i) {
+        window_sum += arr[i];
+    }
+    max_sum = window_sum; // The first window's sum is our initial max
+
+    // 2. Slide the window across the rest of the array
+    // 'i' represents the right end of the current window
+    for (int i = k; i < arr.size(); ++i) {
+        // Add the new element entering the window (arr[i])
+        // Subtract the element leaving the window (arr[i-k])
+        window_sum += arr[i] - arr[i - k];
+
+        // Update max_sum if the current window_sum is greater
+        max_sum = std::max(max_sum, window_sum);
+    }
+
+    return max_sum;
+}
+
+int main() {
+    std::vector<int> my_array = {1, 2, 3, 4, 5};
+    int k_size = 3;
+
+    int result = maxSubarraySum(my_array, k_size);
+    std::cout << "Array: [1, 2, 3, 4, 5], k = 3" << std::endl;
+    std::cout << "Maximum sum of a subarray of size " << k_size << " is: " << result << std::endl; // Expected: 12
+
+    std::vector<int> another_array = {2, 1, 5, 1, 3, 2};
+    k_size = 3;
+    result = maxSubarraySum(another_array, k_size);
+    std::cout << "\nArray: [2, 1, 5, 1, 3, 2], k = 3" << std::endl;
+    std::cout << "Maximum sum of a subarray of size " << k_size << " is: " << result << std::endl; // Expected: 9 (from [5, 1, 3])
+
+    std::vector<int> small_array = {10, 20, 5};
+    k_size = 2;
+    result = maxSubarraySum(small_array, k_size);
+    std::cout << "\nArray: [10, 20, 5], k = 2" << std::endl;
+    std::cout << "Maximum sum of a subarray of size " << k_size << " is: " << result << std::endl; // Expected: 30 (from [10, 20])
+
+    return 0;
+}
+
+```
+
+---
+
+### 🎉 Key Takeaway
+
+Sliding Window is your friend for optimizing problems that ask you to find something (like max sum, min length, number of distinct elements, etc.) within a **contiguous** part of an array or string. It's all about efficiently updating your window as it slides, avoiding redundant calculations!
+
+You got this! Keep practicing! 💪
+
+---
